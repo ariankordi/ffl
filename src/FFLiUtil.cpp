@@ -7,7 +7,9 @@ u32 FFLiRoundUp(u32 value, u32 alignment)
 
 void* FFLiRoundUpPtr(void* ptr, u32 alignment)
 {
-    return (void*)FFLiRoundUp((u32)ptr, alignment);
+    uintptr_t uintptr = reinterpret_cast<uintptr_t>(ptr);
+    uintptr_t rounded = (uintptr + alignment - 1) & ~(alignment - 1);
+    return reinterpret_cast<void*>(rounded);
 }
 
 bool FFLiCheckAlign(u32 value, u32 alignment)
@@ -17,7 +19,8 @@ bool FFLiCheckAlign(u32 value, u32 alignment)
 
 bool FFLiCheckAlignPtr(const void* ptr, u32 alignment)
 {
-    return FFLiCheckAlign((u32)ptr, alignment);
+    uintptr_t uintptr = reinterpret_cast<uintptr_t>(ptr);
+    return (uintptr & (alignment - 1)) == 0;
 }
 
 void FFLiCopyWcharT2U16(u16* dst, u32 size, const wchar_t* src)

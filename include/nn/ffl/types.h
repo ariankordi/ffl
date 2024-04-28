@@ -12,6 +12,7 @@
 
 #include <misc/rio_Types.h>
 
+/*
 #ifdef __cplusplus
     #include <type_traits>
 
@@ -23,6 +24,33 @@
     #define NN_STATIC_ASSERT _Static_assert
     #define NN_STATIC_ASSERT_IS_POD(T)  ((void)0)
 #endif
+*/
+
+
+#ifdef __cplusplus
+    #include <type_traits>
+
+    #define NN_STATIC_ASSERT_IS_POD(T)  static_assert(std::is_trivial<T>::value)
+
+    #ifdef NDEBUG
+        #define NN_STATIC_ASSERT(condition) static_assert(true, "")
+    #else
+        #define NN_STATIC_ASSERT static_assert
+    #endif
+
+#else // __cplusplus
+    #include <assert.h>
+
+    #ifdef NDEBUG
+        #define NN_STATIC_ASSERT(condition) _Static_assert(true, "")
+    #else
+        #define NN_STATIC_ASSERT _Static_assert
+    #endif
+
+    #define NN_STATIC_ASSERT_IS_POD(T)  ((void)0)
+#endif
+
+
 
 #ifdef __cplusplus
 extern "C" {

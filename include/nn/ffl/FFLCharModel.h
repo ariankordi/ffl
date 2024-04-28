@@ -5,11 +5,13 @@
 #include <nn/ffl/FFLModelType.h>
 #include <nn/ffl/FFLResult.h>
 
+#include <nn/ffl/FFLiCharModel.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define FFL_CHAR_MODEL_SIZE (0x778)
+#define FFL_CHAR_MODEL_SIZE sizeof(FFLiCharModel)
 
 typedef struct FFLCharModel
 {

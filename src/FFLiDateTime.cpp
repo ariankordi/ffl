@@ -2,22 +2,27 @@
 
 #if RIO_IS_CAFE
 #include <coreinit/time.h>
-#else
-#if RIO_IS_WIN
+#elif RIO_IS_WIN && defined(_WIN32)
 #include <misc/win/rio_Windows.h>
-#endif // RIO_IS_WIN
+#elif RIO_IS_WIN
+#include <time.h>
+#include <cstdint>
+#endif // RIO_IS_WIN && defined(_WIN32)
 #include <ctime>
-#endif
 
 s64 FFLiGetTick()
 {
 #if RIO_IS_CAFE
     return OSGetTime();
-#elif RIO_IS_WIN
+#elif RIO_IS_WIN && defined(_WIN32)
     LARGE_INTEGER ticks;
     [[maybe_unused]] WINBOOL success = QueryPerformanceFrequency(&ticks);
     RIO_ASSERT(success);
     return ticks.QuadPart;
+#elif RIO_IS_WIN
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return static_cast<s64>(ts.tv_sec) * 1000000000 + ts.tv_nsec;
 #else
     return 0;
 #endif
