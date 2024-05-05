@@ -27,9 +27,11 @@ FFLResult FFLiDatabaseManager::AfterConstruct()
     if (result != FFL_RESULT_OK)
         return result;
 
+    #ifndef FFL_NO_OPEN_DATABASE
     result = m_DatabaseFileAccessor.BootLoad();
     if (result != FFL_RESULT_OK)
         return result;
+    #endif
 
     return FFL_RESULT_OK;
 }
