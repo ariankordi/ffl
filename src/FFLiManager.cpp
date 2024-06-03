@@ -153,6 +153,11 @@ FFLResult FFLiManager::AfterConstruct(const FFLInitDesc* pInitDesc, const FFLRes
     {
         for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
         {
+            // skip resources with size of zero
+            if (pResDesc->size[i] == 0) {
+                RIO_LOG("FFL resource %i has size of zero, skipping\n", i);
+                continue;
+            }
             result = m_ResourceManager.AttachCache(pResDesc->pData[i], pResDesc->size[i], FFLResourceType(i));
             if (result != FFL_RESULT_OK)
                 return result;
