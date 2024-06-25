@@ -85,9 +85,16 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     pModel->charModelDesc = *pDesc;
     pModel->modelType = ModelFlagToModelType(pModel->charModelDesc.modelFlag);
 
-    FFLResult result = m_pCharModelCreateParam->GetDatabaseManager()->PickupCharInfo(&pModel->charInfo, pSource->dataSource, pSource->pBuffer, pSource->index);
-    if (result != FFL_RESULT_OK)
-        return result;
+    FFLResult result;
+
+    if (pSource->dataSource == FFL_DATA_SOURCE_DIRECT_POINTER)
+    {
+        pModel->charInfo = *reinterpret_cast<const FFLiCharInfo*>(pSource->pBuffer);
+    } else {
+        result = m_pCharModelCreateParam->GetDatabaseManager()->PickupCharInfo(&pModel->charInfo, pSource->dataSource, pSource->pBuffer, pSource->index);
+        if (result != FFL_RESULT_OK)
+            return result;
+    }
 
     u32 resolution = FFLiCharModelCreateParam::GetResolution(pDesc->resolution);
     bool isEnabledMipMap = FFLiCharModelCreateParam::IsEnabledMipMap(pDesc->resolution);
