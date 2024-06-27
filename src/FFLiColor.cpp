@@ -466,28 +466,164 @@ const FFLiColorContainer& GetColorContainer()
     return s_ColorContainer[s_ContainerType];
 }
 
+
+// TODO: IMPORT FROM nn::mii::detail::CommonColorTable
+// Common colors as used in Switch Miis
+// 2024-04-22: imported from: https://mii-studio.akamaized.net/static/js/editor.pc.46056ea432a4ef3974af.js
+// Also see: https://jsfiddle.net/arian_/za32o6dc/
+// NOTE: THIS AS-IS IS IMPORTED FROM MII STUDIO JS AND NOT BINARIES
+const FFLColor nnmiiCommonColors[100] = {
+    { 0.1765f, 0.1569f, 0.1569f, 1.0000f },
+    { 0.2510f, 0.1255f, 0.0627f, 1.0000f },
+    { 0.3608f, 0.0941f, 0.0392f, 1.0000f },
+    { 0.4863f, 0.2275f, 0.0784f, 1.0000f },
+    { 0.4706f, 0.4706f, 0.5020f, 1.0000f },
+    { 0.3059f, 0.2431f, 0.0627f, 1.0000f },
+    { 0.5333f, 0.3451f, 0.0941f, 1.0000f },
+    { 0.8157f, 0.6275f, 0.2902f, 1.0000f },
+    { 0.0000f, 0.0000f, 0.0000f, 1.0000f },
+    { 0.4235f, 0.4392f, 0.4392f, 1.0000f },
+    { 0.4000f, 0.2353f, 0.1725f, 1.0000f },
+    { 0.3765f, 0.3686f, 0.1882f, 1.0000f },
+    { 0.2745f, 0.3294f, 0.6588f, 1.0000f },
+    { 0.2196f, 0.4392f, 0.3451f, 1.0000f },
+    { 0.3765f, 0.2196f, 0.0627f, 1.0000f },
+    { 0.6588f, 0.0627f, 0.0314f, 1.0000f },
+    { 0.1255f, 0.1882f, 0.4078f, 1.0000f },
+    { 0.6588f, 0.3765f, 0.0000f, 1.0000f },
+    { 0.4706f, 0.4392f, 0.4078f, 1.0000f },
+    { 0.8471f, 0.3216f, 0.0314f, 1.0000f },
+    { 0.9412f, 0.0471f, 0.0314f, 1.0000f },
+    { 0.9608f, 0.2824f, 0.2824f, 1.0000f },
+    { 0.9412f, 0.6039f, 0.4549f, 1.0000f },
+    { 0.5490f, 0.3137f, 0.2510f, 1.0000f },
+    { 0.5176f, 0.1490f, 0.1490f, 1.0000f },
+    { 1.0000f, 0.4510f, 0.4000f, 1.0000f },
+    { 1.0000f, 0.6510f, 0.6510f, 1.0000f },
+    { 1.0000f, 0.7529f, 0.7294f, 1.0000f },
+    { 0.4510f, 0.1804f, 0.2314f, 1.0000f },
+    { 0.6000f, 0.1216f, 0.2392f, 1.0000f },
+    { 0.5412f, 0.0902f, 0.2431f, 1.0000f },
+    { 0.7098f, 0.2431f, 0.2588f, 1.0000f },
+    { 0.7804f, 0.1176f, 0.3373f, 1.0000f },
+    { 0.6902f, 0.3255f, 0.5059f, 1.0000f },
+    { 0.7804f, 0.3294f, 0.4314f, 1.0000f },
+    { 0.9804f, 0.4588f, 0.5922f, 1.0000f },
+    { 0.9882f, 0.6745f, 0.7882f, 1.0000f },
+    { 1.0000f, 0.7882f, 0.8471f, 1.0000f },
+    { 0.1922f, 0.1098f, 0.2510f, 1.0000f },
+    { 0.2157f, 0.1569f, 0.2392f, 1.0000f },
+    { 0.2980f, 0.0941f, 0.3020f, 1.0000f },
+    { 0.4353f, 0.2588f, 0.7020f, 1.0000f },
+    { 0.5216f, 0.3608f, 0.7216f, 1.0000f },
+    { 0.7529f, 0.5137f, 0.8000f, 1.0000f },
+    { 0.6588f, 0.5765f, 0.7882f, 1.0000f },
+    { 0.7725f, 0.6745f, 0.9020f, 1.0000f },
+    { 0.9333f, 0.7451f, 0.9804f, 1.0000f },
+    { 0.8235f, 0.7725f, 0.9294f, 1.0000f },
+    { 0.0980f, 0.1216f, 0.2510f, 1.0000f },
+    { 0.0706f, 0.2471f, 0.4000f, 1.0000f },
+    { 0.1647f, 0.5098f, 0.8314f, 1.0000f },
+    { 0.3412f, 0.7059f, 0.9490f, 1.0000f },
+    { 0.4784f, 0.7725f, 0.8706f, 1.0000f },
+    { 0.5373f, 0.6510f, 0.9804f, 1.0000f },
+    { 0.5176f, 0.7412f, 0.9804f, 1.0000f },
+    { 0.6314f, 0.8902f, 1.0000f, 1.0000f },
+    { 0.0431f, 0.1804f, 0.2118f, 1.0000f },
+    { 0.0039f, 0.2392f, 0.2314f, 1.0000f },
+    { 0.0510f, 0.3098f, 0.3490f, 1.0000f },
+    { 0.1373f, 0.4000f, 0.3882f, 1.0000f },
+    { 0.1882f, 0.4941f, 0.5490f, 1.0000f },
+    { 0.3098f, 0.6824f, 0.6902f, 1.0000f },
+    { 0.4784f, 0.7686f, 0.6196f, 1.0000f },
+    { 0.4980f, 0.8314f, 0.7529f, 1.0000f },
+    { 0.5294f, 0.8980f, 0.7137f, 1.0000f },
+    { 0.0392f, 0.2902f, 0.2078f, 1.0000f },
+    { 0.2627f, 0.4784f, 0.0000f, 1.0000f },
+    { 0.0078f, 0.4588f, 0.3843f, 1.0000f },
+    { 0.2118f, 0.6000f, 0.4392f, 1.0000f },
+    { 0.2941f, 0.6784f, 0.1020f, 1.0000f },
+    { 0.5725f, 0.7490f, 0.0392f, 1.0000f },
+    { 0.3882f, 0.7804f, 0.5333f, 1.0000f },
+    { 0.6196f, 0.8784f, 0.2588f, 1.0000f },
+    { 0.5882f, 0.8706f, 0.4941f, 1.0000f },
+    { 0.7333f, 0.9490f, 0.6667f, 1.0000f },
+    { 0.6000f, 0.5765f, 0.1686f, 1.0000f },
+    { 0.6510f, 0.5843f, 0.3882f, 1.0000f },
+    { 0.8000f, 0.7529f, 0.2235f, 1.0000f },
+    { 0.8000f, 0.7255f, 0.5294f, 1.0000f },
+    { 0.8510f, 0.8000f, 0.5098f, 1.0000f },
+    { 0.8353f, 0.8510f, 0.4353f, 1.0000f },
+    { 0.8353f, 0.9020f, 0.5137f, 1.0000f },
+    { 0.8471f, 0.9804f, 0.6157f, 1.0000f },
+    { 0.4902f, 0.2706f, 0.0000f, 1.0000f },
+    { 0.9020f, 0.7333f, 0.4784f, 1.0000f },
+    { 0.9961f, 0.8863f, 0.2902f, 1.0000f },
+    { 0.9804f, 0.8706f, 0.5098f, 1.0000f },
+    { 0.9686f, 0.9176f, 0.6118f, 1.0000f },
+    { 0.9804f, 0.9725f, 0.6078f, 1.0000f },
+    { 0.6510f, 0.3020f, 0.1176f, 1.0000f },
+    { 1.0000f, 0.5882f, 0.0510f, 1.0000f },
+    { 0.8196f, 0.6078f, 0.4118f, 1.0000f },
+    { 1.0000f, 0.6980f, 0.4000f, 1.0000f },
+    { 1.0000f, 0.7608f, 0.5490f, 1.0000f },
+    { 0.8980f, 0.8118f, 0.6941f, 1.0000f },
+    { 0.2549f, 0.2549f, 0.2549f, 1.0000f },
+    { 0.6078f, 0.6078f, 0.6078f, 1.0000f },
+    { 0.7451f, 0.7451f, 0.7451f, 1.0000f },
+    { 0.8627f, 0.8431f, 0.8039f, 1.0000f },
+    { 1.0000f, 1.0000f, 1.0000f, 1.0000f },
+};
+
+
+const FFLColor nnmiiFacelineColors[10] = {
+    { 1.0000f, 0.8275f, 0.6784f, 1.0000f },
+    { 1.0000f, 0.7137f, 0.4196f, 1.0000f },
+    { 0.8706f, 0.4745f, 0.2588f, 1.0000f },
+    { 1.0000f, 0.6667f, 0.5490f, 1.0000f },
+    { 0.6784f, 0.3176f, 0.1608f, 1.0000f },
+    { 0.3882f, 0.1725f, 0.0941f, 1.0000f },
+    { 1.0000f, 0.7451f, 0.6471f, 1.0000f },
+    { 1.0000f, 0.7725f, 0.5608f, 1.0000f },
+    { 0.5490f, 0.2353f, 0.1373f, 1.0000f },
+    { 0.2353f, 0.1765f, 0.1373f, 1.0000f },
+};
+
+// TODO: IMPORT nn::mii::detail::UpperLipColorTable
+// THEN IMPLEMENT FOR GetMouthColorG
+
 const FFLColor& GetFacelineColor(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiFacelineColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_FACELINE_COLOR_0 + index];
 }
 
 const FFLColor& GetBeardColor(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetEyebrowColor(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetMustacheColor(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetHairColor(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
@@ -503,21 +639,32 @@ const FFLColor& GetEyeColorG(const FFLiColorContainer& container, s32 index)
 
 const FFLColor& GetEyeColorB(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_EYE_COLOR_B_0 + index];
 }
 
 const FFLColor& GetGlassColor(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_GLASS_COLOR_0 + index];
 }
 
 const FFLColor& GetMouthColorR(const FFLiColorContainer& container, s32 index)
 {
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_R_0 + index];
 }
 
 const FFLColor& GetMouthColorG(const FFLiColorContainer& container, s32 index)
 {
+    // TODO: GREEN IS SUPPOSED TO BE SLIGHTLY DARKER
+    // THAN RED (NORMAL COMMON COLOR)
+    // ..!!!!!!!!!!
+    if (isCommonColorMarked(index))
+        return nnmiiCommonColors[unmarkCommonColor(index)];
     return container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_G_0 + index];
 }
 
@@ -551,4 +698,15 @@ const FFLColor& GetNoselineColor(const FFLiColorContainer& container)
     return container.colors[FFLI_COLOR_TYPE_FACE_LINE];
 }
 
+}
+
+// outside of the namespace so that this is exported
+bool isCommonColorMarked(s32 index) {
+    return (index & COMMON_COLOR_MARK_BIT) != 0;
+}
+s32 markCommonColor(s32 index) {
+    return index | COMMON_COLOR_MARK_BIT;
+}
+s32 unmarkCommonColor(s32 index) {
+    return index & ~COMMON_COLOR_MARK_BIT;
 }

@@ -56,4 +56,11 @@ void FFLiGetColorContainer(FFLiColorContainer* pContainer, FFLiContainerType typ
 ??? FFLiGetOffScreenSrgbFetch();
 */
 
+// Somewhat of a HACK: Mark s32 color values as being colors
+// meant to be looked up in the common color table (Switch Mii colors)
+#define COMMON_COLOR_MARK_BIT 0x80000000
+bool isCommonColorMarked(s32 index);
+s32 markCommonColor(s32 index);
+s32 unmarkCommonColor(s32 index);
+
 #endif // FFLI_COLOR_H_
