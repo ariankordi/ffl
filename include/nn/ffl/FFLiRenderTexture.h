@@ -14,7 +14,7 @@ struct FFLiRenderTexture
     rio::RenderTargetColor* pColorTarget;
     rio::RenderTargetDepth* pDepthTarget;
 };
-NN_STATIC_ASSERT(sizeof(FFLiRenderTexture) == 0x10);
+NN_STATIC_ASSERT32(sizeof(FFLiRenderTexture) == 0x10);
 
 struct FFLColor;
 

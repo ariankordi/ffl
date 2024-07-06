@@ -13,7 +13,7 @@ struct FFLiMaskTextures
 {
     FFLiRenderTexture*  pRenderTextures[FFL_EXPRESSION_MAX];
 };
-NN_STATIC_ASSERT(sizeof(FFLiMaskTextures) == 0x4C);
+NN_STATIC_ASSERT32(sizeof(FFLiMaskTextures) == 0x4C);
 
 struct  FFLiCharInfo;
 #if RIO_IS_CAFE

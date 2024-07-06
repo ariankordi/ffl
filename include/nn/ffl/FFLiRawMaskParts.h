@@ -9,7 +9,7 @@
 struct FFLiRawMaskPartsDrawParam : FFLDrawParam
 {
 };
-NN_STATIC_ASSERT(sizeof(FFLiRawMaskPartsDrawParam) == 0x68);
+NN_STATIC_ASSERT32(sizeof(FFLiRawMaskPartsDrawParam) == 0x68);
 
 enum FFLiOriginPosition
 {

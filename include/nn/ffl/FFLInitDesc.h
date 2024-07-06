@@ -16,7 +16,7 @@ typedef struct FFLInitDesc
     BOOL                    _10;
 }
 FFLInitDesc;
-NN_STATIC_ASSERT(sizeof(FFLInitDesc) == 0x14);
+NN_STATIC_ASSERT32(sizeof(FFLInitDesc) == 0x14);
 
 #ifdef __cplusplus
 }

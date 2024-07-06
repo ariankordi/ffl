@@ -37,7 +37,7 @@ struct FFLiCharModel
     FFLModelType            modelType;
     FFLBoundingBox          boundingBox[3];
 };
-NN_STATIC_ASSERT(sizeof(FFLiCharModel) == 0x778);
+NN_STATIC_ASSERT32(sizeof(FFLiCharModel) == 0x778);
 
 struct FFLCharModelSource;
 struct FFLShaderCallback;

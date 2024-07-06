@@ -55,6 +55,6 @@ private:
     u8                      _d9c;
     bool                    m_IsSaveHiddenNeeded;
 };
-NN_STATIC_ASSERT(sizeof(FFLiDatabaseFileAccessor) == 0xDA0);
+NN_STATIC_ASSERT32(sizeof(FFLiDatabaseFileAccessor) == 0xDA0);
 
 #endif // FFLI_DATABASE_FILE_ACCESSOR_H_
