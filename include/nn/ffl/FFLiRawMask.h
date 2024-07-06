@@ -14,7 +14,7 @@ struct FFLiRawMaskDrawParam
     FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsMole;
     FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsFill;
 };
-NN_STATIC_ASSERT(sizeof(FFLiRawMaskDrawParam) == 0x3A8);
+NN_STATIC_ASSERT32(sizeof(FFLiRawMaskDrawParam) == 0x3A8);
 
 struct FFLiRawMaskTextureDesc
 {
@@ -24,7 +24,7 @@ struct FFLiRawMaskTextureDesc
     rio::Texture2D* pTexturesMustache[2];
     rio::Texture2D* pTextureMole;
 };
-NN_STATIC_ASSERT(sizeof(FFLiRawMaskTextureDesc) == 0x20);
+NN_STATIC_ASSERT32(sizeof(FFLiRawMaskTextureDesc) == 0x20);
 
 struct  FFLiCharInfo;
 class   FFLiShaderCallback;

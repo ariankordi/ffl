@@ -50,6 +50,25 @@
     #define NN_STATIC_ASSERT_IS_POD(T)  ((void)0)
 #endif
 
+// NN_STATIC_ASSERT32 = NN_STATIC_ASSERT but only applies for 32 bit
+#ifdef __cplusplus
+    #include <type_traits>
+
+    #if defined(NDEBUG) || INTPTR_MAX == INT64_MAX
+        #define NN_STATIC_ASSERT32(condition) static_assert(true, "")
+    #else
+        #define NN_STATIC_ASSERT32 NN_STATIC_ASSERT
+    #endif
+#else // __cplusplus
+    #include <assert.h>
+
+    #if defined(NDEBUG) || INTPTR_MAX == INT64_MAX
+        #define NN_STATIC_ASSERT32(condition) _Static_assert(true, "")
+    #else
+        #define NN_STATIC_ASSERT32 NN_STATIC_ASSERT
+    #endif
+#endif
+
 
 
 #ifdef __cplusplus

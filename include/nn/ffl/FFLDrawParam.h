@@ -27,14 +27,14 @@ typedef struct FFLAttributeBuffer
     void*   ptr;
 }
 FFLAttributeBuffer;
-NN_STATIC_ASSERT(sizeof(FFLAttributeBuffer) == 0xC);
+NN_STATIC_ASSERT32(sizeof(FFLAttributeBuffer) == 0xC);
 
 typedef struct FFLAttributeBufferParam
 {
     FFLAttributeBuffer  attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_MAX];
 }
 FFLAttributeBufferParam;
-NN_STATIC_ASSERT(sizeof(FFLAttributeBufferParam) == 0x3C);
+NN_STATIC_ASSERT32(sizeof(FFLAttributeBufferParam) == 0x3C);
 
 typedef struct FFLPrimitiveParam
 {
@@ -44,7 +44,7 @@ typedef struct FFLPrimitiveParam
     void*                       pIndexBuffer;
 }
 FFLPrimitiveParam;
-NN_STATIC_ASSERT(sizeof(FFLPrimitiveParam) == 0x10);
+NN_STATIC_ASSERT32(sizeof(FFLPrimitiveParam) == 0x10);
 
 typedef enum FFLCullMode
 {
@@ -63,7 +63,7 @@ typedef struct FFLDrawParam
     FFLPrimitiveParam       primitiveParam;
 }
 FFLDrawParam;
-NN_STATIC_ASSERT(sizeof(FFLDrawParam) == 0x68);
+NN_STATIC_ASSERT32(sizeof(FFLDrawParam) == 0x68);
 
 #ifdef __cplusplus
 }

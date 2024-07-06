@@ -58,6 +58,6 @@ private:
     FFLiResourceCache           m_ResourceCache;
     char                        m_Path[FFL_RESOURCE_TYPE_MAX][FFL_PATH_MAX_LEN];
 };
-NN_STATIC_ASSERT(sizeof(FFLiResourceManager) == 0x218);
+NN_STATIC_ASSERT32(sizeof(FFLiResourceManager) == 0x218);
 
 #endif // FFLI_RESOURCE_MANAGER_H_

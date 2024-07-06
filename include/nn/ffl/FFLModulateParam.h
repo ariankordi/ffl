@@ -86,7 +86,7 @@ typedef struct FFLModulateParam
     const rio::Texture2D*   pTexture2D;
 }
 FFLModulateParam;
-NN_STATIC_ASSERT(sizeof(FFLModulateParam) == 0x18);
+NN_STATIC_ASSERT32(sizeof(FFLModulateParam) == 0x18);
 
 #ifdef __cplusplus
 }
