@@ -16,7 +16,7 @@ s64 FFLiGetTick()
     return OSGetTime();
 #elif RIO_IS_WIN && defined(_WIN32)
     LARGE_INTEGER ticks;
-    [[maybe_unused]] WINBOOL success = QueryPerformanceFrequency(&ticks);
+    [[maybe_unused]] bool success = QueryPerformanceFrequency(&ticks);
     RIO_ASSERT(success);
     return ticks.QuadPart;
 #elif RIO_IS_WIN

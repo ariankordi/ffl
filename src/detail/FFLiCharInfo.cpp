@@ -20,12 +20,12 @@ bool CompareBirthPlatform(const FFLiCharInfo* a, const FFLiCharInfo* b);
 
 }
 
-BOOL FFLiVerifyCharInfo(const FFLiCharInfo* pCharInfo, BOOL verifyName)
+bool FFLiVerifyCharInfo(const FFLiCharInfo* pCharInfo, bool verifyName)
 {
     return FFLiiVerifyCharInfo(pCharInfo, verifyName);
 }
 
-FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharInfo, BOOL verifyName)
+FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharInfo, bool verifyName)
 {
     if (!FFLiRange<s32>(0, FFL_FACE_TYPE_MAX - 1, pCharInfo->parts.faceType))
         return FFLI_VERIFY_CHAR_INFO_REASON_FACE_TYPE_INVALID;
@@ -212,7 +212,7 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     return FFLI_VERIFY_CHAR_INFO_REASON_OK;
 }
 
-BOOL FFLiiVerifyCharInfo(const FFLiCharInfo* pCharInfo, BOOL verifyName)
+bool FFLiiVerifyCharInfo(const FFLiCharInfo* pCharInfo, bool verifyName)
 {
     return FFLiVerifyCharInfoWithReason(pCharInfo, verifyName) == FFLI_VERIFY_CHAR_INFO_REASON_OK;
 }

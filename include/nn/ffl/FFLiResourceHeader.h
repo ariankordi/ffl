@@ -69,12 +69,12 @@ private:
     u32                         m_Version;                  // I think? Always 0x00070000
     u32                         m_UncompressBufferSize;
     u32                         _c[4 / sizeof(u32)];        // Unused, but non-zero in files
-    BOOL                        m_IsExpand;                 // Must be 1 specifically to be true, not just non-zero
+    int                         m_IsExpand;                 // Must be 1 specifically to be true, not just non-zero
     FFLiResourceTextureHeader   m_TextureHeader;
     FFLiResourceShapeHeader     m_ShapeHeader;
     u32                         _49d0[48 / sizeof(u32)];    // Unused AND zero in files
 };
-NN_STATIC_ASSERT(sizeof(BOOL) == 4);
+//NN_STATIC_ASSERT(sizeof(BOOL) == 4);
 NN_STATIC_ASSERT_IS_POD(FFLiResourceHeader);
 NN_STATIC_ASSERT(sizeof(FFLiResourceHeader) == 0x4A00);
 

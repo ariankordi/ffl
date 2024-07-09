@@ -146,8 +146,8 @@ typedef enum FFLiVerifyCharInfoReason
 }
 FFLiVerifyCharInfoReason;
 
-BOOL FFLiVerifyCharInfo(const FFLiCharInfo* pCharInfo, BOOL verifyName);
-FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharInfo, BOOL verifyName);
+bool FFLiVerifyCharInfo(const FFLiCharInfo* pCharInfo, bool verifyName);
+FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharInfo, bool verifyName);
 
 #ifdef __cplusplus
 
@@ -155,7 +155,7 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
 
 // --------------------------------------------------------------------------
 
-BOOL FFLiiVerifyCharInfo(const FFLiCharInfo* pCharInfo, BOOL verifyName);
+bool FFLiiVerifyCharInfo(const FFLiCharInfo* pCharInfo, bool verifyName);
 
 s32 FFLiiGetEyeRotateOffset(s32 type);
 s32 FFLiiGetEyebrowRotateOffset(s32 type);

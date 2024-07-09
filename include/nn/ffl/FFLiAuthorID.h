@@ -16,7 +16,7 @@ typedef struct FFLiAuthorID
 FFLiAuthorID;
 NN_STATIC_ASSERT(sizeof(FFLiAuthorID) == FFLI_AUTHOR_ID_SIZE);
 
-BOOL FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b);
-BOOL FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID);
+bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b);
+bool FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID);
 
 #endif // FFLI_AUTHOR_ID_H_

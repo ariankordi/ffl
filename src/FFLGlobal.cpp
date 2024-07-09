@@ -23,7 +23,7 @@ FFLResult FFLExit(void)
     return FFLiExit();
 }
 
-BOOL FFLIsAvailable(void)
+bool FFLIsAvailable(void)
 {
     return FFLiIsAvailable();
 }

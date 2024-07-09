@@ -37,17 +37,17 @@ typedef struct FFLiCreateID
 FFLiCreateID;
 NN_STATIC_ASSERT(sizeof(FFLiCreateID) == FFL_CREATE_ID_SIZE);
 
-BOOL FFLiIsNullMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsNullMiiID(const FFLCreateID* pCreateID);
 
 void FFLiGetTemporaryMiiID(FFLCreateID* pCreateID);
 
-BOOL FFLiIsNormalMiiID(const FFLCreateID* pCreateID);
-BOOL FFLiIsSpecialMiiID(const FFLCreateID* pCreateID);
-BOOL FFLiIsNTRMiiID(const FFLCreateID* pCreateID);
-BOOL FFLiIsTemporaryMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsNormalMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsSpecialMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsNTRMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsTemporaryMiiID(const FFLCreateID* pCreateID);
 
-BOOL FFLiIsValidMiiID(const FFLCreateID* pCreateID);
-BOOL FFLiIsSameMiiID(const FFLCreateID* a, const FFLCreateID* b);
+bool FFLiIsValidMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsSameMiiID(const FFLCreateID* a, const FFLCreateID* b);
 
 #ifdef __cplusplus
 }

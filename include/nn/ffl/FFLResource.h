@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-FFLResult FFLGetResourcePath(char* pDst, u32 size, FFLResourceType resourceType, BOOL LG);
+FFLResult FFLGetResourcePath(char* pDst, u32 size, FFLResourceType resourceType, bool LG);
 
 #ifdef __cplusplus
 }

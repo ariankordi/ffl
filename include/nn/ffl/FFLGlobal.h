@@ -15,7 +15,7 @@ FFLResult FFLInitResEx(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pRes
 void FFLInitResGPUStep(void);
 FFLResult FFLFlushQuota(void);
 FFLResult FFLExit(void);
-BOOL FFLIsAvailable(void);
+bool FFLIsAvailable(void);
 FFLColor FFLGetFavoriteColor(s32 index);
 
 #ifdef __cplusplus
