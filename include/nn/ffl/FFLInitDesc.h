@@ -12,8 +12,8 @@ typedef struct FFLInitDesc
     const void*             _0; // Deleted
     void*                   _4; // Deleted
     FFLFontRegion           fontRegion;
-    BOOL                    _c;
-    BOOL                    _10;
+    int                     _c;
+    int                     _10;
 }
 FFLInitDesc;
 NN_STATIC_ASSERT32(sizeof(FFLInitDesc) == 0x14);

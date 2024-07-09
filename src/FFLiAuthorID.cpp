@@ -1,7 +1,7 @@
 #include <nn/ffl/FFLiAuthorID.h>
 #include <nn/ffl/FFLiSystem.h>
 
-BOOL FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b)
+bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b)
 {
     const u32 count = FFLI_AUTHOR_ID_SIZE / sizeof(u16);
     NN_STATIC_ASSERT(count == 4);
@@ -21,7 +21,7 @@ BOOL FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b)
     return true;
 }
 
-BOOL FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID)
+bool FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID)
 {
     return FFLiIsSameAuthorID(pAuthorID, FFLiGetUserID());
 }

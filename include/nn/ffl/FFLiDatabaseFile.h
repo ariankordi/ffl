@@ -4,10 +4,11 @@
 #include <nn/ffl/FFLiDatabaseFileHidden.h>
 #include <nn/ffl/FFLiDatabaseFileOfficial.h>
 
-struct FFLiDatabaseFile
+class FFLiDatabaseFile
 {
-    FFLiDatabaseFileOfficial    official;
-    FFLiDatabaseFileHidden      hidden;
+    public:
+        FFLiDatabaseFileOfficial    official;
+        FFLiDatabaseFileHidden      hidden;
 };
 NN_STATIC_ASSERT(sizeof(FFLiDatabaseFile) == 0x4E440);
 

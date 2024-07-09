@@ -2,8 +2,17 @@
 #define FFL_TYPES_H_
 
 // Hard-coded for now
-#if (!defined(__BYTE_ORDER__) || !defined(__ORDER_LITTLE_ENDIAN__) || !defined(__ORDER_BIG_ENDIAN__))
-    #error "Need __BYTE_ORDER__, __ORDER_LITTLE_ENDIAN__ and __ORDER_BIG_ENDIAN__ to be defined"
+#if !defined(__BYTE_ORDER__) || !defined(__ORDER_LITTLE_ENDIAN__) || !defined(__ORDER_BIG_ENDIAN__)
+    // Define these in MSVC
+    #ifdef _MSC_VER
+        // NOTE: assuming little endian
+        // ... MSVC only targets x86, ARM anyway, all little endian
+        #define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
+        #define __ORDER_LITTLE_ENDIAN__ 1234
+        #define __ORDER_BIG_ENDIAN__ 4321
+    #else
+        #error "Need __BYTE_ORDER__, __ORDER_LITTLE_ENDIAN__ and __ORDER_BIG_ENDIAN__ to be defined"
+    #endif
 #endif
 
 #if (__BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ && __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__)

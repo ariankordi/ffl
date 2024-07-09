@@ -13,10 +13,12 @@
 
 #include <nn/ffl/detail/FFLiCopySurface.h>
 
+#include <nn/ffl/FFLiDatabaseFile.h>
+
 struct FFLResourceDesc;
 
-struct  FFLiDatabaseFile;
-struct  FFLiFileWriteBuffer;
+//struct  FFLiDatabaseFile;
+class  FFLiFileWriteBuffer;
 struct  FFLiResourceMultiHeader;
 
 FFLResult FFLiInitResEx(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pResDesc);

@@ -13,10 +13,10 @@ typedef struct FFLStoreData FFLStoreData;
 
 FFLResult FFLiGetStoreData(FFLStoreData* pStoreData, FFLDataSource dataSource, u16 index);
 
-BOOL FFLIsAvailableOfficialData(u16 index);
-BOOL FFLIsRegularOfficialData(u16 index);
+bool FFLIsAvailableOfficialData(u16 index);
+bool FFLIsRegularOfficialData(u16 index);
 
-FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, BOOL checkFontRegion);
+FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion);
 
 void FFLiEnableSpecialMii(u32 key);
 

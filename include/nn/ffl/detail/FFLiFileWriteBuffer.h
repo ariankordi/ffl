@@ -5,9 +5,10 @@
 
 #define FFLI_FILE_WRITE_BUFFER_SIZE (0x40000u)
 
-struct FFLiFileWriteBuffer
+class FFLiFileWriteBuffer
 {
-    u8  data[FFLI_FILE_WRITE_BUFFER_SIZE];
+    public:
+        u8  data[FFLI_FILE_WRITE_BUFFER_SIZE];
 };
 NN_STATIC_ASSERT(sizeof(FFLiFileWriteBuffer) == FFLI_FILE_WRITE_BUFFER_SIZE);
 

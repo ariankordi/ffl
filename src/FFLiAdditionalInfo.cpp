@@ -45,7 +45,7 @@ void ReplaceNonAsciiNameChar(u16* s, s32 len)
 
 }
 
-void FFLiGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, const FFLiCharInfo* pCharInfo, BOOL checkFontRegion, FFLFontRegion fontRegion)
+void FFLiGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, const FFLiCharInfo* pCharInfo, bool checkFontRegion, FFLFontRegion fontRegion)
 {
     if (pCharInfo->ngWord && !FFLiIsHomeAuthorID(&pCharInfo->authorID))
     {
