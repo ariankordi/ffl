@@ -40,20 +40,36 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     const rio::OrthoProjection proj = rio::OrthoProjection(-200.0f, 200.0f, 0.0f, resolution, 0.0f, resolution);
     const rio::BaseMtx44f& projMatrix = proj.getMatrix();
 
-    FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[0]));
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), &(rawMasks.rawMaskPartsDescMustache[0]), &projMatrix);
+    if (pDesc->pTexturesMustache[0] != NULL) {
+        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[0]));
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), &(rawMasks.rawMaskPartsDescMustache[0]), &projMatrix);
+    } else {
+        pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D = NULL;
+    }
 
-    FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[1]));
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), &(rawMasks.rawMaskPartsDescMustache[1]), &projMatrix);
+    if (pDesc->pTexturesMustache[1] != NULL) {
+        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[1]));
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), &(rawMasks.rawMaskPartsDescMustache[1]), &projMatrix);
+    } else {
+        pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D = NULL;
+    }
 
     FFLiInitModulateMouth(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, *pDesc->pTextureMouth);
     FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, &rawMasks.rawMaskPartsDescMouth, &projMatrix);
 
-    FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[0]));
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), &(rawMasks.rawMaskPartsDescEyebrow[0]), &projMatrix);
+    if (pDesc->pTexturesEyebrow[0] != NULL) {
+        FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[0]));
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), &(rawMasks.rawMaskPartsDescEyebrow[0]), &projMatrix);
+    } else {
+        pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam.pTexture2D = NULL;
+    }
 
-    FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[1]));
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), &(rawMasks.rawMaskPartsDescEyebrow[1]), &projMatrix);
+    if (pDesc->pTexturesEyebrow[0] != NULL) {
+        FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[1]));
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), &(rawMasks.rawMaskPartsDescEyebrow[1]), &projMatrix);
+    } else {
+        pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam.pTexture2D = NULL;
+    }
 
     FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[0]));
     FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), &(rawMasks.rawMaskPartsDescEye[0]), &projMatrix);
@@ -61,8 +77,12 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[1]));
     FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), &(rawMasks.rawMaskPartsDescEye[1]), &projMatrix);
 
-    FFLiInitModulateMole(&pDrawParam->drawParamRawMaskPartsMole.modulateParam, *pDesc->pTextureMole);
-    FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, &rawMasks.rawMaskPartsDescMole, &projMatrix);
+    if (pDesc->pTextureMole != NULL) {
+        FFLiInitModulateMole(&pDrawParam->drawParamRawMaskPartsMole.modulateParam, *pDesc->pTextureMole);
+        FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, &rawMasks.rawMaskPartsDescMole, &projMatrix);
+    } else {
+        pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D = NULL;
+    }
 
     FFLiInitModulateFill(&pDrawParam->drawParamRawMaskPartsFill.modulateParam);
     FFLiInitDrawParamRawMaskPartsFill(&pDrawParam->drawParamRawMaskPartsFill);
@@ -71,26 +91,36 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
 void FFLiDeleteDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam)
 {
     FFLiDeleteDrawParamRawMaskPartsFill(&pDrawParam->drawParamRawMaskPartsFill);
-    FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole);
+    if (pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D != NULL)
+        FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole);
     FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]));
     FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]));
-    FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]));
-    FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]));
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam.pTexture2D != NULL)
+        FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]));
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam.pTexture2D != NULL)
+        FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]));
     FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth);
-    FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]));
-    FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]));
+    if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
+        FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]));
+    if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
+        FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]));
 }
 
 void FFLiInvalidateRawMask(FFLiRawMaskDrawParam* pDrawParam)
 {
-    FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]));
-    FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]));
+    if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
+        FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]));
+    if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
+        FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]));
     FFLiInvalidateDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth);
-    FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]));
-    FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]));
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam.pTexture2D != NULL)
+        FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]));
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam.pTexture2D != NULL)
+        FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]));
     FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]));
     FFLiInvalidateDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]));
-    FFLiInvalidateDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole);
+    if (pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D != NULL)
+        FFLiInvalidateDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole);
     FFLiInvalidateDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsFill);
 }
 
@@ -112,14 +142,19 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
 
     pCallback->CallApplyAlphaTestEnable();
 
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), pCallback);
     FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, pCallback);
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), pCallback);
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), pCallback);
     FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), pCallback);
     FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), pCallback);
-    FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
+    if (pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
 
     renderState.setColorMask(false, false, false, true);
     renderState.applyColorMask();
@@ -134,14 +169,19 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     renderState.applyBlendAndFastZ();
     pCallback->CallApplyAlphaTestEnable();
 
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), pCallback);
     FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, pCallback);
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), pCallback);
-    FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), pCallback);
+    if (pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), pCallback);
     FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), pCallback);
     FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), pCallback);
-    FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
+    if (pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D != NULL)
+        FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
 
     renderState.setColorMask(true, true, true, true);
     renderState.applyColorMask();

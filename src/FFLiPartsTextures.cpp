@@ -137,31 +137,47 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
         }
     }
 
-    FFLResult result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureEyebrow, FFLI_TEXTURE_PARTS_TYPE_EYEBROW, pCharInfo->parts.eyebrowType, pResLoader);
-    if (result != FFL_RESULT_OK)
-    {
-        DeleteTextures_Mouth(pPartsTextures, expressionFlag, pResLoader->IsExpand());
-        DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
-        return result;
+    // NOTE: EYEBROW, MUSTACHE, AND MOLE ARE ALL BLANK WHEN THEY ARE ZERO
+
+    FFLResult result;
+
+    if (pCharInfo->parts.eyebrowType != 23) {
+        result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureEyebrow, FFLI_TEXTURE_PARTS_TYPE_EYEBROW, pCharInfo->parts.eyebrowType, pResLoader);
+        if (result != FFL_RESULT_OK)
+        {
+            DeleteTextures_Mouth(pPartsTextures, expressionFlag, pResLoader->IsExpand());
+            DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
+            return result;
+        }
+    } else {
+        pPartsTextures->pTextureEyebrow = NULL;
     }
 
-    result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMustache, FFLI_TEXTURE_PARTS_TYPE_MUSTACHE, pCharInfo->parts.mustacheType, pResLoader);
-    if (result != FFL_RESULT_OK)
-    {
-        DeleteTexture_Eyebrow(pPartsTextures, pResLoader->IsExpand());
-        DeleteTextures_Mouth(pPartsTextures, expressionFlag, pResLoader->IsExpand());
-        DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
-        return result;
+    if (pCharInfo->parts.mustacheType != 0) {
+        result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMustache, FFLI_TEXTURE_PARTS_TYPE_MUSTACHE, pCharInfo->parts.mustacheType, pResLoader);
+        if (result != FFL_RESULT_OK)
+        {
+            DeleteTexture_Eyebrow(pPartsTextures, pResLoader->IsExpand());
+            DeleteTextures_Mouth(pPartsTextures, expressionFlag, pResLoader->IsExpand());
+            DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
+            return result;
+        }
+    } else {
+        pPartsTextures->pTextureMustache = NULL;
     }
 
-    result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMole, FFLI_TEXTURE_PARTS_TYPE_MOLE, pCharInfo->parts.moleType, pResLoader);
-    if (result != FFL_RESULT_OK)
-    {
-        DeleteTexture_Mustache(pPartsTextures, pResLoader->IsExpand());
-        DeleteTexture_Eyebrow(pPartsTextures, pResLoader->IsExpand());
-        DeleteTextures_Mouth(pPartsTextures, expressionFlag, pResLoader->IsExpand());
-        DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
-        return result;
+    if (pCharInfo->parts.moleType != 0) {
+        result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMole, FFLI_TEXTURE_PARTS_TYPE_MOLE, pCharInfo->parts.moleType, pResLoader);
+        if (result != FFL_RESULT_OK)
+        {
+            DeleteTexture_Mustache(pPartsTextures, pResLoader->IsExpand());
+            DeleteTexture_Eyebrow(pPartsTextures, pResLoader->IsExpand());
+            DeleteTextures_Mouth(pPartsTextures, expressionFlag, pResLoader->IsExpand());
+            DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
+            return result;
+        }
+    } else {
+        pPartsTextures->pTextureMole = NULL;
     }
 
     return FFL_RESULT_OK;
@@ -259,17 +275,20 @@ void DeleteTextures_Mouth(FFLiPartsTextures* pPartsTextures, u32 expressionFlag,
 
 void DeleteTexture_Eyebrow(FFLiPartsTextures* pPartsTextures, bool isExpand)
 {
-    FFLiDeleteTexture(&pPartsTextures->pTextureEyebrow, isExpand);
+    if (pPartsTextures->pTextureEyebrow != NULL)
+        FFLiDeleteTexture(&pPartsTextures->pTextureEyebrow, isExpand);
 }
 
 void DeleteTexture_Mustache(FFLiPartsTextures* pPartsTextures, bool isExpand)
 {
-    FFLiDeleteTexture(&pPartsTextures->pTextureMustache, isExpand);
+    if (pPartsTextures->pTextureMustache != NULL)
+        FFLiDeleteTexture(&pPartsTextures->pTextureMustache, isExpand);
 }
 
 void DeleteTexture_Mole(FFLiPartsTextures* pPartsTextures, bool isExpand)
 {
-    FFLiDeleteTexture(&pPartsTextures->pTextureMole, isExpand);
+    if (pPartsTextures->pTextureMole != NULL)
+        FFLiDeleteTexture(&pPartsTextures->pTextureMole, isExpand);
 }
 
 #if RIO_IS_CAFE

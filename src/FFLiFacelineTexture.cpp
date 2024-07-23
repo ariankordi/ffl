@@ -78,15 +78,24 @@ FFLResult FFLiInitTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObje
 {
     rio::MemUtil::set(pObject, 0, sizeof(FFLiFacelineTextureTempObject));
 
-    FFLResult result = FFLiLoadTextureWithAllocate(&pObject->pTextureFaceLine, FFLI_TEXTURE_PARTS_TYPE_FACELINE, pCharInfo->parts.faceLine, pResLoader);
-    if (result != FFL_RESULT_OK)
-        return result;
+    FFLResult result;
+    if (pCharInfo->parts.faceLine != 0) {
+        result = FFLiLoadTextureWithAllocate(&pObject->pTextureFaceLine, FFLI_TEXTURE_PARTS_TYPE_FACELINE, pCharInfo->parts.faceLine, pResLoader);
+        if (result != FFL_RESULT_OK)
+            return result;
+    } else {
+        pObject->pTextureFaceLine = NULL;
+    }
 
-    result = FFLiLoadTextureWithAllocate(&pObject->pTextureFaceMake, FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP, pCharInfo->parts.faceMakeup, pResLoader);
-    if (result != FFL_RESULT_OK)
-    {
-        DeleteTexture_FaceLine(pObject, pResLoader->IsExpand());
-        return result;
+    if (pCharInfo->parts.faceMakeup != 0) {
+        result = FFLiLoadTextureWithAllocate(&pObject->pTextureFaceMake, FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP, pCharInfo->parts.faceMakeup, pResLoader);
+        if (result != FFL_RESULT_OK)
+        {
+            DeleteTexture_FaceLine(pObject, pResLoader->IsExpand());
+            return result;
+        }
+    } else {
+        pObject->pTextureFaceMake = NULL;
     }
 
     s32 beardType = pCharInfo->parts.beardType;
@@ -107,8 +116,10 @@ FFLResult FFLiInitTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObje
     InitDrawParamWithoutModulate(&pObject->drawParamFaceMake, resolution);
     InitDrawParamWithoutModulate(&pObject->drawParamFaceBeard, resolution);
 
-    FFLiInitModulateFaceLine(&pObject->drawParamFaceLine.modulateParam, *pObject->pTextureFaceLine);
-    FFLiInitModulateFaceMake(&pObject->drawParamFaceMake.modulateParam, *pObject->pTextureFaceMake);
+    if (pCharInfo->parts.faceLine != 0)
+        FFLiInitModulateFaceLine(&pObject->drawParamFaceLine.modulateParam, *pObject->pTextureFaceLine);
+    if (pCharInfo->parts.faceMakeup != 0)
+        FFLiInitModulateFaceMake(&pObject->drawParamFaceMake.modulateParam, *pObject->pTextureFaceMake);
     if (enableBeardTexture)
         FFLiInitModulateFaceBeard(&pObject->drawParamFaceBeard.modulateParam, pCharInfo->parts.beardColor, *pObject->pTextureFaceBeard);
 
@@ -174,8 +185,10 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
     RIO_ASSERT(renderTexture.pTexture2D->getTextureFormat() == rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM);
     FFLiSetupRenderTexture(&renderTexture, &facelineColor, NULL, 0, pCallback);
 
-    pCallback->CallDraw(pObject->drawParamFaceMake);
-    pCallback->CallDraw(pObject->drawParamFaceLine);
+    if (pObject->pTextureFaceMake != NULL)
+        pCallback->CallDraw(pObject->drawParamFaceMake);
+    if (pObject->pTextureFaceLine != NULL)
+        pCallback->CallDraw(pObject->drawParamFaceLine);
     if (pObject->pTextureFaceBeard != NULL)
         pCallback->CallDraw(pObject->drawParamFaceBeard);
 
@@ -235,12 +248,14 @@ rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch)
 
 void DeleteTexture_FaceLine(FFLiFacelineTextureTempObject* pObject, bool isExpand)
 {
-    FFLiDeleteTexture(&pObject->pTextureFaceLine, isExpand);
+    if (pObject->pTextureFaceLine != NULL)
+        FFLiDeleteTexture(&pObject->pTextureFaceLine, isExpand);
 }
 
 void DeleteTexture_FaceMake(FFLiFacelineTextureTempObject* pObject, bool isExpand)
 {
-    FFLiDeleteTexture(&pObject->pTextureFaceMake, isExpand);
+    if (pObject->pTextureFaceMake != NULL)
+        FFLiDeleteTexture(&pObject->pTextureFaceMake, isExpand);
 }
 
 void DeleteTexture_FaceBeard(FFLiFacelineTextureTempObject* pObject, const FFLiCharInfo* pCharInfo, bool isExpand)
