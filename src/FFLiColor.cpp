@@ -714,6 +714,7 @@ const FFLColor nnmiiUpperLipColors[100] = {
  * GetFacelineColorToVer3
  */
 const FFLColor nnmiiFacelineColors[10] = {
+    // NOTE: these are passed to switch shaders with A = 0
     { 1.0000000f, 0.8274510f, 0.6784314f, 1.0f },
     { 1.0000000f, 0.7137255f, 0.4196079f, 1.0f },
     { 0.8705883f, 0.4745099f, 0.2588236f, 1.0f },
@@ -728,9 +729,8 @@ const FFLColor nnmiiFacelineColors[10] = {
 
 const FFLColor& GetFacelineColor(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiFacelineColors[unmarkCommonColor(index)];
-    return container.colors[FFLI_COLOR_TYPE_FACELINE_COLOR_0 + index];
+    // NOTE: ver3 faceline colors ARE COMPATIBLE WITH the switch faceline color table
+    return nnmiiFacelineColors[index];
 }
 
 const FFLColor& GetBeardColor(const FFLiColorContainer& container, s32 index)

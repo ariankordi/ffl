@@ -138,6 +138,7 @@ FFLResult FFLiDatabaseManager::PickupCharInfo(FFLiCharInfo* pCharInfo, FFLDataSo
 
     switch (dataSource)
     {
+    case FFL_DATA_SOURCE_DIRECT_POINTER:
     case FFL_DATA_SOURCE_BUFFER:
         rio::MemUtil::copy(pCharInfo, pBuffer, sizeof(FFLiCharInfo));
         result = FFL_RESULT_OK;
