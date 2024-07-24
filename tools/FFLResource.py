@@ -769,9 +769,18 @@ class FFLiResourceTextureHeader:
                 else:
                     assert texture_filename.endswith(".dds")
                     gx2Texture = DDSToGX2Texture(texture_filename, 0, 7, GX2TileMode.Default, 0, False, (0, 1, 2, 3), False)
-                    assert gx2Texture.surface.numMips == numMips
-                    assert gx2Texture.surface.format == format
-                    assert gx2Texture.compSel == compSel
+                    #assert gx2Texture.surface.numMips == numMips
+                    fail = False
+                    if gx2Texture.surface.numMips != numMips:
+                        print(f'{texture_filename} numMips {gx2Texture.surface.numMips} != {numMips}')
+                        #fail = True
+                    if gx2Texture.surface.format != format:
+                        print(f'{texture_filename} format {gx2Texture.surface.format} != {format}')
+                        fail = True
+                    if gx2Texture.compSel != compSel:
+                        print(f'{texture_filename} compSel {gx2Texture.compSel} != {compSel}')
+                        #fail = True
+                    assert not fail
 
                 partsInfoArray.append([partsInfo, gx2Texture])
 

@@ -11,6 +11,7 @@
 #include <nn/ffl/FFLiRenderTexture.h>
 #include <nn/ffl/FFLiResourceLoader.h>
 #include <nn/ffl/FFLiShaderCallback.h>
+#include <nn/ffl/FFLShaderCallback.h>
 #include <nn/ffl/FFLiTexture.h>
 #include <nn/ffl/FFLiUtil.h>
 
@@ -183,6 +184,12 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
 
     FFLiInvalidateRenderTexture(&renderTexture);
     RIO_ASSERT(renderTexture.pTexture2D->getTextureFormat() == rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM);
+
+    // NOTE: switch shader needs faceline color's alpha to be 0
+    // this value is set by the shader AFTER calling FFLSetShaderCallback
+    if (pCallback->Get()->facelineColorIsTransparent)
+        facelineColor.a = 0.0f;
+
     FFLiSetupRenderTexture(&renderTexture, &facelineColor, NULL, 0, pCallback);
 
     if (pObject->pTextureFaceMake != NULL)
