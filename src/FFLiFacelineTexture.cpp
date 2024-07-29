@@ -156,8 +156,10 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
     InvalidateDrawParam(&pObject->drawParamFaceBeard);
 
 #if RIO_IS_CAFE
-    InvalidateTexture(pObject->pTextureFaceLine->getNativeTexture());
-    InvalidateTexture(pObject->pTextureFaceMake->getNativeTexture());
+    if (pObject->pTextureFaceLine != NULL)
+        InvalidateTexture(pObject->pTextureFaceLine->getNativeTexture());
+    if (pObject->pTextureFaceMake != NULL)
+        InvalidateTexture(pObject->pTextureFaceMake->getNativeTexture());
     if (enableBeardTexture)
         InvalidateTexture(pObject->pTextureFaceBeard->getNativeTexture());
 #endif // RIO_IS_CAFE

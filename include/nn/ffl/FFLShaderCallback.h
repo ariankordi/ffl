@@ -23,7 +23,7 @@ typedef struct FFLShaderCallback
     void (*pSetMatrixFunc)(void* pObj, const rio::BaseMtx44f& matrix);
 }
 FFLShaderCallback;
-NN_STATIC_ASSERT32(sizeof(FFLShaderCallback) == 0x11);
+NN_STATIC_ASSERT32(sizeof(FFLShaderCallback) == 0x14);
 
 void FFLSetShaderCallback(const FFLShaderCallback* pCallback);
 

@@ -141,7 +141,8 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     renderState.apply();
 
     pCallback->CallApplyAlphaTestEnable();
-
+// i am not personally sure why it is even drawing twice
+#ifndef FFL_NO_DRAW_MASK_TWICE
     if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
         FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
     if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
@@ -168,7 +169,7 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     renderState.setBlendFactor(rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_ONE);
     renderState.applyBlendAndFastZ();
     pCallback->CallApplyAlphaTestEnable();
-
+#endif
     if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
         FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
     if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
