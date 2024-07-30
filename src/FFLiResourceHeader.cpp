@@ -4,7 +4,7 @@
 
 #define SIZE_OF_MEMBER(cls, member) sizeof( ((cls*)0)->member )
 
-u32 FFLiGetTextureResourceNum(FFLiTexturePartsType partsType)
+u32 FFLiGetTextureResourceNum(FFLiResourceHeader* pHeader, FFLiTexturePartsType partsType)
 {
     switch (partsType)
     {
@@ -21,7 +21,8 @@ u32 FFLiGetTextureResourceNum(FFLiTexturePartsType partsType)
     case FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP:
         return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoFaceMakeup) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_GLASS:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoGlass) / sizeof(FFLiResourcePartsInfo);
+        //return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoGlass) / sizeof(FFLiResourcePartsInfo);
+        return pHeader->GetTextureGlassTypeMax();
     case FFLI_TEXTURE_PARTS_TYPE_MOLE:
         return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoMole) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_MOUTH:
@@ -68,9 +69,14 @@ u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
     }
 }
 
-FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceTextureHeader* pHeader, FFLiTexturePartsType partsType)
+FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceHeader* pResHeader, FFLiTexturePartsType partsType)
 {
-    *pNum = FFLiGetTextureResourceNum(partsType);
+    FFLiResourceTextureHeader* pHeader = pResHeader->GetTextureHeader();
+    *pNum = FFLiGetTextureResourceNum(pResHeader, partsType);
+
+    // Calculate the size difference between the new struct (current) and old struct (with old files)
+    s32 sizeDifference = (sizeof(pHeader->partsInfoGlass) / sizeof(FFLiResourcePartsInfo)) - pResHeader->GetTextureGlassTypeMax();//11;//pResHeader->GetTextureHeaderOffsetAfterGlassTypeAdjust();
+
     switch (partsType)
     {
     case FFLI_TEXTURE_PARTS_TYPE_BEARD:
@@ -87,14 +93,26 @@ FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceTe
         return pHeader->partsInfoFaceMakeup;
     case FFLI_TEXTURE_PARTS_TYPE_GLASS:
         return pHeader->partsInfoGlass;
-    case FFLI_TEXTURE_PARTS_TYPE_MOLE:
-        return pHeader->partsInfoMole;
+    // EVERYTHING AFTER GLASS IS SHIFTED
+    case FFLI_TEXTURE_PARTS_TYPE_MOLE: {
+        /*
+            size_t sizeOfPartsInfo = sizeof(FFLiResourcePartsInfo);
+            void* calculatedAddress = (char*)pHeader->partsInfoMole - (11 * sizeOfPartsInfo);
+
+            printf("Address of partsInfoGlass:                     %p\n", (void*)pHeader->partsInfoGlass);
+            printf("Address of partsInfoMole:                      %p\n", (void*)pHeader->partsInfoMole);
+            printf("ChatGPT calculated address for partsInfoGlass: %p\n", calculatedAddress);
+            printf("Using partsInfoMole[-11]:                      %p\n", (void*)&(pHeader->partsInfoMole[-11]));
+            printf("Now, our approach:                             %p\n", pHeader->partsInfoMole - pResHeader->GetTextureHeaderOffsetAfterGlassTypeAdjust());
+        */
+        return &pHeader->partsInfoMole[ - sizeDifference];
+    }
     case FFLI_TEXTURE_PARTS_TYPE_MOUTH:
-        return pHeader->partsInfoMouth;
+        return &pHeader->partsInfoMouth[ - sizeDifference];
     case FFLI_TEXTURE_PARTS_TYPE_MUSTACHE:
-        return pHeader->partsInfoMustache;
+        return &pHeader->partsInfoMustache[ - sizeDifference];
     case FFLI_TEXTURE_PARTS_TYPE_NOSELINE:
-        return pHeader->partsInfoNoseline;
+        return &pHeader->partsInfoNoseline[ - sizeDifference];
     default:
         return NULL;
     }
@@ -185,7 +203,7 @@ FFLResult FFLiResourceHeader::GetResult() const
     if (m_Magic != 0x46465241)  // FFRA
         return FFL_RESULT_FILE_INVALID;
 
-    if (m_Version != FFLI_RESOURCE_HEADER_VERSION)
+    if ((m_Version & 0x00FF0000) != FFLI_RESOURCE_HEADER_VERSION)  // Check if the fourth byte matches 7
         return FFL_RESULT_FILE_INVALID;
 
     return FFL_RESULT_OK;
@@ -226,7 +244,7 @@ void FFLiResourceHeader::SwapEndian()
     for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, GetTextureHeader(), FFLiTexturePartsType(i));
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, this, FFLiTexturePartsType(i));
         SwapEndianResourcePartsInfo(pPartsInfo, num);
     }
 

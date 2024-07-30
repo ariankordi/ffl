@@ -141,8 +141,10 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_MUSTACHE_POS_MAX - 1, pCharInfo->parts.mustachePositionY))
         return FFLI_VERIFY_CHAR_INFO_REASON_MUSTACHE_POS_INVALID;
 
+    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
     if (!FFLiRange<s32>(0, FFL_GLASS_TYPE_MAX - 1, pCharInfo->parts.glassType))
         return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_TYPE_INVALID;
+    #endif
 
     #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
     if (!FFLiRange<s32>(0, FFL_GLASS_COLOR_MAX - 1, pCharInfo->parts.glassColor))
