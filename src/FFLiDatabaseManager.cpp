@@ -14,7 +14,9 @@ FFLiDatabaseManager::FFLiDatabaseManager(FFLiDatabaseFile* pFile, FFLiFileWriteB
     , m_DatabaseFileAccessor(pFile, pWriteBuffer)
     , m_DatabaseRandom(pContext->RandomContext())
 {
+    #ifndef FFL_NO_OPEN_DATABASE
     m_DatabaseFileAccessor.Init();
+    #endif
 }
 
 FFLiDatabaseManager::~FFLiDatabaseManager()
@@ -23,11 +25,11 @@ FFLiDatabaseManager::~FFLiDatabaseManager()
 
 FFLResult FFLiDatabaseManager::AfterConstruct()
 {
+    #ifndef FFL_NO_OPEN_DATABASE
     FFLResult result = m_DatabaseFileAccessor.AfterConstruct(m_pSystemContext->TitleID());
     if (result != FFL_RESULT_OK)
         return result;
 
-    #ifndef FFL_NO_OPEN_DATABASE
     result = m_DatabaseFileAccessor.BootLoad();
     if (result != FFL_RESULT_OK)
         return result;
@@ -38,15 +40,17 @@ FFLResult FFLiDatabaseManager::AfterConstruct()
 
 FFLResult FFLiDatabaseManager::BeforeDestruct()
 {
+    #ifndef FFL_NO_OPEN_DATABASE
     FFLResult result = m_DatabaseFileAccessor.BeforeDestruct();
     if (result != FFL_RESULT_OK)
         return result;
-
+    #endif
     return FFL_RESULT_OK;
 }
 
 FFLResult FFLiDatabaseManager::FlushQuota(bool force)
 {
+    #ifndef FFL_NO_OPEN_DATABASE
     FFLResult result = m_DatabaseFileAccessor.BeforeFlushQuota();
     if (result != FFL_RESULT_OK)
         return result;
@@ -54,7 +58,7 @@ FFLResult FFLiDatabaseManager::FlushQuota(bool force)
     result = m_DatabaseFileAccessor.FlushQuota(force);
     if (result != FFL_RESULT_OK)
         return result;
-
+    #endif
     return FFL_RESULT_OK;
 }
 
@@ -70,9 +74,12 @@ bool FFLiDatabaseManager::IsEnabledSpecialMii() const
 
 FFLResult FFLiDatabaseManager::GetCharInfoFromOfficial(FFLiCharInfo* pCharInfo, u16 index)
 {
+    #ifndef FFL_NO_OPEN_DATABASE
     if (!m_DatabaseFileAccessor.GetDatabaseFile()->official.Get(pCharInfo, index, true, IsEnabledSpecialMii()))
         return FFL_RESULT_FILE_INVALID;
-
+    #else
+        RIO_ASSERT(false);
+    #endif
     return FFL_RESULT_OK;
 }
 
