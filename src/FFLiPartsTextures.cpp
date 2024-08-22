@@ -88,11 +88,12 @@ static const FFLiEyeMouthTypeElement EYE_MOUTH_TYPE_ELEMENT[FFL_EXPRESSION_MAX] 
     { { FFLI_EYE_TEXTURE_TYPE_27, FFLI_EYE_TEXTURE_TYPE_27 }, FFLI_MOUTH_TEXTURE_TYPE_7, FFLI_EYEBROW_TEXTURE_TYPE_0 }
 };
 
-void ExpressionToEyeUseFlag(bool* pUseFlag, u32 expressionFlag);
-void ExpressionToMouthUseFlag(bool* pUseFlag, u32 expressionFlag);
 
-void DeleteTextures_Eye(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, bool isExpand);
-void DeleteTextures_Mouth(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, bool isExpand);
+void ExpressionToEyeUseFlag(bool* pUseFlag, u64 expressionFlag);
+void ExpressionToMouthUseFlag(bool* pUseFlag, u64 expressionFlag);
+
+void DeleteTextures_Eye(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, bool isExpand);
+void DeleteTextures_Mouth(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, bool isExpand);
 void DeleteTexture_Eyebrow(FFLiPartsTextures* pPartsTextures, bool isExpand);
 void DeleteTexture_Mustache(FFLiPartsTextures* pPartsTextures, bool isExpand);
 void DeleteTexture_Mole(FFLiPartsTextures* pPartsTextures, bool isExpand);
@@ -226,7 +227,7 @@ s32 FFLiCharInfoAndTypeToMouthIndex(const FFLiCharInfo* pCharInfo, FFLiMouthText
     }
 }
 
-FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, u32 expressionFlag, FFLiResourceLoader* pResLoader)
+FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, u64 expressionFlag, FFLiResourceLoader* pResLoader)
 {
     rio::MemUtil::set(pPartsTextures, 0, sizeof(FFLiPartsTextures));
 
@@ -319,7 +320,7 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
     return FFL_RESULT_OK;
 }
 
-void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, FFLResourceType resourceType)
+void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, FFLResourceType resourceType)
 {
     RIO_ASSERT(FFLiManager::IsConstruct());
     bool isExpand = FFLiManager::GetInstance()->GetResourceManager().IsExpand(resourceType);
@@ -353,25 +354,25 @@ const FFLiEyeMouthTypeElement& FFLiGetEyeMouthTypeElement(FFLExpression expressi
     return EYE_MOUTH_TYPE_ELEMENT[expression];
 }
 
-u32 FFLiGetMaxMouthNum(u32 expressionFlagCount)
+u32 FFLiGetMaxMouthNum(u64 expressionFlagCount)
 {
     return FFLiMin<u32>(expressionFlagCount, FFLI_MOUTH_TEXTURE_TYPE_MAX);
 }
 
-u32 FFLiGetMaxEyeNum(u32 expressionFlagCount)
+u32 FFLiGetMaxEyeNum(u64 expressionFlagCount)
 {
     return FFLiMin<u32>(expressionFlagCount + 1, FFLI_EYE_TEXTURE_TYPE_MAX);
 }
 
 namespace {
 
-void ExpressionToEyeUseFlag(bool* pUseFlag, u32 expressionFlag)
+void ExpressionToEyeUseFlag(bool* pUseFlag, u64 expressionFlag)
 {
     rio::MemUtil::set(pUseFlag, 0, sizeof(bool) * FFLI_EYE_TEXTURE_TYPE_MAX);
 
     for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
     {
-        if (expressionFlag & 1 << i)
+        if (expressionFlag & static_cast<u64>(1) << i)
         {
             pUseFlag[EYE_MOUTH_TYPE_ELEMENT[i].eyeTextureType[0]] = true;
             pUseFlag[EYE_MOUTH_TYPE_ELEMENT[i].eyeTextureType[1]] = true;
@@ -379,17 +380,17 @@ void ExpressionToEyeUseFlag(bool* pUseFlag, u32 expressionFlag)
     }
 }
 
-void ExpressionToMouthUseFlag(bool* pUseFlag, u32 expressionFlag)
+void ExpressionToMouthUseFlag(bool* pUseFlag, u64 expressionFlag)
 {
     rio::MemUtil::set(pUseFlag, 0, sizeof(bool) * FFLI_MOUTH_TEXTURE_TYPE_MAX);
 
     for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
-        if (expressionFlag & 1 << i)
+        if (expressionFlag & static_cast<u64>(1) << i)
             pUseFlag[EYE_MOUTH_TYPE_ELEMENT[i].mouthTextureType] = true;
 
 }
 
-void DeleteTextures_Eye(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, bool isExpand)
+void DeleteTextures_Eye(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, bool isExpand)
 {
     bool useFlag[FFLI_EYE_TEXTURE_TYPE_MAX];
     ExpressionToEyeUseFlag(useFlag, expressionFlag);
@@ -399,7 +400,7 @@ void DeleteTextures_Eye(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, b
             FFLiDeleteTexture(&(pPartsTextures->pTexturesEye[j - 1]), isExpand);
 }
 
-void DeleteTextures_Mouth(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, bool isExpand)
+void DeleteTextures_Mouth(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, bool isExpand)
 {
     bool useFlag[FFLI_MOUTH_TEXTURE_TYPE_MAX];
     ExpressionToMouthUseFlag(useFlag, expressionFlag);

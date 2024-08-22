@@ -104,14 +104,14 @@ class   FFLiResourceLoader;
 s32 FFLiCharInfoAndTypeToEyeIndex(const FFLiCharInfo* pCharInfo, FFLiEyeTextureType type);
 s32 FFLiCharInfoAndTypeToMouthIndex(const FFLiCharInfo* pCharInfo, FFLiMouthTextureType type);
 
-FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, u32 expressionFlag, FFLiResourceLoader* pResLoader);
-void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, u32 expressionFlag, FFLResourceType resourceType);
+FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, u64 expressionFlag, FFLiResourceLoader* pResLoader);
+void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, FFLResourceType resourceType);
 
 void FFLiInvalidatePartsTextures(FFLiPartsTextures* pPartsTextures);
 
 const FFLiEyeMouthTypeElement& FFLiGetEyeMouthTypeElement(FFLExpression expression);
 
-u32 FFLiGetMaxMouthNum(u32 expressionFlagCount);
-u32 FFLiGetMaxEyeNum(u32 expressionFlagCount);
+u32 FFLiGetMaxMouthNum(u64 expressionFlagCount);
+u32 FFLiGetMaxEyeNum(u64 expressionFlagCount);
 
 #endif // FFLI_PARTS_TEXTURES_H_

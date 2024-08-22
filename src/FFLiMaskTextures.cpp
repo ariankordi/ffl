@@ -23,16 +23,16 @@ rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch);
 FFLiRenderTexture* FFLiRenderTextureAllocate();
 void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture);
 
-bool CanUseExpression(u32 expressionFlag, FFLExpression expression);
+bool CanUseExpression(u64 expressionFlag, FFLExpression expression);
 
-void InitRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag);
-void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag);
+void InitRawMask(FFLiMaskTexturesTempObject* pObject, u64 expressionFlag);
+void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, u64 expressionFlag);
 
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo* pCharInfo, FFLExpression expression);
 
 }
 
-FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, u32 expressionFlag, u32 resolution, bool enableMipMap)
+FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, u64 expressionFlag, u32 resolution, bool enableMipMap)
 {
     FFLExpression expression = FFL_EXPRESSION_MAX;
 
@@ -40,7 +40,7 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, u32 expressi
 
     for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
     {
-        if ((expressionFlag & 1 << i) == 0)
+        if ((expressionFlag & static_cast<u64>(1) << i) == 0)
         {
             pMaskTextures->pRenderTextures[i] = NULL;
             continue;
@@ -70,7 +70,7 @@ void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures)
     }
 }
 
-FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, u32 expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader)
+FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, u64 expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader)
 {
     rio::MemUtil::set(pObject, 0, sizeof(FFLiMaskTexturesTempObject));
 
@@ -117,7 +117,7 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
     return FFL_RESULT_OK;
 }
 
-void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag, FFLResourceType resourceType)
+void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, u64 expressionFlag, FFLResourceType resourceType)
 {
     for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
@@ -195,19 +195,19 @@ void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture)
     delete pRenderTexture;
 }
 
-bool CanUseExpression(u32 expressionFlag, FFLExpression expression)
+bool CanUseExpression(u64 expressionFlag, FFLExpression expression)
 {
-    return (expressionFlag & 1 << expression) != 0;
+    return (expressionFlag & static_cast<u64>(1) << expression) != 0;
 }
 
-void InitRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag)
+void InitRawMask(FFLiMaskTexturesTempObject* pObject, u64 expressionFlag)
 {
     for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
         if (CanUseExpression(expressionFlag, FFLExpression(i)))
             pObject->pRawMaskDrawParam[i] = new FFLiRawMaskDrawParam;
 }
 
-void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag)
+void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, u64 expressionFlag)
 {
     for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
