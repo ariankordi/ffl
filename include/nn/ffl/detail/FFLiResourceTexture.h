@@ -27,17 +27,18 @@ struct FFLiResourceTextureHeader
     u32                     partsMaxSize[FFLI_TEXTURE_PARTS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoBeard[3];
     FFLiResourcePartsInfo   partsInfoCap[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoEye[FFL_EYE_TYPE_TRUE_MAX];
-    FFLiResourcePartsInfo   partsInfoEyebrow[FFL_EYEBROW_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoEye[80];
+    FFLiResourcePartsInfo   partsInfoEyebrow[28];
     FFLiResourcePartsInfo   partsInfoFaceline[FFL_FACE_LINE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceMakeup[FFL_FACE_MAKE_MAX];
-    FFLiResourcePartsInfo   partsInfoGlass[FFL_GLASS_TYPE_MAX];
+    // leave this as FFL_GLASS_TYPE_MAX for AFLResHigh.dat NOT 2_3
+    FFLiResourcePartsInfo   partsInfoGlass[20];
     FFLiResourcePartsInfo   partsInfoMole[FFL_MOLE_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoMouth[FFL_MOUTH_TYPE_TRUE_MAX];
+    FFLiResourcePartsInfo   partsInfoMouth[52];
     FFLiResourcePartsInfo   partsInfoMustache[FFL_MUSTACHE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoNoseline[FFL_NOSE_TYPE_MAX];
 };
-NN_STATIC_ASSERT(sizeof(FFLiResourceTextureHeader) == 0x13FC);
+//NN_STATIC_ASSERT(sizeof(FFLiResourceTextureHeader) == 0x13FC);
 
 class FFLiResourceTextureFooter
 {
@@ -54,7 +55,7 @@ public:
 
     u8 NumMips() const
     {
-        return m_NumMips;
+        return 1;
     }
 
     GX2SurfaceFormat SurfaceFormat() const;

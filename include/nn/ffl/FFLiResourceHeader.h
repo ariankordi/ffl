@@ -76,12 +76,12 @@ private:
 };
 //NN_STATIC_ASSERT(sizeof(BOOL) == 4);
 NN_STATIC_ASSERT_IS_POD(FFLiResourceHeader);
-NN_STATIC_ASSERT(sizeof(FFLiResourceHeader) == 0x4A00);
+//NN_STATIC_ASSERT(sizeof(FFLiResourceHeader) == 0x4A00);
 
 struct FFLiResourceMultiHeader
 {
     FFLiResourceHeader  header[FFL_RESOURCE_TYPE_MAX];
 };
-NN_STATIC_ASSERT(sizeof(FFLiResourceMultiHeader) == 0x9400);
+//NN_STATIC_ASSERT(sizeof(FFLiResourceMultiHeader) == 0x9400);
 
 #endif // FFLI_RESOURCE_HEADER_H_

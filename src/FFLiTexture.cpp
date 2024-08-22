@@ -56,7 +56,7 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
     surface.format = footer.SurfaceFormat();
     surface.aa = GX2_AA_MODE_1X;
     surface.use = GX2_SURFACE_USE_TEXTURE;
-    surface.tileMode = GX2_TILE_MODE_DEFAULT;
+    surface.tileMode = GX2_TILE_MODE_LINEAR_SPECIAL;
     surface.swizzle = 0;
 
     GX2CalcSurfaceSizeAndAlignment(&surface);
