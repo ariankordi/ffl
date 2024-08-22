@@ -235,7 +235,12 @@ s32 FFLiiGetEyeRotateOffset(s32 type)
         3, 3, 3, 3,
         4, 4, 4, 4,
         3, 4, 4, 3,
-        4, 4
+        4, 4, 4, 4,
+
+        4, 4, 4, 4,
+        4, 4, 4, 4,
+        4, 4, 4, 4,
+        4, 4, 4, 4
     };
     return 32 - ROTATE[type];
 }
@@ -248,7 +253,9 @@ s32 FFLiiGetEyebrowRotateOffset(s32 type)
         4, 7, 6, 8,
         5, 5, 6, 6,
         7, 7, 6, 6,
-        5, 6, 7, 5
+        5, 6, 7, 5,
+
+        6, 6, 6, 6
     };
     return 32 - ROTATE[type];
 }

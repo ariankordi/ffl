@@ -9,7 +9,7 @@ extern "C" {
 
 typedef enum FFLExpression
 {
-    FFL_EXPRESSION_MAX = 19
+    FFL_EXPRESSION_MAX = 70
 }
 FFLExpression;
 

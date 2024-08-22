@@ -38,8 +38,9 @@ bool FFLiCharModelCreateParam::CheckModelDesc(const FFLCharModelDesc* pDesc)
     if (pDesc->resourceType >= FFL_RESOURCE_TYPE_MAX)
         return false;
 
-    if ((pDesc->expressionFlag & 0x7ffff) == 0)
+    /*if ((pDesc->expressionFlag & 0x7ffff) == 0)
         return false;
+    */
 
     if ((pDesc->modelFlag & 7) == 0)
         return false;
