@@ -2,6 +2,7 @@
 #include <nn/ffl/FFLiRawMask.h>
 #include <nn/ffl/FFLiRawMaskParts.h>
 #include <nn/ffl/FFLiShaderCallback.h>
+#include <nn/ffl/FFLiPartsTextures.h>
 
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
@@ -31,6 +32,14 @@ struct RawMasks
 void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex);
 
 }
+
+#define EXCLUDE_COLOR_FROM_EYE_TEXTURE_TYPES_SIZE 4
+
+const s32 excludeColorFromEyeTextureTypes[EXCLUDE_COLOR_FROM_EYE_TEXTURE_TYPES_SIZE] = {
+    0x49, 0x48, 0x41, 0x3E
+    /*FFLI_EYE_TEXTURE_TYPE_22, FFLI_EYE_TEXTURE_TYPE_21,
+    FFLI_EYE_TEXTURE_TYPE_14, FFLI_EYE_TEXTURE_TYPE_11*/
+};
 
 void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex, const FFLiRawMaskTextureDesc* pDesc)
 {
@@ -72,9 +81,19 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     }
 
     FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[0]));
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), &(rawMasks.rawMaskPartsDescEye[0]), &projMatrix);
-
     FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[1]));
+
+    // for certain eye indices (only testing left eye index for now)...
+    // ... exclude color entirely by setting modulate mode to 1
+    for (s32 i = 0; i < EXCLUDE_COLOR_FROM_EYE_TEXTURE_TYPES_SIZE; i++) {
+        if (excludeColorFromEyeTextureTypes[i] == leftEyeIndex) {
+            pDrawParam->drawParamRawMaskPartsEye[0].modulateParam.mode = FFL_MODULATE_MODE_1;
+            pDrawParam->drawParamRawMaskPartsEye[1].modulateParam.mode = FFL_MODULATE_MODE_1;
+            break;
+        }
+    }
+
+    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), &(rawMasks.rawMaskPartsDescEye[0]), &projMatrix);
     FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), &(rawMasks.rawMaskPartsDescEye[1]), &projMatrix);
 
     if (pDesc->pTextureMole != NULL) {

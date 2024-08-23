@@ -93,8 +93,8 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
             desc.pTexturesEye[0] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[0]];
             desc.pTexturesEye[1] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[1]];
 
-            desc.pTexturesEyebrow[0] = pObject->partsTextures.pTextureEyebrow;
-            desc.pTexturesEyebrow[1] = pObject->partsTextures.pTextureEyebrow;
+            desc.pTexturesEyebrow[0] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
+            desc.pTexturesEyebrow[1] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
 
             desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
@@ -306,6 +306,85 @@ const CorrectParam& GetCorrectParam(FFLExpression expression)
 
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo*, FFLExpression expression)
 {
+    // courtesy of miitomo
+    switch(expression) {
+    case 19:
+    case 20:
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+    case 45:
+    case 46:
+    case 53:
+    case 54:
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        break;
+    case 25:
+    case 26:
+    case 37:
+    case 38:
+    case 55:
+    case 56:
+    case 57:
+    case 58:
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        break;
+    case 33:
+    case 34:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        break;
+    case 35:
+    case 36:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        break;
+    case 39:
+    case 40:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyebrowRotate = 6;
+        break;
+    case 43:
+    case 44:
+    case 47:
+    case 48:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        break;
+    case 49:
+    case 50:
+    case 51:
+    case 52:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyebrowScale = 4;
+        pExpressionCharInfo->parts.eyebrowScaleY = 3;
+        pExpressionCharInfo->parts.eyebrowRotate = 6;
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        pExpressionCharInfo->parts.eyeSpacingX = 2;
+        pExpressionCharInfo->parts.eyePositionY = 12;
+        pExpressionCharInfo->parts.eyebrowSpacingX = 2;
+        pExpressionCharInfo->parts.eyebrowPositionY = 10;
+        pExpressionCharInfo->parts.mouthPositionY = 13;
+        break;
+    case 67:
+    case 68:
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        break;
+    case 69:
+    case 70:
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+    }
+
     const CorrectParam& param = GetCorrectParam(expression);
 
     if (param.mouthType >= 0)
@@ -314,14 +393,19 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     s32 eyeRotateOffset = param.eyeRotateOffset;
     if (param.eyeType >= 0 && param.eyeType != pExpressionCharInfo->parts.eyeType)
     {
-        eyeRotateOffset += FFLiiGetEyeRotateOffset(pExpressionCharInfo->parts.eyeType);
-        eyeRotateOffset -= FFLiiGetEyeRotateOffset(param.eyeType);
+        s32 iVar1 = FFLiiGetEyeRotateOffset(pExpressionCharInfo->parts.eyeType);
+        s32 iVar2 = FFLiiGetEyeRotateOffset(param.eyeType);
+        if (param.eyeType < 62)
+            eyeRotateOffset = (eyeRotateOffset + iVar1) - iVar2;
+        else
+            eyeRotateOffset = (eyeRotateOffset - iVar1) + iVar2;
     }
 
-    if (eyeRotateOffset != 0)
+    s32 eyeRotate;
+    if (param.eyeType > 0 && eyeRotateOffset != 0)
     {
         // pExpressionCharInfo->parts.eyeRotate = clamp(pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset, 0, 7);
-        s32 eyeRotate = pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset;
+        eyeRotate = pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset;
         if (eyeRotate < 0)
             eyeRotate = 0;
         else if (eyeRotate > 7)
@@ -329,9 +413,32 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.eyeRotate = eyeRotate;
     }
 
-    pExpressionCharInfo->parts.eyebrowPositionY += param.eyebrowPositionY;
+    if (pExpressionCharInfo->parts.mouthType == 48)
+        pExpressionCharInfo->parts.mouthScale = 8;
+
+    s32 mouthScaleY;
+    if (expression == 67) {
+        if (pExpressionCharInfo->parts.mouthScaleY < 3) {
+            mouthScaleY = 0;
+        } else {
+            mouthScaleY = pExpressionCharInfo->parts.mouthScaleY + -3;
+            if (mouthScaleY > 6) {
+                mouthScaleY = 6;
+            }
+        }
+        pExpressionCharInfo->parts.mouthScaleY = mouthScaleY;
+    }
+
+    // the below is done in AFLiExpressionTexture::setup
+    // NOTE: dont' think this worksl ol
+    if ((expression - 49 < 0xe)
+        && ((0x300fU >> (expression - 49 & 0xff) & 1) != 0)
+    ) {
+        pExpressionCharInfo->parts.mustacheType = 0;
+    }
 
     s32 eyebrowRotateOffset = param.eyebrowRotateOffset;
+    pExpressionCharInfo->parts.eyebrowPositionY += param.eyebrowPositionY;
     if (eyebrowRotateOffset != 0)
     {
         // pExpressionCharInfo->parts.eyebrowRotate = clamp(pExpressionCharInfo->parts.eyebrowRotate + eyebrowRotateOffset, 0, 11);

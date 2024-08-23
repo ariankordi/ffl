@@ -84,7 +84,7 @@ struct FFLiPartsTextures
 {
     rio::Texture2D* pTexturesEye[FFLI_EYE_TEXTURE_TYPE_MAX];
     rio::Texture2D* pTexturesMouth[FFLI_MOUTH_TEXTURE_TYPE_MAX];
-    rio::Texture2D* pTextureEyebrow;
+    rio::Texture2D* pTexturesEyebrow[FFLI_EYEBROW_TEXTURE_TYPE_MAX];
     rio::Texture2D* pTextureMustache;
     rio::Texture2D* pTextureMole;
 };
@@ -103,6 +103,7 @@ class   FFLiResourceLoader;
 
 s32 FFLiCharInfoAndTypeToEyeIndex(const FFLiCharInfo* pCharInfo, FFLiEyeTextureType type);
 s32 FFLiCharInfoAndTypeToMouthIndex(const FFLiCharInfo* pCharInfo, FFLiMouthTextureType type);
+s32 FFLiCharInfoAndTypeToEyebrowIndex(const FFLiCharInfo* pCharInfo, FFLiEyebrowTextureType type);
 
 FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, FFLiResourceLoader* pResLoader);
 void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
@@ -113,5 +114,6 @@ const FFLiEyeMouthTypeElement& FFLiGetEyeMouthTypeElement(FFLExpression expressi
 
 u32 FFLiGetMaxMouthNum(FFLExpressionFlag expressionFlagCount);
 u32 FFLiGetMaxEyeNum(FFLExpressionFlag expressionFlagCount);
+u32 FFLiGetMaxEyebrowNum(FFLExpressionFlag expressionFlagCount);
 
 #endif // FFLI_PARTS_TEXTURES_H_
