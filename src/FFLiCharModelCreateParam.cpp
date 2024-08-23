@@ -30,6 +30,8 @@ bool FFLiCharModelCreateParam::IsEnabledMipMap(FFLResolution resolution)
     return resolution & FFL_RESOLUTION_MIP_MAP_ENABLE_MASK;
 }
 
+#define FFL_MAX_EXPRESSION_FLAG_MASK ((FFLExpressionFlag)1 << FFL_EXPRESSION_MAX) - 1
+
 bool FFLiCharModelCreateParam::CheckModelDesc(const FFLCharModelDesc* pDesc)
 {
     if (pDesc == NULL)
@@ -38,9 +40,8 @@ bool FFLiCharModelCreateParam::CheckModelDesc(const FFLCharModelDesc* pDesc)
     if (pDesc->resourceType >= FFL_RESOURCE_TYPE_MAX)
         return false;
 
-    /*if ((pDesc->expressionFlag & 0x7ffff) == 0)
+    if ((pDesc->expressionFlag & FFL_MAX_EXPRESSION_FLAG_MASK) == 0)
         return false;
-    */
 
     if ((pDesc->modelFlag & 7) == 0)
         return false;

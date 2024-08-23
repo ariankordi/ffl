@@ -146,6 +146,14 @@ enum
     FFLI_FAVORITE_COLOR_NUM = FFL_FAVORITE_COLOR_MAX
 };
 
+// __int128 will only be defined on gnu, 64-bit
+#if __SIZEOF_INT128__
+typedef __int128 FFLExpressionFlag;
+#else
+// otherwise it is a u32 like normal
+typedef u32 FFLExpressionFlag;
+#endif
+
 #ifdef __cplusplus
 }
 #endif

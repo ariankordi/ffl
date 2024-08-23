@@ -88,7 +88,7 @@ struct FFLiPartsTextures
     rio::Texture2D* pTextureMustache;
     rio::Texture2D* pTextureMole;
 };
-NN_STATIC_ASSERT32(sizeof(FFLiPartsTextures) == 0x38);
+NN_STATIC_ASSERT32(sizeof(FFLiPartsTextures) == 0xE8);
 
 struct FFLiEyeMouthTypeElement
 {
@@ -104,14 +104,14 @@ class   FFLiResourceLoader;
 s32 FFLiCharInfoAndTypeToEyeIndex(const FFLiCharInfo* pCharInfo, FFLiEyeTextureType type);
 s32 FFLiCharInfoAndTypeToMouthIndex(const FFLiCharInfo* pCharInfo, FFLiMouthTextureType type);
 
-FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, u64 expressionFlag, FFLiResourceLoader* pResLoader);
-void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, u64 expressionFlag, FFLResourceType resourceType);
+FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, FFLiResourceLoader* pResLoader);
+void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
 
 void FFLiInvalidatePartsTextures(FFLiPartsTextures* pPartsTextures);
 
 const FFLiEyeMouthTypeElement& FFLiGetEyeMouthTypeElement(FFLExpression expression);
 
-u32 FFLiGetMaxMouthNum(u64 expressionFlagCount);
-u32 FFLiGetMaxEyeNum(u64 expressionFlagCount);
+u32 FFLiGetMaxMouthNum(FFLExpressionFlag expressionFlagCount);
+u32 FFLiGetMaxEyeNum(FFLExpressionFlag expressionFlagCount);
 
 #endif // FFLI_PARTS_TEXTURES_H_

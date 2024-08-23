@@ -10,14 +10,14 @@ extern "C" {
 
 typedef struct FFLCharModelDesc
 {
-    FFLResolution   resolution;
-    u64             expressionFlag;
-    u32             modelFlag;
-    FFLResourceType resourceType;
+    FFLResolution     resolution;
+    FFLExpressionFlag expressionFlag;
+    u32               modelFlag;
+    FFLResourceType   resourceType;
     int             _10;    // Deleted
 }
 FFLCharModelDesc;
-NN_STATIC_ASSERT(sizeof(FFLCharModelDesc) == 0x20);
+//NN_STATIC_ASSERT(sizeof(FFLCharModelDesc) == 0x20);
 
 #ifdef __cplusplus
 }

@@ -15,6 +15,6 @@ struct FFLiMaskTexturesTempObject
     void*                   _84;
     void*                   _88[FFL_EXPRESSION_MAX];    // Deleted
 };
-NN_STATIC_ASSERT32(sizeof(FFLiMaskTexturesTempObject) == 0xD4);
+NN_STATIC_ASSERT32(sizeof(FFLiMaskTexturesTempObject) == 0x31C);
 
 #endif // FFLI_MASK_TEXTURES_TEMP_OBJECT_H_
