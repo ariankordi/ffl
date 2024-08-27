@@ -171,7 +171,15 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     FFLiShaderCallback shaderCallback;
     shaderCallback.Set(pCallback);
 
-    shaderCallback.CallSetMatrix(rio::Matrix44f::ident);
+    rio::Matrix44f mvpMatrix = rio::Matrix44f::ident;
+
+    // Flip Y in the view matrix when the
+    // default GL clip control is being used
+#ifdef RIO_NO_CLIP_CONTROL
+    mvpMatrix.m[1][1] *= -1.f;
+#endif
+
+    shaderCallback.CallSetMatrix(mvpMatrix);
 
     FFLiRenderMaskTextures(&pModel->maskTextures, &pModel->pTextureTempObject->maskTextures, &shaderCallback
 #if RIO_IS_CAFE
