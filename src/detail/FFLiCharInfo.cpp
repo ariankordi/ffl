@@ -4,6 +4,8 @@
 #include <nn/ffl/FFLiMisc.h>
 #include <nn/ffl/FFLiUtil.h>
 
+#include <nn/ffl/FFLiColor.h>
+
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
 #include <cstring>
@@ -30,10 +32,8 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_FACE_TYPE_MAX - 1, pCharInfo->parts.faceType))
         return FFLI_VERIFY_CHAR_INFO_REASON_FACE_TYPE_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_FACELINE_COLOR_MAX - 1, pCharInfo->parts.facelineColor))
+    if (!FFLiRange<s32>(0, NNMII_FACELINE_COLOR_MAX - 1, pCharInfo->parts.facelineColor))
         return FFLI_VERIFY_CHAR_INFO_REASON_FACELINE_COLOR_INVALID;
-    #endif
 
     if (!FFLiRange<s32>(0, FFL_FACE_LINE_MAX - 1, pCharInfo->parts.faceLine))
         return FFLI_VERIFY_CHAR_INFO_REASON_FACE_LINE_INVALID;
@@ -44,10 +44,13 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_HAIR_TYPE_MAX - 1, pCharInfo->parts.hairType))
         return FFLI_VERIFY_CHAR_INFO_REASON_HAIR_TYPE_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_HAIR_COLOR_MAX - 1, pCharInfo->parts.hairColor))
-        return FFLI_VERIFY_CHAR_INFO_REASON_HAIR_COLOR_INVALID;
-    #endif
+    if (isCommonColorMarked(pCharInfo->parts.hairColor)) {
+        if (!FFLiRange<s32>(0, NNMII_COMMON_COLOR_MAX - 1, unmarkCommonColor(pCharInfo->parts.hairColor)))
+            return FFLI_VERIFY_CHAR_INFO_REASON_HAIR_COLOR_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_HAIR_COLOR_MAX - 1, pCharInfo->parts.hairColor))
+            return FFLI_VERIFY_CHAR_INFO_REASON_HAIR_COLOR_INVALID;
+    }
 
     if (!FFLiRange<s32>(0, FFL_HAIR_DIR_MAX - 1, pCharInfo->parts.hairDir))
         return FFLI_VERIFY_CHAR_INFO_REASON_HAIR_DIR_INVALID;
@@ -55,10 +58,13 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_EYE_TYPE_DATA_MAX - 1, pCharInfo->parts.eyeType))
         return FFLI_VERIFY_CHAR_INFO_REASON_EYE_TYPE_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_EYE_COLOR_MAX - 1, pCharInfo->parts.eyeColor))
-        return FFLI_VERIFY_CHAR_INFO_REASON_EYE_COLOR_INVALID;
-    #endif
+    if (isCommonColorMarked(pCharInfo->parts.eyeColor)) {
+        if (!FFLiRange<s32>(0, NNMII_COMMON_COLOR_MAX - 1, unmarkCommonColor(pCharInfo->parts.eyeColor)))
+            return FFLI_VERIFY_CHAR_INFO_REASON_EYE_COLOR_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_EYE_COLOR_MAX - 1, pCharInfo->parts.eyeColor))
+            return FFLI_VERIFY_CHAR_INFO_REASON_EYE_COLOR_INVALID;
+    }
 
     if (!FFLiRange<s32>(0, FFL_EYE_SCALE_MAX - 1, pCharInfo->parts.eyeScale))
         return FFLI_VERIFY_CHAR_INFO_REASON_EYE_SCALE_INVALID;
@@ -78,10 +84,13 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_EYEBROW_TYPE_MAX - 1, pCharInfo->parts.eyebrowType))
         return FFLI_VERIFY_CHAR_INFO_REASON_EYEBROW_TYPE_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_EYEBROW_COLOR_MAX - 1, pCharInfo->parts.eyebrowColor))
-        return FFLI_VERIFY_CHAR_INFO_REASON_EYEBROW_COLOR_INVALID;
-    #endif
+    if (isCommonColorMarked(pCharInfo->parts.eyebrowColor)) {
+        if (!FFLiRange<s32>(0, NNMII_COMMON_COLOR_MAX - 1, unmarkCommonColor(pCharInfo->parts.eyebrowColor)))
+            return FFLI_VERIFY_CHAR_INFO_REASON_EYEBROW_COLOR_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_EYEBROW_COLOR_MAX - 1, pCharInfo->parts.eyebrowColor))
+            return FFLI_VERIFY_CHAR_INFO_REASON_EYEBROW_COLOR_INVALID;
+    }
 
     if (!FFLiRange<s32>(0, FFL_EYEBROW_SCALE_MAX - 1, pCharInfo->parts.eyebrowScale))
         return FFLI_VERIFY_CHAR_INFO_REASON_EYEBROW_SCALE_INVALID;
@@ -110,10 +119,13 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_MOUTH_TYPE_DATA_MAX - 1, pCharInfo->parts.mouthType))
         return FFLI_VERIFY_CHAR_INFO_REASON_MOUTH_TYPE_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_MOUTH_COLOR_MAX - 1, pCharInfo->parts.mouthColor))
-        return FFLI_VERIFY_CHAR_INFO_REASON_MOUTH_COLOR_INVALID;
-    #endif
+    if (isCommonColorMarked(pCharInfo->parts.mouthColor)) {
+        if (!FFLiRange<s32>(0, NNMII_COMMON_COLOR_MAX - 1, unmarkCommonColor(pCharInfo->parts.mouthColor)))
+            return FFLI_VERIFY_CHAR_INFO_REASON_MOUTH_COLOR_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_MOUTH_COLOR_MAX - 1, pCharInfo->parts.mouthColor))
+            return FFLI_VERIFY_CHAR_INFO_REASON_MOUTH_COLOR_INVALID;
+    }
 
     if (!FFLiRange<s32>(0, FFL_MOUTH_SCALE_MAX - 1, pCharInfo->parts.mouthScale))
         return FFLI_VERIFY_CHAR_INFO_REASON_MOUTH_SCALE_INVALID;
@@ -130,10 +142,13 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_BEARD_TYPE_MAX - 1, pCharInfo->parts.beardType))
         return FFLI_VERIFY_CHAR_INFO_REASON_BEARD_TYPE_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_BEARD_COLOR_MAX - 1, pCharInfo->parts.beardColor))
-        return FFLI_VERIFY_CHAR_INFO_REASON_BEARD_COLOR_INVALID;
-    #endif
+    if (isCommonColorMarked(pCharInfo->parts.beardColor)) {
+        if (!FFLiRange<s32>(0, NNMII_COMMON_COLOR_MAX - 1, unmarkCommonColor(pCharInfo->parts.beardColor)))
+            return FFLI_VERIFY_CHAR_INFO_REASON_BEARD_COLOR_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_BEARD_COLOR_MAX - 1, pCharInfo->parts.beardColor))
+            return FFLI_VERIFY_CHAR_INFO_REASON_BEARD_COLOR_INVALID;
+    }
 
     if (!FFLiRange<s32>(0, FFL_MUSTACHE_SCALE_MAX - 1, pCharInfo->parts.mustacheScale))
         return FFLI_VERIFY_CHAR_INFO_REASON_MUSTACHE_SCALE_INVALID;
@@ -141,15 +156,24 @@ FFLiVerifyCharInfoReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharI
     if (!FFLiRange<s32>(0, FFL_MUSTACHE_POS_MAX - 1, pCharInfo->parts.mustachePositionY))
         return FFLI_VERIFY_CHAR_INFO_REASON_MUSTACHE_POS_INVALID;
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_GLASS_TYPE_MAX - 1, pCharInfo->parts.glassType))
-        return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_TYPE_INVALID;
-    #endif
+    // NOTE: we DO NOT HAVE a specific flag for whether new glass types
+    // are supported, so as a HACK we are using glass color
+    if (isCommonColorMarked(pCharInfo->parts.glassColor)) {
+        // TODO: replace 20 with extended glass types enum, potentially
+        if (!FFLiRange<s32>(0, 20 - 1, pCharInfo->parts.glassType))
+            return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_TYPE_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_GLASS_TYPE_MAX - 1, pCharInfo->parts.glassType))
+            return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_TYPE_INVALID;
+    }
 
-    #ifndef FFL_TEST_DISABLE_MII_COLOR_VERIFY
-    if (!FFLiRange<s32>(0, FFL_GLASS_COLOR_MAX - 1, pCharInfo->parts.glassColor))
-        return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_COLOR_INVALID;
-    #endif
+    if (isCommonColorMarked(pCharInfo->parts.glassColor)) {
+        if (!FFLiRange<s32>(0, NNMII_COMMON_COLOR_MAX - 1, unmarkCommonColor(pCharInfo->parts.glassColor)))
+            return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_COLOR_INVALID;
+    } else {
+        if (!FFLiRange<s32>(0, FFL_GLASS_COLOR_MAX - 1, pCharInfo->parts.glassColor))
+            return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_COLOR_INVALID;
+    }
 
     if (!FFLiRange<s32>(0, FFL_GLASS_SCALE_MAX - 1, pCharInfo->parts.glassScale))
         return FFLI_VERIFY_CHAR_INFO_REASON_GLASS_SCALE_INVALID;
