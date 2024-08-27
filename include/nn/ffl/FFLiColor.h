@@ -63,4 +63,7 @@ bool isCommonColorMarked(s32 index);
 s32 markCommonColor(s32 index);
 s32 unmarkCommonColor(s32 index);
 
+#define NNMII_COMMON_COLOR_MAX 100
+#define NNMII_FACELINE_COLOR_MAX 10
+
 #endif // FFLI_COLOR_H_
