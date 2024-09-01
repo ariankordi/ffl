@@ -30,6 +30,7 @@ FFLiResourceManager::FFLiResourceManager(FFLiResourceMultiHeader* pHeader)
 
 FFLiResourceManager::~FFLiResourceManager()
 {
+    // NOTE: m_pResourceMultiHeader is freed by FFLiResourceManager
 }
 
 const char* FFLiResourceManager::GetRelativeResourcePath(FFLResourceType resourceType, bool LG)
@@ -61,33 +62,87 @@ FFLResult FFLiResourceManager::LoadResourceHeader()
 
 FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
 {
+    RIO_ASSERT(false && "AAA AAAAAAAAAAAAA FFLiResourceManager::LoadResourceHeaderImpl NOT IMPLEMENTED NOT IMPLEMENTEEEEEDDDDDDDDDDDDDDDDDDDDDD\n");
+
     rio::FileHandle fileHandle;
     rio::NativeFileDevice* device = rio::FileDeviceMgr::instance()->getNativeFileDevice();
 
     for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
     {
-        FFLiResourceHeader* pHeader = &(m_pResourceMultiHeader->header[i]);
+        //FFLiResourceHeader* pHeader = &(m_pResourceMultiHeader->header[i]);
+        // FIRST, we will make a small buffer, not reused, just to
+        // read enough about the header to know which kind it is...
+        char pHeaderPreData[sizeof(FFLiResourceHeaderDefaultData)];
 
         if (!device->tryOpen(&fileHandle, GetPath(FFLResourceType(i)), rio::FileDevice::FILE_OPEN_FLAG_READ))
             return FFL_RESULT_FILE_INVALID;
 
         u32 readSize = 0;
-        if (!(fileHandle.tryRead(&readSize, (u8*)pHeader, sizeof(FFLiResourceHeader)) && readSize == sizeof(FFLiResourceHeader)))
+        // ... read into the small buffer.
+        if (!(fileHandle.tryRead(&readSize, (u8*)pHeaderPreData, sizeof(FFLiResourceHeaderDefaultData)) && readSize == sizeof(FFLiResourceHeaderDefaultData)))
         {
             fileHandle.tryClose();
             return FFL_RESULT_FILE_INVALID;
         }
 
-        if (!fileHandle.tryClose())
+        // ... NOW, determine type and try to
+        // read in the ENTIRE header into a NEW buffer
+        bool needsEndianSwap;
+        m_pResourceMultiHeader->header[i] = DetermineAndAllocateResourceHeaderType(pHeaderPreData, &needsEndianSwap);
+        RIO_ASSERT(m_pResourceMultiHeader->header[i] != nullptr);
+
+        // Read in the ENTIRE thing to a brand new buffer.
+        u32 headerSize = m_pResourceMultiHeader->header[i]->GetHeaderSize();
+
+        void* pData = rio::MemUtil::alloc(headerSize, rio::FileDevice::cBufferMinAlignment);
+        rio::MemUtil::copy(pData, &pHeaderPreData, sizeof(FFLiResourceHeaderDefaultData));
+
+        headerSize -= readSize;
+        //readSize = 0;
+
+        if (!(
+            //fileHandle.trySeek(0, rio::FileDevice::SEEK_ORIGIN_BEGIN) &&
+            fileHandle.tryRead(&readSize, (u8*)pData+readSize, headerSize)
+            && readSize == headerSize
+            ))
+        {
+            fileHandle.tryClose();
+            rio::MemUtil::free(pData);
+            delete m_pResourceMultiHeader->header[i];
+            m_pResourceMultiHeader->header[i] = nullptr;
             return FFL_RESULT_FILE_INVALID;
+        }
 
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-        pHeader->SwapEndian();
-#endif // __BYTE_ORDER__
 
-        FFLResult result = FFLiIsVaildResourceHeader(pHeader);
+        // Use that buffer in the header class.
+        m_pResourceMultiHeader->header[i]->SetHeader(pData);
+        // (Will be freed by the destructor)
+
+        if (!fileHandle.tryClose())
+        {
+            rio::MemUtil::free(pData);
+            delete m_pResourceMultiHeader->header[i];
+            m_pResourceMultiHeader->header[i] = nullptr;
+            return FFL_RESULT_FILE_INVALID;
+        }
+
+        if (m_pResourceMultiHeader->header[i]->m_NeedsEndianSwap)
+        {
+            // If reading the entire thing from the beginning:
+            // flip endianness for only the first part of the header
+            reinterpret_cast<FFLiResourceHeaderDefaultData*>(pData)->SwapEndian();
+            m_pResourceMultiHeader->header[i]->SwapEndian();
+        }
+
+        FFLResult result = FFLiIsVaildResourceHeader(m_pResourceMultiHeader->header[i]);
+        RIO_ASSERT(result == FFL_RESULT_OK);
         if (result != FFL_RESULT_OK)
+        {
+            rio::MemUtil::free(pData);
+            delete m_pResourceMultiHeader->header[i];
+            m_pResourceMultiHeader->header[i] = nullptr;
             return result;
+        }
     }
 
     return FFL_RESULT_OK;
@@ -119,7 +174,8 @@ FFLiResourceHeader* FFLiResourceManager::HeaderFromCache(FFLResourceType resourc
 
 FFLiResourceHeader* FFLiResourceManager::HeaderFromFile(FFLResourceType resourceType) const
 {
-    return &(m_pResourceMultiHeader->header[resourceType]);
+    RIO_LOG("AAA AAAAAAAAAAAAA FFLiResourceManager::HeaderFromFile NOT IMPLEMENTED NOT IMPLEMENTEEEEEDDDDDDDDDDDDDDDDDDDDDD\n");
+    return m_pResourceMultiHeader->header[resourceType];
 }
 
 u32 FFLiResourceManager::GetTextureAlignedMaxSize(FFLResourceType resourceType, FFLiTexturePartsType partsType) const

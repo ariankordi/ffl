@@ -2,9 +2,11 @@
 #include <nn/ffl/FFLiSwapEndian.h>
 #include <nn/ffl/FFLiUtil.h>
 
+#include <nn/ffl/detail/FFLiResourceTexture.h>
+
 #define SIZE_OF_MEMBER(cls, member) sizeof( ((cls*)0)->member )
 
-u32 FFLiGetTextureResourceNum(FFLiTexturePartsType partsType)
+u32 FFLiResourceHeaderDefault::GetTextureResourceNum(FFLiTexturePartsType partsType) const
 {
     switch (partsType)
     {
@@ -34,6 +36,43 @@ u32 FFLiGetTextureResourceNum(FFLiTexturePartsType partsType)
         return 0;
     }
 }
+
+u32 FFLiResourceHeaderAFL_2_3::GetTextureResourceNum(FFLiTexturePartsType partsType) const
+{
+    switch (partsType)
+    {
+    case FFLI_TEXTURE_PARTS_TYPE_BEARD:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoBeard) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_CAP:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoCap) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_EYE:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoEye) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_EYEBROW:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoEyebrow) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_FACELINE:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoFaceline) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoFaceMakeup) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_GLASS:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoGlass) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_MOLE:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoMole) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_MOUTH:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoMouth) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_MUSTACHE:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoMustache) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_TEXTURE_PARTS_TYPE_NOSELINE:
+        return SIZE_OF_MEMBER(FFLiResourceTextureHeaderAFL_2_3, partsInfoNoseline) / sizeof(FFLiResourcePartsInfo);
+    default:
+        return 0;
+    }
+}
+
+u32 FFLiGetTextureResourceNum(FFLiResourceHeader* pHeader, FFLiTexturePartsType partsType)
+{
+    return pHeader->GetTextureResourceNum(partsType);
+}
+
 
 u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
 {
@@ -68,36 +107,73 @@ u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
     }
 }
 
-FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceTextureHeader* pHeader, FFLiTexturePartsType partsType)
+
+FFLiResourcePartsInfo* FFLiResourceTextureHeader::GetPartsInfos(FFLiTexturePartsType partsType)
 {
-    *pNum = FFLiGetTextureResourceNum(partsType);
     switch (partsType)
     {
     case FFLI_TEXTURE_PARTS_TYPE_BEARD:
-        return pHeader->partsInfoBeard;
+        return this->partsInfoBeard;
     case FFLI_TEXTURE_PARTS_TYPE_CAP:
-        return pHeader->partsInfoCap;
+        return this->partsInfoCap;
     case FFLI_TEXTURE_PARTS_TYPE_EYE:
-        return pHeader->partsInfoEye;
+        return this->partsInfoEye;
     case FFLI_TEXTURE_PARTS_TYPE_EYEBROW:
-        return pHeader->partsInfoEyebrow;
+        return this->partsInfoEyebrow;
     case FFLI_TEXTURE_PARTS_TYPE_FACELINE:
-        return pHeader->partsInfoFaceline;
+        return this->partsInfoFaceline;
     case FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP:
-        return pHeader->partsInfoFaceMakeup;
+        return this->partsInfoFaceMakeup;
     case FFLI_TEXTURE_PARTS_TYPE_GLASS:
-        return pHeader->partsInfoGlass;
+        return this->partsInfoGlass;
     case FFLI_TEXTURE_PARTS_TYPE_MOLE:
-        return pHeader->partsInfoMole;
+        return this->partsInfoMole;
     case FFLI_TEXTURE_PARTS_TYPE_MOUTH:
-        return pHeader->partsInfoMouth;
+        return this->partsInfoMouth;
     case FFLI_TEXTURE_PARTS_TYPE_MUSTACHE:
-        return pHeader->partsInfoMustache;
+        return this->partsInfoMustache;
     case FFLI_TEXTURE_PARTS_TYPE_NOSELINE:
-        return pHeader->partsInfoNoseline;
+        return this->partsInfoNoseline;
     default:
         return NULL;
     }
+}
+
+
+FFLiResourcePartsInfo* FFLiResourceTextureHeaderAFL_2_3::GetPartsInfos(FFLiTexturePartsType partsType)
+{
+    switch (partsType)
+    {
+    case FFLI_TEXTURE_PARTS_TYPE_BEARD:
+        return this->partsInfoBeard;
+    case FFLI_TEXTURE_PARTS_TYPE_CAP:
+        return this->partsInfoCap;
+    case FFLI_TEXTURE_PARTS_TYPE_EYE:
+        return this->partsInfoEye;
+    case FFLI_TEXTURE_PARTS_TYPE_EYEBROW:
+        return this->partsInfoEyebrow;
+    case FFLI_TEXTURE_PARTS_TYPE_FACELINE:
+        return this->partsInfoFaceline;
+    case FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP:
+        return this->partsInfoFaceMakeup;
+    case FFLI_TEXTURE_PARTS_TYPE_GLASS:
+        return this->partsInfoGlass;
+    case FFLI_TEXTURE_PARTS_TYPE_MOLE:
+        return this->partsInfoMole;
+    case FFLI_TEXTURE_PARTS_TYPE_MOUTH:
+        return this->partsInfoMouth;
+    case FFLI_TEXTURE_PARTS_TYPE_MUSTACHE:
+        return this->partsInfoMustache;
+    case FFLI_TEXTURE_PARTS_TYPE_NOSELINE:
+        return this->partsInfoNoseline;
+    default:
+        return NULL;
+    }
+}
+
+FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceHeader* pResHeader, FFLiTexturePartsType partsType)
+{
+    return pResHeader->GetTextureResourcePartsInfos(pNum, partsType);
 }
 
 FFLiResourcePartsInfo* FFLiGetShapeResoucePartsInfos(u32* pNum, FFLiResourceShapeHeader* pHeader, FFLiShapePartsType partsType)
@@ -179,13 +255,13 @@ s32 FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits windowBits)
 
 FFLResult FFLiResourceHeader::GetResult() const
 {
-    if (!FFLiCheckAlignPtr(this, 4))
+    if (!FFLiCheckAlignPtr(GetHeaderRaw(), 4))
         return FFL_RESULT_ERROR;
 
-    if (m_Magic != 0x46465241)  // FFRA
+    if (GetMagic() != 0x46465241)  // FFRA
         return FFL_RESULT_FILE_INVALID;
 
-    if (m_Version != FFLI_RESOURCE_HEADER_VERSION)
+    if (GetVersion() != FFLI_RESOURCE_HEADER_VERSION)
         return FFL_RESULT_FILE_INVALID;
 
     return FFL_RESULT_OK;
@@ -208,25 +284,63 @@ void SwapEndianResourcePartsInfo(FFLiResourcePartsInfo* pPartsInfo, u32 num)
 
 }
 
-void FFLiResourceHeader::SwapEndian()
+// NOTE: both of the below SwapEndian functions
+// assume that everything before parts is already swapped
+
+void FFLiResourceHeaderDefault::SwapEndian()
 {
     // This function is deleted in NSMBU.
     // Therefore, its implementation is only theoretical.
 
-    m_Magic = FFLiSwapEndianImpl<u32>(m_Magic);
-    m_Version = FFLiSwapEndianImpl<u32>(m_Version);
-    m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_UncompressBufferSize);
+    /*
+    m_Header->m_Magic = FFLiSwapEndianImpl<u32>(m_Header->m_Magic);
+    m_Header->m_Version = FFLiSwapEndianImpl<u32>(m_Header->m_Version);
+    m_Header->m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_Header->m_UncompressBufferSize);
 
     // Dunno what to do with this
     // _c
 
-    m_IsExpand = FFLiSwapEndianImpl<u32>(m_IsExpand);
-
-    FFLiSwapEndianArrayImpl<u32>(GetTextureHeader()->partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);
+    m_Header->m_IsExpand = FFLiSwapEndianImpl<u32>(m_Header->m_IsExpand);
+    */
+    FFLiSwapEndianArrayImpl<u32>(m_Header->m_TextureHeader.partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);
     for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, GetTextureHeader(), FFLiTexturePartsType(i));
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, this, FFLiTexturePartsType(i));
+        SwapEndianResourcePartsInfo(pPartsInfo, num);
+    }
+
+    FFLiSwapEndianArrayImpl<u32>(GetShapeHeader()->partsMaxSize, FFLI_SHAPE_PARTS_TYPE_MAX);
+    for (u32 i = 0; i < FFLI_SHAPE_PARTS_TYPE_MAX; i++)
+    {
+        u32 num;
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, GetShapeHeader(), FFLiShapePartsType(i));
+        SwapEndianResourcePartsInfo(pPartsInfo, num);
+    }
+
+    // Dunno what to do with this
+    // _49d0
+}
+
+void FFLiResourceHeaderAFL_2_3::SwapEndian()
+{
+    // This function is deleted in NSMBU.
+    // Therefore, its implementation is only theoretical.
+    /*
+    m_Header->m_Magic = FFLiSwapEndianImpl<u32>(m_Header->m_Magic);
+    m_Header->m_Version = FFLiSwapEndianImpl<u32>(m_Header->m_Version);
+    m_Header->m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_Header->m_UncompressBufferSize);
+
+    // Dunno what to do with this
+    // _c
+
+    m_Header->m_IsExpand = FFLiSwapEndianImpl<u32>(m_Header->m_IsExpand);
+    */
+    FFLiSwapEndianArrayImpl<u32>(m_Header->m_TextureHeader.partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);
+    for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
+    {
+        u32 num;
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, this, FFLiTexturePartsType(i));
         SwapEndianResourcePartsInfo(pPartsInfo, num);
     }
 

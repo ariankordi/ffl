@@ -97,6 +97,12 @@ FFLI_RESOURCE_STRATEGY_UNCOMPRESSED     = 5
 FFLI_RESOURCE_STRATEGY_MAX              = 6
 
 
+# ResHeaderHint
+RES_HINT_DEFAULT = 0
+RES_HINT_AFL     = 1
+RES_HINT_AFL_2_3 = 2
+#RES_HINT_AFL_2_3_NO_2_SHAPES = 3
+
 # big endian default
 endianness_character = '>'
 
@@ -104,6 +110,9 @@ endianness_character = '>'
 if '-LE' in sys.argv:
     endianness_character = '<'
     print("\033[91mWARNING: The little endian option is only meant for if you modified the FFL decomp to take them - No FFL resource has ever been made in little endian so extraction will not work.\033[0m")
+
+# this will be added to the header
+total_uncompressed_size = 0
 
 class FFLiResourcePartsInfo:
     _format = endianness_character + '3I4B'
@@ -160,6 +169,8 @@ class FFLiResourcePartsInfo:
         return partsData
 
     def save(self, partsData, currentFileSize, isExpand=False, expandAlignment=0):
+        global total_uncompressed_size
+
         data = bytearray()
 
         if partsData:
@@ -175,6 +186,8 @@ class FFLiResourcePartsInfo:
 
             dataPos = currentFileSize
             dataSize = len(partsData)
+
+            total_uncompressed_size += dataSize
 
             if self.strategy == FFLI_RESOURCE_STRATEGY_UNCOMPRESSED:
                 compressedSize = 0
@@ -196,6 +209,7 @@ class FFLiResourcePartsInfo:
                 strategy = self.strategy
 
                 compressobj = zlib.compressobj(compressLevel, zlib.DEFLATED, windowBits, memoryLevel, strategy)
+
                 partsData = b''.join([
                     compressobj.compress(partsData),
                     compressobj.flush()
@@ -288,6 +302,7 @@ class FFLiResourceTextureFooter:
 
     @staticmethod
     def save(gx2Texture):
+        global total_uncompressed_size
         if gx2Texture is None:
             return b''
 
@@ -322,6 +337,8 @@ class FFLiResourceTextureFooter:
             numMips,
             textureFormat
         )
+
+        #total_uncompressed_size += len(data)
 
         return data
 
@@ -562,6 +579,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoNoseline.append([partsInfo, gx2Texture])
 
     def save(self, currentFileSize, isExpand=False):
+        global total_uncompressed_size
         data = bytearray()
 
         partsMaxSizeBeard = 0
@@ -688,6 +706,9 @@ class FFLiResourceTextureHeader:
             partsInfoMustacheData,
             partsInfoNoselineData
         )
+
+        #total_uncompressed_size += len(headerData)
+        #total_uncompressed_size += len(data)
 
         return headerData, data
 
@@ -1193,6 +1214,7 @@ class FFLiResourceShapeDataHeader:
 
     @staticmethod
     def save(shape, isExpand=False):
+        global total_uncompressed_size
         if shape is None:
             return b''
 
@@ -1279,6 +1301,8 @@ class FFLiResourceShapeDataHeader:
             dataSize[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX] = indexNum
             partsData += data
             pos += len(data)
+
+        #total_uncompressed_size += len(dataSize)
 
         return b''.join([
             struct.pack(shape._dataPosSizeFormat, *dataPos),
@@ -1775,6 +1799,7 @@ class FFLiResourceShapeHeader:
             self.partsInfoForehead2.append([partsInfo, shape])
 
     def save(self, currentFileSize, isExpand):
+        global total_uncompressed_size
         data = bytearray()
 
         expandAlignment = max(ATTRIBUTE_DATA_ALIGNMENT, INDEX_DATA_ALIGNMENT)
@@ -1914,6 +1939,9 @@ class FFLiResourceShapeHeader:
             partsInfoForehead1Data,
             partsInfoForehead2Data
         )
+
+        #total_uncompressed_size += len(headerData)
+        #total_uncompressed_size += len(data)
 
         return headerData, data
 
@@ -2101,17 +2129,29 @@ class FFLiResourceHeader:
         self.shapeHeader.load(shapeHeaderData, data, pos, self.isExpand)
 
     def save(self):
+        global total_uncompressed_size
         fileSize = self.size
 
         textureHeaderData, textureData = self.textureHeader.save(fileSize, self.isExpand); fileSize += len(textureData)
         shapeHeaderData, shapeData = self.shapeHeader.save(fileSize, self.isExpand); fileSize += len(shapeData)
+
+        # NOTE: this will NOT match any FFL resource, but it will be close
+
+        total_uncompressed_size += self.size
+
+        print(f'total uncompressed size: 0x{total_uncompressed_size:X}')
+
+        # pack resource header hint into first 3 bits ig
+        total_uncompressed_size = (resource_header_hint << 29) | total_uncompressed_size
+        print(f'0x{total_uncompressed_size:X}')
 
         headerData = struct.pack(
             self._format,
             0x46465241,  # b'FFRA',
             0x00070000,
             self.uncompressBufferSize,
-            0,  # unused
+            total_uncompressed_size,
+            #(0x2502DE0 if texture_header_parts_info_sizes[6] == 20 else 0x0CBBDE0),  # _c
             int(self.isExpand),
             textureHeaderData,
             shapeHeaderData
@@ -2207,9 +2247,11 @@ class FFLiResourceHeader:
         self.textureHeader.compare(other.textureHeader)
         self.shapeHeader.compare(other.shapeHeader)
 
+resource_header_hint = RES_HINT_DEFAULT
 
 def header_modify_afl():
-    global texture_header_parts_info_sizes, tile_mode, disable_mipmaps
+    global texture_header_parts_info_sizes, tile_mode, disable_mipmaps, resource_header_hint
+    resource_header_hint = RES_HINT_AFL
     texture_header_parts_info_sizes[2] = 80  # eye type
     texture_header_parts_info_sizes[3] = 28  # eyebrow
     texture_header_parts_info_sizes[8] = 52  # mouth type
@@ -2218,7 +2260,8 @@ def header_modify_afl():
 
 def header_modify_afl_2_3():
     header_modify_afl()
-    global texture_header_parts_info_sizes
+    global texture_header_parts_info_sizes, resource_header_hint
+    resource_header_hint = RES_HINT_AFL_2_3
     texture_header_parts_info_sizes[6] = 20  # glass type
 
 

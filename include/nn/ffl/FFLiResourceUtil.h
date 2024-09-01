@@ -7,4 +7,6 @@ class FFLiResourceHeader;
 
 FFLResult FFLiIsVaildResourceHeader(const FFLiResourceHeader* pHeader);
 
+FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* needsEndianSwap);
+
 #endif // FFLI_RESOURCE_UTIL_H_
