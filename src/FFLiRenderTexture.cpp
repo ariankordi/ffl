@@ -47,6 +47,8 @@ void FFLiDeleteRenderTexture(FFLiRenderTexture* pRenderTexture)
     pRenderTexture->pDepthTarget = nullptr;
 
     delete pRenderBuffer;
+    // NOTE: both of the below show the following warning
+    // warning: deleting object of polymorphic class type 'rio::RenderTargetColor/rio::RenderTargetDepth' which has non-virtual destructor might cause undefined behavior
     delete pColorTarget;
     delete pDepthTarget;
 

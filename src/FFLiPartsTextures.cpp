@@ -402,7 +402,7 @@ void ExpressionToEyeUseFlag(bool* pUseFlag, FFLExpressionFlag expressionFlag)
 {
     rio::MemUtil::set(pUseFlag, 0, sizeof(bool) * FFLI_EYE_TEXTURE_TYPE_MAX);
 
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
     {
         if (expressionFlag & static_cast<FFLExpressionFlag>(1) << i)
         {
@@ -416,7 +416,7 @@ void ExpressionToMouthUseFlag(bool* pUseFlag, FFLExpressionFlag expressionFlag)
 {
     rio::MemUtil::set(pUseFlag, 0, sizeof(bool) * FFLI_MOUTH_TEXTURE_TYPE_MAX);
 
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
         if (expressionFlag & static_cast<FFLExpressionFlag>(1) << i)
             pUseFlag[EYE_MOUTH_TYPE_ELEMENT[i].mouthTextureType] = true;
 
@@ -426,7 +426,7 @@ void ExpressionToEyebrowUseFlag(bool* pUseFlag, FFLExpressionFlag expressionFlag
 {
     rio::MemUtil::set(pUseFlag, 0, sizeof(bool) * FFLI_EYEBROW_TEXTURE_TYPE_MAX);
 
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
         if (expressionFlag & static_cast<FFLExpressionFlag>(1) << i)
             pUseFlag[EYE_MOUTH_TYPE_ELEMENT[i].eyebrowTextureType] = true;
 

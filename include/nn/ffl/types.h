@@ -147,11 +147,16 @@ enum
 };
 
 // __int128 will only be defined on gnu, 64-bit
-#if __SIZEOF_INT128__
+#if !RIO_IS_CAFE && __SIZEOF_INT128__
 typedef __int128 FFLExpressionFlag;
+#define FFL_EXPRESSION_LIMIT FFL_EXPRESSION_MAX
 #else
 // otherwise it is a u32 like normal
 typedef u32 FFLExpressionFlag;
+// FFL_EXPRESSION_LIMIT is what ExpressionTo*UseFlag use
+// the purpose is that this is used in place of FFL_EXPRESSION_MAX
+// so that they don't try to iterate and potentially overflow past 32
+#define FFL_EXPRESSION_LIMIT 31
 #endif
 
 #ifdef __cplusplus

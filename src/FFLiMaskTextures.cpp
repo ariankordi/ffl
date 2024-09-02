@@ -308,60 +308,60 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
 {
     // courtesy of miitomo
     switch(expression) {
-    case 19:
-    case 20:
+    case FFL_EXPRESSION_19:
+    case FFL_EXPRESSION_20:
         pExpressionCharInfo->parts.eyeScale = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
-    case 45:
-    case 46:
-    case 53:
-    case 54:
+    case FFL_EXPRESSION_45:
+    case FFL_EXPRESSION_46:
+    case FFL_EXPRESSION_53:
+    case FFL_EXPRESSION_54:
         pExpressionCharInfo->parts.mouthScaleY = 3;
         pExpressionCharInfo->parts.mouthScale = 4;
         break;
-    case 25:
-    case 26:
-    case 37:
-    case 38:
-    case 55:
-    case 56:
-    case 57:
-    case 58:
+    case FFL_EXPRESSION_25:
+    case FFL_EXPRESSION_26:
+    case FFL_EXPRESSION_37:
+    case FFL_EXPRESSION_38:
+    case FFL_EXPRESSION_55:
+    case FFL_EXPRESSION_56:
+    case FFL_EXPRESSION_57:
+    case FFL_EXPRESSION_58:
         pExpressionCharInfo->parts.eyeScale = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
         pExpressionCharInfo->parts.eyeRotate = 4;
         break;
-    case 33:
-    case 34:
+    case FFL_EXPRESSION_33:
+    case FFL_EXPRESSION_34:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.mouthScaleY = 3;
         pExpressionCharInfo->parts.mouthScale = 4;
         break;
-    case 35:
-    case 36:
+    case FFL_EXPRESSION_35:
+    case FFL_EXPRESSION_36:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
         pExpressionCharInfo->parts.eyeScale = 4;
         pExpressionCharInfo->parts.mouthScale = 4;
         pExpressionCharInfo->parts.mouthScaleY = 3;
         break;
-    case 39:
-    case 40:
+    case FFL_EXPRESSION_39:
+    case FFL_EXPRESSION_40:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
         pExpressionCharInfo->parts.eyeScale = 4;
         pExpressionCharInfo->parts.eyebrowRotate = 6;
         break;
-    case 43:
-    case 44:
-    case 47:
-    case 48:
+    case FFL_EXPRESSION_43:
+    case FFL_EXPRESSION_44:
+    case FFL_EXPRESSION_47:
+    case FFL_EXPRESSION_48:
         pExpressionCharInfo->parts.eyeRotate = 4;
         break;
-    case 49:
-    case 50:
-    case 51:
-    case 52:
+    case FFL_EXPRESSION_49:
+    case FFL_EXPRESSION_50:
+    case FFL_EXPRESSION_51:
+    case FFL_EXPRESSION_52:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
         pExpressionCharInfo->parts.eyeScale = 4;
@@ -376,13 +376,15 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.eyebrowPositionY = 10;
         pExpressionCharInfo->parts.mouthPositionY = 13;
         break;
-    case 67:
-    case 68:
+    case FFL_EXPRESSION_67:
+    case FFL_EXPRESSION_68:
         pExpressionCharInfo->parts.mouthScaleY = 3;
         break;
-    case 69:
-    case 70:
+    case FFL_EXPRESSION_69:
         pExpressionCharInfo->parts.eyeScaleY = 3;
+        break;
+    default:
+        break;
     }
 
     const CorrectParam& param = GetCorrectParam(expression);
@@ -402,7 +404,7 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     }
 
     s32 eyeRotate;
-    if (param.eyeType > 0 && eyeRotateOffset != 0)
+    if (eyeRotateOffset != 0)
     {
         // pExpressionCharInfo->parts.eyeRotate = clamp(pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset, 0, 7);
         eyeRotate = pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset;
@@ -432,7 +434,7 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     // the below is done in AFLiExpressionTexture::setup
     // NOTE: dont' think this worksl ol
     if ((expression - 49 < 0xe)
-        && ((0x300fU >> (expression - 49 & 0xff) & 1) != 0)
+        && ((0x300fU >> ((expression - 49) & 0xff) & 1) != 0)
     ) {
         pExpressionCharInfo->parts.mustacheType = 0;
     }

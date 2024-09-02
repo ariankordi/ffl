@@ -30,7 +30,7 @@ bool FFLiCharModelCreateParam::IsEnabledMipMap(FFLResolution resolution)
     return resolution & FFL_RESOLUTION_MIP_MAP_ENABLE_MASK;
 }
 
-#define FFL_MAX_EXPRESSION_FLAG_MASK ((FFLExpressionFlag)1 << FFL_EXPRESSION_MAX) - 1
+#define FFL_MAX_EXPRESSION_FLAG_MASK (((FFLExpressionFlag)1 << FFL_EXPRESSION_LIMIT) - 1)
 
 bool FFLiCharModelCreateParam::CheckModelDesc(const FFLCharModelDesc* pDesc)
 {
