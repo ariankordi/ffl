@@ -62,7 +62,7 @@ FFLResult FFLiResourceManager::LoadResourceHeader()
 
 FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
 {
-    RIO_ASSERT(false && "AAA AAAAAAAAAAAAA FFLiResourceManager::LoadResourceHeaderImpl NOT IMPLEMENTED NOT IMPLEMENTEEEEEDDDDDDDDDDDDDDDDDDDDDD\n");
+    //RIO_ASSERT(false && "AAA AAAAAAAAAAAAA FFLiResourceManager::LoadResourceHeaderImpl NOT IMPLEMENTED NOT IMPLEMENTEEEEEDDDDDDDDDDDDDDDDDDDDDD\n");
 
     rio::FileHandle fileHandle;
     rio::NativeFileDevice* device = rio::FileDeviceMgr::instance()->getNativeFileDevice();
@@ -89,8 +89,10 @@ FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
         // read in the ENTIRE header into a NEW buffer
         bool needsEndianSwap;
         m_pResourceMultiHeader->header[i] = DetermineAndAllocateResourceHeaderType(pHeaderPreData, &needsEndianSwap);
+
         RIO_ASSERT(m_pResourceMultiHeader->header[i] != nullptr);
 
+        m_pResourceMultiHeader->header[i]->m_NeedsEndianSwap = needsEndianSwap;
         // Read in the ENTIRE thing to a brand new buffer.
         u32 headerSize = m_pResourceMultiHeader->header[i]->GetHeaderSize();
 
@@ -130,7 +132,7 @@ FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
         {
             // If reading the entire thing from the beginning:
             // flip endianness for only the first part of the header
-            reinterpret_cast<FFLiResourceHeaderDefaultData*>(pData)->SwapEndian();
+            //reinterpret_cast<FFLiResourceHeaderDefaultData*>(pData)->SwapEndian();
             m_pResourceMultiHeader->header[i]->SwapEndian();
         }
 
@@ -174,7 +176,6 @@ FFLiResourceHeader* FFLiResourceManager::HeaderFromCache(FFLResourceType resourc
 
 FFLiResourceHeader* FFLiResourceManager::HeaderFromFile(FFLResourceType resourceType) const
 {
-    RIO_LOG("AAA AAAAAAAAAAAAA FFLiResourceManager::HeaderFromFile NOT IMPLEMENTED NOT IMPLEMENTEEEEEDDDDDDDDDDDDDDDDDDDDDD\n");
     return m_pResourceMultiHeader->header[resourceType];
 }
 

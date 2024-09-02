@@ -80,6 +80,14 @@ FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePa
 
     const FFLiResourcePartsInfo& partsInfo = pPartsInfo[index];
 
+    // debug logging for the above (to test endiannesssss)
+    /*
+    RIO_LOG("FFLiGetTextureResoucePartsInfos(%i, %u):\n", partsType, index);
+    RIO_LOG("  dataPos: 0x%08X (%u)\n", partsInfo.dataPos, partsInfo.dataPos);
+    RIO_LOG("  dataSize: 0x%08X (%u)\n", partsInfo.dataSize, partsInfo.dataSize);
+    RIO_LOG("  compressedSize: 0x%08X (%u)\n", partsInfo.compressedSize, partsInfo.compressedSize);
+    */
+
     FFLResult result = Load(pData, pSize, partsInfo);
     if (result != FFL_RESULT_OK)
         return result;
@@ -87,7 +95,13 @@ FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePa
     if (pHeader->m_NeedsEndianSwap)
     {
         u32 size = *pSize;
-        if (size && ((IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED) || !IsCached()))
+        if (size && (
+                    (
+                        IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
+                    )
+                    || !IsCached()
+                )
+            )
         {
             FFLiResourceTextureFooter& footer = FFLiResourceTextureFooter::GetFooterImpl(pData, size);
             footer.SwapEndian();
@@ -101,10 +115,19 @@ FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsT
     u32 num;
     FFLiResourceHeader* pHeader = Header();
     FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, pHeader->GetShapeHeader(), partsType);
+
     if (pPartsInfo == NULL || index >= num)
         return FFL_RESULT_ERROR;
 
     const FFLiResourcePartsInfo& partsInfo = pPartsInfo[index];
+
+    /*
+    RIO_LOG("FFLiGetShapeResoucePartsInfos(%i, %u):\n", partsType, index);
+    RIO_LOG("  dataPos: 0x%08X (%u)\n", partsInfo.dataPos, partsInfo.dataPos);
+    RIO_LOG("  dataSize: 0x%08X (%u)\n", partsInfo.dataSize, partsInfo.dataSize);
+    RIO_LOG("  compressedSize: 0x%08X (%u)\n", partsInfo.compressedSize, partsInfo.compressedSize);
+    */
+
 
     FFLResult result = Load(pData, pSize, partsInfo);
     if (result != FFL_RESULT_OK)
@@ -113,7 +136,13 @@ FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsT
     if (pHeader->m_NeedsEndianSwap)
     {
         u32 size = *pSize;
-        if (size && ((IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED) || !IsCached()))
+        if (size && (
+                    (
+                        IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
+                    )
+                    || !IsCached()
+                )
+            )
         {
             FFLiSwapEndianResourceShapeElement(pData, partsType, false);
         }
@@ -243,7 +272,7 @@ rio::RawErrorCode FFLiResourceLoader::OpenIfClosed()
     return rio::RAW_ERROR_OK;
 }
 
-rio::RawErrorCode FFLiResourceLoader::ReadWithPos(void* pDst, u32 pos, u32 size)
+s32 FFLiResourceLoader::ReadWithPos(void* pDst, u32 pos, u32 size)
 {
     if (!m_FileHandle.trySeek(pos, rio::FileDevice::SEEK_ORIGIN_BEGIN))
     {
@@ -260,7 +289,7 @@ rio::RawErrorCode FFLiResourceLoader::ReadWithPos(void* pDst, u32 pos, u32 size)
         return status;
     }
 
-    return rio::RAW_ERROR_OK;
+    return 1;
 }
 
 rio::RawErrorCode FFLiResourceLoader::Close()
@@ -290,7 +319,9 @@ bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuf
     const void* src = pSrc;
     u32 srcSize = partsInfo.compressedSize;
 
-    return inflator.Process(&dst, &dstSize, &src, &srcSize, Z_FINISH) == Z_STREAM_END;
+    s32 ret = inflator.Process(&dst, &dstSize, &src, &srcSize, Z_FINISH);
+    RIO_ASSERT(ret == Z_STREAM_END);
+    return ret == Z_STREAM_END;
 }
 
 }

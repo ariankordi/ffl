@@ -27,7 +27,7 @@ FFLResult FFLiResourceCache::Attach(void* pData, u32 size, FFLResourceType resou
     FFLiResourceHeader* pHeader;// = (FFLiResourceHeader*)pData;
 
     // will be freed by destructor if it is bound
-    bool needsEndianSwap = false;
+    bool needsEndianSwap;
     //pHeader = new FFLiResourceHeaderAFL_2_3();
     pHeader = DetermineAndAllocateResourceHeaderType(pData, &needsEndianSwap);
     RIO_ASSERT(pHeader != nullptr);

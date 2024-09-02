@@ -28,6 +28,10 @@ FFLiResourcePartsInfo* FFLiGetShapeResoucePartsInfos(u32* pNum, FFLiResourceShap
 
 s32 FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits windowBits);
 
+
+template <typename T>
+void HeaderSwapEndianImpl(T* pHeader);
+
 // --------------------------------------------------------------------------
 
 #define FFLI_RESOURCE_HEADER_VERSION    (0x00070000)
@@ -154,6 +158,9 @@ public:
 private:
     // header will be, hot loaded?? into this
     FFLiResourceHeaderDefaultData* m_Header;
+
+    template <typename T>
+    friend void HeaderSwapEndianImpl(T* header);
 };
 
 //NN_STATIC_ASSERT(sizeof(BOOL) == 4);
@@ -236,6 +243,9 @@ private:
         FFLiResourceShapeHeader          m_ShapeHeader;
         u32                              _49d0[48 / sizeof(u32)];
     } *m_Header;
+
+    template <typename T>
+    friend void HeaderSwapEndianImpl(T* header);
 };
 
 #endif // FFLI_RESOURCE_HEADER_H_

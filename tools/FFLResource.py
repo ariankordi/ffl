@@ -114,6 +114,10 @@ if '-LE' in sys.argv:
 # this will be added to the header
 total_uncompressed_size = 0
 
+# the maximum size of a compressed object in the resource
+# this will actually be the uncompressBufferSize
+maximum_compressed_size = 0
+
 class FFLiResourcePartsInfo:
     _format = endianness_character + '3I4B'
     size = struct.calcsize(_format)
@@ -169,7 +173,7 @@ class FFLiResourcePartsInfo:
         return partsData
 
     def save(self, partsData, currentFileSize, isExpand=False, expandAlignment=0):
-        global total_uncompressed_size
+        global total_uncompressed_size, maximum_compressed_size
 
         data = bytearray()
 
@@ -215,6 +219,10 @@ class FFLiResourcePartsInfo:
                     compressobj.flush()
                 ])
                 compressedSize = len(partsData)
+                #print(f'compressedSize: 0x{compressedSize:X}')
+                if compressedSize > maximum_compressed_size:
+                    maximum_compressed_size = compressedSize
+                    print(f'new compressedSize: 0x{compressedSize:X}')
 
             data += partsData
 
@@ -2144,6 +2152,9 @@ class FFLiResourceHeader:
         # pack resource header hint into first 3 bits ig
         total_uncompressed_size = (resource_header_hint << 29) | total_uncompressed_size
         print(f'0x{total_uncompressed_size:X}')
+
+        # set uncompress buffer size as the maximum compressed size
+        self.uncompressBufferSize = maximum_compressed_size
 
         headerData = struct.pack(
             self._format,
