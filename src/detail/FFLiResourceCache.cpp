@@ -38,7 +38,7 @@ FFLResult FFLiResourceCache::Attach(void* pData, u32 size, FFLResourceType resou
     for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, pHeader, FFLiTexturePartsType(i));
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, pHeader->GetTextureHeader(), FFLiTexturePartsType(i));
 
         for (u32 j = 0; j < num; j++)
         {

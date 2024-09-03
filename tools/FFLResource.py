@@ -186,8 +186,6 @@ class FFLiResourcePartsInfo:
                 memoryLevel = self.memoryLevel + 1
                 strategy = self.strategy
 
-                #compressLevel = FFLI_RESOURCE_COMPRESS_LEVEL_NO_COMPRESSION  # FORCE NO COMPRESSION
-
                 compressobj = zlib.compressobj(compressLevel, zlib.DEFLATED, windowBits, memoryLevel, strategy)
                 partsData = b''.join([
                     compressobj.compress(partsData),
@@ -367,35 +365,24 @@ FFLI_TEXTURE_PARTS_TYPE_MUSTACHE    =  9
 FFLI_TEXTURE_PARTS_TYPE_NOSELINE    = 10
 FFLI_TEXTURE_PARTS_TYPE_MAX         = 11
 
-# NOTE: THIS WILL BE CHANGED IN FFLiResourceTextureHeader.importFromPath
-FFL_GLASS_TYPE_MAX = 9
-FFL_GLASS_TYPE_NEW_MAX = 20
 
 class FFLiResourceTextureHeader:
-    size = 0
-    def __init__(self):
-        self._recalculate_format_and_size()
-
-    def _recalculate_format_and_size(self):
-        self._format = '>%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
-            FFLI_TEXTURE_PARTS_TYPE_MAX,
-            FFLiResourcePartsInfo.size * 3,
-            FFLiResourcePartsInfo.size * 132,
-            FFLiResourcePartsInfo.size * 62,
-            FFLiResourcePartsInfo.size * 24,
-            FFLiResourcePartsInfo.size * 12,
-            FFLiResourcePartsInfo.size * 12,
-            FFLiResourcePartsInfo.size * FFL_GLASS_TYPE_MAX,
-            FFLiResourcePartsInfo.size * 2,
-            FFLiResourcePartsInfo.size * 37,
-            FFLiResourcePartsInfo.size * 6,
-            FFLiResourcePartsInfo.size * 18
-        )
-        self.size = struct.calcsize(self._format)
-        #assert size == 0x13FC
-        if self.size != 0x13FC:
-            print(f"\033[91mFFLiResourceTextureHeader SIZE IS NOT 0x13FC!!!!!!!!!!!!!!!! THE ACTUAL SIZE IS: 0x{self.size:X} (THIS WILL NOT WORK IN FFL)\033[0m")
-
+    _format = '>%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
+        FFLI_TEXTURE_PARTS_TYPE_MAX,
+        FFLiResourcePartsInfo.size * 3,
+        FFLiResourcePartsInfo.size * 132,
+        FFLiResourcePartsInfo.size * 62,
+        FFLiResourcePartsInfo.size * 24,
+        FFLiResourcePartsInfo.size * 12,
+        FFLiResourcePartsInfo.size * 12,
+        FFLiResourcePartsInfo.size * 9,
+        FFLiResourcePartsInfo.size * 2,
+        FFLiResourcePartsInfo.size * 37,
+        FFLiResourcePartsInfo.size * 6,
+        FFLiResourcePartsInfo.size * 18
+    )
+    size = struct.calcsize(_format)
+    assert size == 0x13FC
 
     def load(self, headerData, data, pos=0, isExpand=False):
         (partsMaxSizeBeard,
@@ -476,8 +463,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoFaceMake.append([partsInfo, gx2Texture])
 
         self.partsInfoGlass = []
-        # NOTE: THIS IS IN LOAD ROUTINE!!!! NOT CALLED WHEN SAVING AT ALLLL
-        for i in range(FFL_GLASS_TYPE_MAX):
+        for i in range(9):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoGlassData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -523,7 +509,6 @@ class FFLiResourceTextureHeader:
                 gx2Texture.initTextureRegs()
             self.partsInfoNoseline.append([partsInfo, gx2Texture])
 
-    # SAVE TEXTURE RESOURCE HEADER, CALLED BY SAVE TOTAL RESOURCE HEADER (called by entrypoint)
     def save(self, currentFileSize, isExpand=False):
         data = bytearray()
 
@@ -581,8 +566,7 @@ class FFLiResourceTextureHeader:
             partsInfoFaceMakeData += partsInfoData
             data += partsData
 
-        # glass type is determined by: FFLiResourceTextureFooter.save
-        partsMaxSizeGlass = 0  # THIS IS THE TOTAL BYTE SIZE OF PARTS INFO. NOT THE AMOUNT OF PARTS
+        partsMaxSizeGlass = 0
         partsInfoGlassData = bytearray()
         for partsInfo, gx2Texture in self.partsInfoGlass:
             partsData = FFLiResourceTextureFooter.save(gx2Texture)
@@ -723,24 +707,12 @@ class FFLiResourceTextureHeader:
         if not pathIsCwd:
             os.chdir(cwd)
 
-    # texture import entrypoint (CALLED BY RESOURCE HEADER IMPORT)
     def importFromPath(self, path=''):
-        global FFL_GLASS_TYPE_MAX
         pathIsCwd = not path or path == '.'
 
         if not pathIsCwd:
             cwd = os.getcwd()
             os.chdir(path)
-
-        # can we open max glass type?
-        filename = '%s_%d' % ("Glass", FFL_GLASS_TYPE_NEW_MAX - 1)
-        json_filename = filename + '.json'
-        if os.path.isfile(json_filename):
-            print(f"\033[91mFOUND FILE {json_filename}, SETTING GLASS TYPE MAX TO 20. THIS FILE WILL NO LONGER WORK WITH FFL\033[0m")
-            FFL_GLASS_TYPE_MAX = FFL_GLASS_TYPE_NEW_MAX
-        else:
-            print(f"glass type max file {json_filename} does not exist")
-        self._recalculate_format_and_size()
 
         for count, compSel, name in (
             (  3, 0x00000000, "Beard"),
@@ -749,7 +721,7 @@ class FFLiResourceTextureHeader:
             ( 24, 0x00000000, "Eyebrow"),
             ( 12, 0x00000000, "Faceline"),
             ( 12, 0x00010203, "FaceMake"),
-            (  FFL_GLASS_TYPE_MAX, 0x01010100, "Glass"),
+            (  9, 0x01010100, "Glass"),
             (  2, 0x00000000, "Mole"),
             ( 37, 0x00010203, "Mouth"),
             (  6, 0x00000000, "Mustache"),
@@ -1748,7 +1720,6 @@ class FFLiResourceShapeHeader:
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
             self.partsInfoForehead2.append([partsInfo, shape])
 
-    # NOTE: THIS IS IN SHAPE
     def save(self, currentFileSize, isExpand):
         data = bytearray()
 
@@ -1792,7 +1763,6 @@ class FFLiResourceShapeHeader:
 
         partsMaxSizeGlass = 0
         partsInfoGlassData = bytearray()
-        # NOTE: THIS IS IN SHAPE
         for partsInfo, shape in self.partsInfoGlass:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
             partsMaxSizeGlass = max(len(partsData), partsMaxSizeGlass)
@@ -1945,7 +1915,6 @@ class FFLiResourceShapeHeader:
         if not pathIsCwd:
             os.chdir(cwd)
 
-    # shape (i will ignore)
     def importFromPath(self, path=''):
         pathIsCwd = not path or path == '.'
 
@@ -2040,20 +2009,11 @@ class FFLiResourceShapeHeader:
                 partsInfoA.compare(partsInfoB, label)
                 FFLiResourceShapeDataHeader.compare(shapeA, shapeB, label)
 
-FFLIRESOURCEHEADER_DEFAULT_SIZE = 0x4A00
 
 class FFLiResourceHeader:
-    # calculate size of the struct
-    size = 0
-    def __init__(self):
-        self._recalculate_format_and_size()
-
-    def _recalculate_format_and_size(self):
-        self._format = '>4s2I4xI%ds%ds48x' % (FFLiResourceTextureHeader().size, FFLiResourceShapeHeader.size)
-        self.size = struct.calcsize(self._format)
-        #assert size == 0x4A00
-        if self.size != FFLIRESOURCEHEADER_DEFAULT_SIZE:
-            print(f"\033[91mFFLiResourceHeader SIZE IS NOT DEFAULT OF {FFLIRESOURCEHEADER_DEFAULT_SIZE}!!!!!!!!!!!!!!!! THE ACTUAL SIZE IS: 0x{self.size:X} (THIS WILL NOT WORK IN FFL)\033[0m")
+    _format = '>4s2I4xI%ds%ds48x' % (FFLiResourceTextureHeader.size, FFLiResourceShapeHeader.size)
+    size = struct.calcsize(_format)
+    assert size == 0x4A00
 
     def load(self, data, pos=0):
         (magic,
@@ -2074,30 +2034,16 @@ class FFLiResourceHeader:
         self.shapeHeader = FFLiResourceShapeHeader()
         self.shapeHeader.load(shapeHeaderData, data, pos, self.isExpand)
 
-    # SAVE RESOURCE HEADER (also in entrypoint)
     def save(self):
-        fileSize = self.size
+        fileSize = FFLiResourceHeader.size
 
         textureHeaderData, textureData = self.textureHeader.save(fileSize, self.isExpand); fileSize += len(textureData)
         shapeHeaderData, shapeData = self.shapeHeader.save(fileSize, self.isExpand); fileSize += len(shapeData)
 
-        # default version
-        version = 0x00070000
-        # HACK: HACK: ADD GLASS TYPE MAX TO FIRST 8 BITS, TO LAST 16 BITS
-        if self.size != FFLIRESOURCEHEADER_DEFAULT_SIZE:
-            # Values to replace
-            uint8_value = FFL_GLASS_TYPE_MAX
-            uint16_value = self.textureHeader.size
-            # Replace the first byte
-            version = (version & 0x00FFFFFF) | (uint8_value << 24)
-            # Replace the last two bytes
-            version = (version & 0xFFFF0000) | uint16_value
-            print(f"WE JUST CHANGED VERSION FROM 0x00070000 TO 0x{version:X}")
-
         headerData = struct.pack(
             self._format,
             b'FFRA',
-            version,
+            0x00070000,
             self.uncompressBufferSize,
             int(self.isExpand),
             textureHeaderData,
@@ -2150,7 +2096,6 @@ class FFLiResourceHeader:
         if not pathIsCwd:
             os.chdir(cwd)
 
-    # resource header import (ENTRYPOINT)
     def importFromPath(self, name, path=''):
         # Make sure no funny business is happening
         path = os.path.join(path, os.path.dirname(name))
@@ -2178,10 +2123,6 @@ class FFLiResourceHeader:
 
         self.textureHeader = FFLiResourceTextureHeader()
         self.textureHeader.importFromPath(texturePath)
-        print(f"recalculating size.\nprevious texture header size: 0x{self.textureHeader.size:X}, total header size: 0x{self.size:X}")
-        #self.textureHeader._recalculate_format_and_size()
-        self._recalculate_format_and_size()
-        print(f"current texture header size: 0x{self.textureHeader.size:X}, total header size: 0x{self.size:X}")
 
         self.shapeHeader = FFLiResourceShapeHeader()
         self.shapeHeader.importFromPath(shapePath)

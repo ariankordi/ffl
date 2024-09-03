@@ -48,32 +48,7 @@ u32 FFLiResourceLoader::GetShapeAlignedMaxSize(FFLiShapePartsType partsType) con
 FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePartsType partsType, u32 index)
 {
     u32 num;
-    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header(), partsType);
-
-    // NOTE: if this is a glass type, we are going to check...
-    // ... if the currently loaded resource has the new glass types
-    // if it does NOT then we will map the index to the ver3 table
-    // effectively loads new glasses if they are in the resource
-    // while loading the old glasses if they are not
-
-    // glass type threshold for FFLResHigh, FFLResMiddle
-    // this is what num would be if you were using those resources
-    // new switch glasses to ver3 table
-    // taken from MiiPort/include/convert_mii.h: https://github.com/Genwald/MiiPort/blob/4ee38bbb8aa68a2365e9c48d59d7709f760f9b5d/include/convert_mii.h
-    static const u8 ToVer3GlassTypeTable[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 1, 3, 7, 7, 6, 7, 8, 7, 7};
-
-    if (partsType == FFLI_TEXTURE_PARTS_TYPE_GLASS
-        // is this a higher glass type than what is in the default resource?
-        && index > FFL_GLASS_TYPE_MAX - 1
-        // well, then does this resource have more than that many?
-        && num < index
-        // finally, check the glass type is not too large for th table
-        && index < sizeof(ToVer3GlassTypeTable)
-    )
-        // ... in this case, your resource does not have that glass type
-        // assuming this is a new glass type, we will map it to ver3
-        index = ToVer3GlassTypeTable[index];
-
+    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header()->GetTextureHeader(), partsType);
     if (pPartsInfo == NULL || index >= num)
         return FFL_RESULT_ERROR;
 
@@ -125,7 +100,7 @@ FFLResult FFLiResourceLoader::GetPointerTextureByExpandCache(void** ppPtr, u32* 
         return FFL_RESULT_FILE_LOAD_ERROR;
 
     u32 num;
-    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header(), partsType);
+    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header()->GetTextureHeader(), partsType);
     if (pPartsInfo == NULL || index >= num)
         return FFL_RESULT_ERROR;
 
