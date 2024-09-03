@@ -9,6 +9,6 @@ struct FFLiTextureTempObject
     FFLiMaskTexturesTempObject      maskTextures;
     FFLiFacelineTextureTempObject   facelineTexture;
 };
-NN_STATIC_ASSERT32(sizeof(FFLiTextureTempObject) == 0x220);
+NN_STATIC_ASSERT32(sizeof(FFLiTextureTempObject) == 0x4D4);
 
 #endif // FFLI_TEXTURE_TEMP_OBJECT_H_

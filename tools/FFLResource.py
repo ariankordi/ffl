@@ -26,6 +26,7 @@ import os
 import struct
 import sys
 import zlib
+import argparse
 
 from ninTexUtils.gx2 import GX2SurfaceDim
 from ninTexUtils.gx2 import GX2SurfaceFormat
@@ -96,8 +97,29 @@ FFLI_RESOURCE_STRATEGY_UNCOMPRESSED     = 5
 FFLI_RESOURCE_STRATEGY_MAX              = 6
 
 
+# ResHeaderHint
+RES_HINT_DEFAULT = 1
+RES_HINT_AFL     = 2
+RES_HINT_AFL_2_3 = 3
+#RES_HINT_AFL_2_3_NO_2_SHAPES = 4
+
+# big endian default
+endianness_character = '>'
+
+# parse now ig
+if '-LE' in sys.argv:
+    endianness_character = '<'
+    print("\033[91mWARNING: The little endian option is only meant for if you modified the FFL decomp to take them - No FFL resource has ever been made in little endian so extraction will not work.\033[0m")
+
+# this will be added to the header
+total_uncompressed_size = 0
+
+# the maximum size of a compressed object in the resource
+# this will actually be the uncompressBufferSize
+maximum_compressed_size = 0
+
 class FFLiResourcePartsInfo:
-    _format = '>3I4B'
+    _format = endianness_character + '3I4B'
     size = struct.calcsize(_format)
     assert size == 0x10
 
@@ -151,6 +173,8 @@ class FFLiResourcePartsInfo:
         return partsData
 
     def save(self, partsData, currentFileSize, isExpand=False, expandAlignment=0):
+        global total_uncompressed_size, maximum_compressed_size
+
         data = bytearray()
 
         if partsData:
@@ -166,6 +190,8 @@ class FFLiResourcePartsInfo:
 
             dataPos = currentFileSize
             dataSize = len(partsData)
+
+            total_uncompressed_size += dataSize
 
             if self.strategy == FFLI_RESOURCE_STRATEGY_UNCOMPRESSED:
                 compressedSize = 0
@@ -187,11 +213,16 @@ class FFLiResourcePartsInfo:
                 strategy = self.strategy
 
                 compressobj = zlib.compressobj(compressLevel, zlib.DEFLATED, windowBits, memoryLevel, strategy)
+
                 partsData = b''.join([
                     compressobj.compress(partsData),
                     compressobj.flush()
                 ])
                 compressedSize = len(partsData)
+                #print(f'compressedSize: 0x{compressedSize:X}')
+                if compressedSize > maximum_compressed_size:
+                    maximum_compressed_size = compressedSize
+                    print(f'new compressedSize: 0x{compressedSize:X}')
 
             data += partsData
 
@@ -233,7 +264,7 @@ class FFLiResourcePartsInfo:
 
 
 class FFLiResourceTextureFooter:
-    _format = '>I2H2B2x'
+    _format = endianness_character + 'I2H2B2x'
     size = struct.calcsize(_format)
     assert size == 0xC
 
@@ -279,17 +310,23 @@ class FFLiResourceTextureFooter:
 
     @staticmethod
     def save(gx2Texture):
+        global total_uncompressed_size
         if gx2Texture is None:
             return b''
 
         data = bytearray(gx2Texture.surface.imageData)
-        if gx2Texture.surface.mipSize == 0:
+        if disable_mipmaps:
+            gx2Texture.surface.mipSize = 1
+            gx2Texture.surface.numMips = 1
             mipOffset = 0
         else:
-            prevMipOffset = len(data)
-            mipOffset = gx2Texture.surface.mipOffset[0]
-            data += b'\0' * (mipOffset - prevMipOffset)
-            data += gx2Texture.surface.mipData
+            if gx2Texture.surface.mipSize == 0:
+                mipOffset = 0
+            else:
+                prevMipOffset = len(data)
+                mipOffset = gx2Texture.surface.mipOffset[0]
+                data += b'\0' * (mipOffset - prevMipOffset)
+                data += gx2Texture.surface.mipData
 
         width = gx2Texture.surface.width
         height = gx2Texture.surface.height
@@ -308,6 +345,8 @@ class FFLiResourceTextureFooter:
             numMips,
             textureFormat
         )
+
+        #total_uncompressed_size += len(data)
 
         return data
 
@@ -366,23 +405,61 @@ FFLI_TEXTURE_PARTS_TYPE_NOSELINE    = 10
 FFLI_TEXTURE_PARTS_TYPE_MAX         = 11
 
 
+texture_header_parts_info_sizes = [
+    3,    # 0 beard
+    132,  # 1 cap
+    62,   # 2 eye
+    24,   # 3 eyebrow
+    12,   # 4 faceline
+    12,   # 5 makeup
+    9,    # 6 glass
+    2,    # 7 mole
+    37,   # 8 mouth
+    6,    # 9 mustache
+    18    # 10 nose
+]
+
+# when this is enabled, no mipmaps are packed (only first mip)
+disable_mipmaps = False  # miitomo resource does not use mips
+
+tile_mode = GX2TileMode.Default  # or change to linear
+
 class FFLiResourceTextureHeader:
-    _format = '>%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
-        FFLI_TEXTURE_PARTS_TYPE_MAX,
-        FFLiResourcePartsInfo.size * 3,
-        FFLiResourcePartsInfo.size * 132,
-        FFLiResourcePartsInfo.size * 62,
-        FFLiResourcePartsInfo.size * 24,
-        FFLiResourcePartsInfo.size * 12,
-        FFLiResourcePartsInfo.size * 12,
-        FFLiResourcePartsInfo.size * 9,
-        FFLiResourcePartsInfo.size * 2,
-        FFLiResourcePartsInfo.size * 37,
-        FFLiResourcePartsInfo.size * 6,
-        FFLiResourcePartsInfo.size * 18
-    )
-    size = struct.calcsize(_format)
-    assert size == 0x13FC
+    size = 0
+
+    def __init__(self):
+        self._recalculate_format_and_size()
+
+    def _recalculate_format_and_size(self):
+        self._format = '>%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
+            FFLI_TEXTURE_PARTS_TYPE_MAX,
+            # beard
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[0],
+            # cap
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[1],
+            # eye
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[2],
+            # eyebrow
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[3],
+            # faceline
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[4],
+            # makeup
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[5],
+            # glass
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[6],
+            # mole
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[7],
+            # mouth
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[8],
+            # mustache
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[9],
+            # nose
+            FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[10]
+        )
+        self.size = struct.calcsize(self._format)
+        #assert size == 0x13FC
+        #if self.size != 0x13FC:
+        #    print(f"\033[91mFFLiResourceTextureHeader size != 0x13FC, actual size: 0x{self.size:X} (will not work in FFL unmodified)\033[0m")
 
     def load(self, headerData, data, pos=0, isExpand=False):
         (partsMaxSizeBeard,
@@ -409,7 +486,7 @@ class FFLiResourceTextureHeader:
          partsInfoNoselineData) = struct.unpack(self._format, headerData)
 
         self.partsInfoBeard = []
-        for i in range(3):
+        for i in range(texture_header_parts_info_sizes[0]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoBeardData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -419,7 +496,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoBeard.append([partsInfo, gx2Texture])
 
         self.partsInfoCap = []
-        for i in range(132):
+        for i in range(texture_header_parts_info_sizes[1]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoCapData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -429,14 +506,14 @@ class FFLiResourceTextureHeader:
             self.partsInfoCap.append([partsInfo, gx2Texture])
 
         self.partsInfoEye = []
-        for i in range(62):
+        for i in range(texture_header_parts_info_sizes[2]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoEyeData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
             self.partsInfoEye.append([partsInfo, gx2Texture])
 
         self.partsInfoEyebrow = []
-        for i in range(24):
+        for i in range(texture_header_parts_info_sizes[3]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoEyebrowData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -446,7 +523,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoEyebrow.append([partsInfo, gx2Texture])
 
         self.partsInfoFaceline = []
-        for i in range(12):
+        for i in range(texture_header_parts_info_sizes[4]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoFacelineData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -456,14 +533,14 @@ class FFLiResourceTextureHeader:
             self.partsInfoFaceline.append([partsInfo, gx2Texture])
 
         self.partsInfoFaceMake = []
-        for i in range(12):
+        for i in range(texture_header_parts_info_sizes[5]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoFaceMakeData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
             self.partsInfoFaceMake.append([partsInfo, gx2Texture])
 
         self.partsInfoGlass = []
-        for i in range(9):
+        for i in range(texture_header_parts_info_sizes[6]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoGlassData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -473,7 +550,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoGlass.append([partsInfo, gx2Texture])
 
         self.partsInfoMole = []
-        for i in range(2):
+        for i in range(texture_header_parts_info_sizes[7]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoMoleData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -483,14 +560,14 @@ class FFLiResourceTextureHeader:
             self.partsInfoMole.append([partsInfo, gx2Texture])
 
         self.partsInfoMouth = []
-        for i in range(37):
+        for i in range(texture_header_parts_info_sizes[8]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoMouthData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
             self.partsInfoMouth.append([partsInfo, gx2Texture])
 
         self.partsInfoMustache = []
-        for i in range(6):
+        for i in range(texture_header_parts_info_sizes[9]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoMustacheData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -500,7 +577,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoMustache.append([partsInfo, gx2Texture])
 
         self.partsInfoNoseline = []
-        for i in range(18):
+        for i in range(texture_header_parts_info_sizes[10]):
             partsInfo = FFLiResourcePartsInfo()
             partsData = partsInfo.load(partsInfoNoselineData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, TEXTURE_DATA_MAX_ALIGNMENT)
             gx2Texture = FFLiResourceTextureFooter.load(partsData)
@@ -510,6 +587,7 @@ class FFLiResourceTextureHeader:
             self.partsInfoNoseline.append([partsInfo, gx2Texture])
 
     def save(self, currentFileSize, isExpand=False):
+        global total_uncompressed_size
         data = bytearray()
 
         partsMaxSizeBeard = 0
@@ -637,6 +715,9 @@ class FFLiResourceTextureHeader:
             partsInfoNoselineData
         )
 
+        #total_uncompressed_size += len(headerData)
+        #total_uncompressed_size += len(data)
+
         return headerData, data
 
     def export(self, path='', asPng=True):
@@ -662,6 +743,8 @@ class FFLiResourceTextureHeader:
             for i, (partsInfo, gx2Texture) in enumerate(partsInfoArray):
                 if gx2Texture is None:
                     continue
+
+                gx2Texture.surface.tileMode = tile_mode
 
                 textureFormat = [
                     GX2SurfaceFormat.Unorm_R8,
@@ -715,17 +798,17 @@ class FFLiResourceTextureHeader:
             os.chdir(path)
 
         for count, compSel, name in (
-            (  3, 0x00000000, "Beard"),
-            (132, 0x00000005, "Cap"),
-            ( 62, 0x00010203, "Eye"),
-            ( 24, 0x00000000, "Eyebrow"),
-            ( 12, 0x00000000, "Faceline"),
-            ( 12, 0x00010203, "FaceMake"),
-            (  9, 0x01010100, "Glass"),
-            (  2, 0x00000000, "Mole"),
-            ( 37, 0x00010203, "Mouth"),
-            (  6, 0x00000000, "Mustache"),
-            ( 18, 0x00000000, "Noseline")
+            (texture_header_parts_info_sizes[0], 0x00000000, "Beard"),
+            (texture_header_parts_info_sizes[1], 0x00000005, "Cap"),
+            (texture_header_parts_info_sizes[2], 0x00010203, "Eye"),
+            (texture_header_parts_info_sizes[3], 0x00000000, "Eyebrow"),
+            (texture_header_parts_info_sizes[4], 0x00000000, "Faceline"),
+            (texture_header_parts_info_sizes[5], 0x00010203, "FaceMake"),
+            (texture_header_parts_info_sizes[6], 0x01010100, "Glass"),
+            (texture_header_parts_info_sizes[7], 0x00000000, "Mole"),
+            (texture_header_parts_info_sizes[8], 0x00010203, "Mouth"),
+            (texture_header_parts_info_sizes[9], 0x00000000, "Mustache"),
+            (texture_header_parts_info_sizes[10], 0x00000000, "Noseline")
         ):
             partsInfoArray = []
 
@@ -763,12 +846,12 @@ class FFLiResourceTextureHeader:
 
                 if texture_filename.endswith(".png"):
                     # # TODO: numMips, format, compSel
-                    # gx2Texture = PNGToGX2Texture([texture_filename], 0, 7, GX2TileMode.Default, 0, False, (0, 1, 2, 3), False)
+                    # gx2Texture = PNGToGX2Texture([texture_filename], 0, 7, tile_mode, 0, False, (0, 1, 2, 3), False)
                     raise NotImplementedError("Importing PNG is not implemented yet.")
 
                 else:
                     assert texture_filename.endswith(".dds")
-                    gx2Texture = DDSToGX2Texture(texture_filename, 0, 7, GX2TileMode.Default, 0, False, (0, 1, 2, 3), False)
+                    gx2Texture = DDSToGX2Texture(texture_filename, 0, 7, tile_mode, 0, False, (0, 1, 2, 3), False)
                     #assert gx2Texture.surface.numMips == numMips
                     fail = False
                     if gx2Texture.surface.numMips != numMips:
@@ -875,7 +958,7 @@ def unormNFromFloat(v, n):
 
 
 class FFLiSnorm10_10_10_2:
-    _format = ">I"
+    _format = endianness_character + "I"
     size = struct.calcsize(_format)
     assert size == 4
 
@@ -913,7 +996,7 @@ class FFLiSnorm10_10_10_2:
 
 
 class FFLiSnorm8_8_8_8:
-    _format = ">4b"
+    _format = endianness_character + "4b"
     size = struct.calcsize(_format)
     assert size == 4
 
@@ -962,7 +1045,7 @@ class FFLiSnorm8_8_8_8:
 
 
 class FFLiUnorm8_8_8_8:
-    _format = ">4B"
+    _format = endianness_character + "4B"
     size = struct.calcsize(_format)
     assert size == 4
 
@@ -1007,9 +1090,9 @@ FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BUFFER_MAX = 6
 
 
 class FFLiResourceShapeDataHeader:
-    _dataPosSizeFormat = '>%dI' % FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BUFFER_MAX
+    _dataPosSizeFormat = endianness_character + '%dI' % FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BUFFER_MAX
     _dataPosSizeFormatSize = struct.calcsize(_dataPosSizeFormat)
-    _vec3Format = '>3f'
+    _vec3Format = endianness_character + '3f'
     _vec3FormatSize = struct.calcsize(_vec3Format)
     size = (_dataPosSizeFormatSize +
             _dataPosSizeFormatSize +
@@ -1017,19 +1100,19 @@ class FFLiResourceShapeDataHeader:
             _vec3FormatSize + _vec3FormatSize + _vec3FormatSize +_vec3FormatSize + _vec3FormatSize + _vec3FormatSize)
     assert size == 0x90
 
-    _positionFormat = '>3f4x'
+    _positionFormat = endianness_character + '3f4x'
     _positionFormatSize = struct.calcsize(_positionFormat)
     assert _positionFormatSize == 0x10
 
-    _texCoordFormat = '>2f'
+    _texCoordFormat = endianness_character + '2f'
     _texCoordFormatSize = struct.calcsize(_texCoordFormat)
     assert _texCoordFormatSize == 8
 
-    _tangetFormat = '>4b'
+    _tangetFormat = endianness_character + '4b'
     _tangetFormatSize = struct.calcsize(_tangetFormat)
     assert _tangetFormatSize == 4
 
-    _colorFormat = '>4B'
+    _colorFormat = endianness_character + '4B'
     _colorFormatSize = struct.calcsize(_colorFormat)
     assert _colorFormatSize == 4
 
@@ -1139,6 +1222,7 @@ class FFLiResourceShapeDataHeader:
 
     @staticmethod
     def save(shape, isExpand=False):
+        global total_uncompressed_size
         if shape is None:
             return b''
 
@@ -1220,11 +1304,13 @@ class FFLiResourceShapeDataHeader:
                 partsData += b'\0' * (pos - prevPos)
 
             indexNum = len(shape.index)
-            data = struct.pack(">%dH" % indexNum, *(shape.index))
+            data = struct.pack(endianness_character + "%dH" % indexNum, *(shape.index))
             dataPos[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX] = pos
             dataSize[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX] = indexNum
             partsData += data
             pos += len(data)
+
+        #total_uncompressed_size += len(dataSize)
 
         return b''.join([
             struct.pack(shape._dataPosSizeFormat, *dataPos),
@@ -1590,7 +1676,7 @@ FFLI_SHAPE_PARTS_TYPE_MAX           = 12
 
 
 class FFLiResourceShapeHeader:
-    _format = '>%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
+    _format = endianness_character + '%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
         FFLI_SHAPE_PARTS_TYPE_MAX,
         FFLiResourcePartsInfo.size * 4,
         FFLiResourcePartsInfo.size * 132,
@@ -1721,6 +1807,7 @@ class FFLiResourceShapeHeader:
             self.partsInfoForehead2.append([partsInfo, shape])
 
     def save(self, currentFileSize, isExpand):
+        global total_uncompressed_size
         data = bytearray()
 
         expandAlignment = max(ATTRIBUTE_DATA_ALIGNMENT, INDEX_DATA_ALIGNMENT)
@@ -1860,6 +1947,9 @@ class FFLiResourceShapeHeader:
             partsInfoForehead1Data,
             partsInfoForehead2Data
         )
+
+        #total_uncompressed_size += len(headerData)
+        #total_uncompressed_size += len(data)
 
         return headerData, data
 
@@ -2009,21 +2099,33 @@ class FFLiResourceShapeHeader:
                 partsInfoA.compare(partsInfoB, label)
                 FFLiResourceShapeDataHeader.compare(shapeA, shapeB, label)
 
+FFLIRESOURCEHEADER_DEFAULT_SIZE = 0x4A00
 
 class FFLiResourceHeader:
-    _format = '>4s2I4xI%ds%ds48x' % (FFLiResourceTextureHeader.size, FFLiResourceShapeHeader.size)
-    size = struct.calcsize(_format)
-    assert size == 0x4A00
+    # calculate size of the struct
+    size = 0
+
+    def __init__(self):
+        self._recalculate_format_and_size()
+
+    def _recalculate_format_and_size(self):
+        # five ints: m_Magic, m_Version, m_UncompressBufferSize, _c, m_IsExpand
+        self._format = endianness_character + '5I%ds%ds48x' % (FFLiResourceTextureHeader().size, FFLiResourceShapeHeader.size)
+        self.size = struct.calcsize(self._format)
+        #assert size == 0x4A00
+        if self.size != FFLIRESOURCEHEADER_DEFAULT_SIZE:
+            print(f"\033[91mFFLiResourceHeader size != 0x{FFLIRESOURCEHEADER_DEFAULT_SIZE:X}, actual size: 0x{self.size:X} (will not work in FFL unmodified)\033[0m")
 
     def load(self, data, pos=0):
         (magic,
          version,
          self.uncompressBufferSize,
+         _c,
          isExpand,
          textureHeaderData,
          shapeHeaderData) = struct.unpack_from(self._format, data, pos)
 
-        assert magic == b'FFRA'
+        assert magic == 0x46465241  # b'FFRA'
         assert version == 0x00070000
 
         self.isExpand = isExpand == 1
@@ -2035,16 +2137,32 @@ class FFLiResourceHeader:
         self.shapeHeader.load(shapeHeaderData, data, pos, self.isExpand)
 
     def save(self):
-        fileSize = FFLiResourceHeader.size
+        global total_uncompressed_size
+        fileSize = self.size
 
         textureHeaderData, textureData = self.textureHeader.save(fileSize, self.isExpand); fileSize += len(textureData)
         shapeHeaderData, shapeData = self.shapeHeader.save(fileSize, self.isExpand); fileSize += len(shapeData)
 
+        # NOTE: this will NOT match any FFL resource, but it will be close
+
+        total_uncompressed_size += self.size
+
+        print(f'total uncompressed size: 0x{total_uncompressed_size:X}')
+
+        # pack resource header hint into first 3 bits ig
+        total_uncompressed_size = (resource_header_hint << 29) | total_uncompressed_size
+        print(f'0x{total_uncompressed_size:X}')
+
+        # set uncompress buffer size as the maximum compressed size
+        self.uncompressBufferSize = maximum_compressed_size
+
         headerData = struct.pack(
             self._format,
-            b'FFRA',
+            0x46465241,  # b'FFRA',
             0x00070000,
             self.uncompressBufferSize,
+            total_uncompressed_size,
+            #(0x2502DE0 if texture_header_parts_info_sizes[6] == 20 else 0x0CBBDE0),  # _c
             int(self.isExpand),
             textureHeaderData,
             shapeHeaderData
@@ -2140,71 +2258,76 @@ class FFLiResourceHeader:
         self.textureHeader.compare(other.textureHeader)
         self.shapeHeader.compare(other.shapeHeader)
 
+resource_header_hint = RES_HINT_DEFAULT
 
-def help():
-    appname = sys.argv[0]
-    if appname.endswith(".py"):
-        appname = "python " + appname
+def header_modify_afl():
+    global texture_header_parts_info_sizes, tile_mode, disable_mipmaps, resource_header_hint
+    resource_header_hint = RES_HINT_AFL
+    texture_header_parts_info_sizes[2] = 80  # eye type
+    texture_header_parts_info_sizes[3] = 28  # eyebrow
+    texture_header_parts_info_sizes[8] = 52  # mouth type
+    disable_mipmaps = True
+    tile_mode = GX2TileMode.Linear_Special
 
-    print("Usage:")
-    print(appname + " -fromJSON <json filename> <dat filename>")
-    print(appname + " -toJSON [-PNG] <dat filename> <json filename>")
+def header_modify_afl_2_3():
+    header_modify_afl()
+    global texture_header_parts_info_sizes, resource_header_hint
+    resource_header_hint = RES_HINT_AFL_2_3
+    texture_header_parts_info_sizes[6] = 20  # glass type
 
 
 def main():
-    if len(sys.argv) < 4:
-        help()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Unpacks and repacks FFL resource archives (FFLResHigh.dat, AFLResHigh.dat, AFLResHigh_2_3.dat, etc.)")
+    parser.add_argument(
+        "-type",
+        choices=["ffl", "afl", "afl_2_3"],
+        default="ffl",
+        help="IMPORTANT: Change this from the default of FFL if you are using AFLResHigh.dat or AFLResHigh_2_3.dat.",
+    )
 
-    if sys.argv[1].lower() == "-fromjson":
-        filename = sys.argv[2]
-        out_filename = sys.argv[3]
+    # Subparser for -fromJSON
+    parser.add_argument("-fromJSON", action="store_true", help="Import a resource")
 
-        if not os.path.isfile(filename):
-            print("Input file not found:", filename)
+    # Subparser for -toJSON
+    parser.add_argument("-toJSON", action="store_true", help="Unpack a resource")
+    parser.add_argument("-PNG", action="store_true", help="Export as PNG")
+
+    parser.add_argument("input_file", type=str, help="Input file")
+    parser.add_argument("output_file", type=str, help="Output file")
+
+    parser.add_argument("-LE", action="store_true", help="Export resource header as little endian")
+
+    args = parser.parse_args()
+
+    # modify globals for afl types
+    if args.type == "afl":
+        header_modify_afl()
+    elif args.type == "afl_2_3":
+        header_modify_afl_2_3()
+
+    if args.fromJSON:
+        if not os.path.isfile(args.input_file):
+            print("Input file not found:", args.input_file)
             sys.exit(1)
 
         header = FFLiResourceHeader()
-        header.importFromPath(filename)
+        header.importFromPath(args.input_file)
         outb = header.save()
 
-        with open(out_filename, "wb") as outf:
+        with open(args.output_file, "wb") as outf:
             outf.write(outb)
 
-    elif sys.argv[1].lower() == "-tojson":
-        asPng = False
-        if len(sys.argv) > 5:
-            help()
+    elif args.toJSON:
+        if not os.path.isfile(args.input_file):
+            print("Input file not found:", args.input_file)
             sys.exit(1)
 
-        if len(sys.argv) == 5:
-            if sys.argv[2].lower() != "-png":
-                help()
-                sys.exit(1)
-
-            asPng = True
-            filename = sys.argv[3]
-            out_filename = sys.argv[4]
-
-        else:
-            filename = sys.argv[2]
-            out_filename = sys.argv[3]
-
-        if not os.path.isfile(filename):
-            print("Input file not found:", filename)
-            sys.exit(1)
-
-        with open(filename, "rb") as inf:
+        with open(args.input_file, "rb") as inf:
             inb = inf.read()
 
         header = FFLiResourceHeader()
         header.load(inb)
-        header.export(out_filename, asPng=asPng)
-
-    else:
-        help()
-        sys.exit(1)
-
+        header.export(args.output_file, asPng=args.PNG)
 
 
 if __name__ == "__main__":

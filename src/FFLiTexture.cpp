@@ -5,6 +5,7 @@
 
 #if RIO_IS_WIN
 #include <ninTexUtils/gx2/gx2Surface.h>
+#include <gpu/win/rio_Texture2DUtilWin.h>
 #elif RIO_IS_CAFE
 #define numMips mipLevels
 #define imagePtr image
@@ -43,6 +44,9 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
 
     rio::NativeTexture2D texture;
 
+    FFLiResourceHeader* pHeader = pResLoader->Header();
+    bool textureFormatIsLinear = pHeader->TextureFormatIsLinear();
+
 #if RIO_IS_WIN
     GX2Surface surface;
 #else
@@ -52,11 +56,16 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
     surface.width = footer.Width();
     surface.height = footer.Height();
     surface.depth = 1;
-    surface.numMips = footer.NumMips();
+    if (pHeader->IgnoreMipMaps())
+        surface.numMips = 1;
+    else
+        surface.numMips = footer.NumMips();
     surface.format = footer.SurfaceFormat();
     surface.aa = GX2_AA_MODE_1X;
     surface.use = GX2_SURFACE_USE_TEXTURE;
     surface.tileMode = GX2_TILE_MODE_DEFAULT;
+    if (textureFormatIsLinear)
+        surface.tileMode = GX2_TILE_MODE_LINEAR_SPECIAL;
     surface.swizzle = 0;
 
     GX2CalcSurfaceSizeAndAlignment(&surface);
@@ -65,7 +74,7 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
     RIO_ASSERT(imagePtr == pData);
 
     void* mipPtr = footer.GetMipPtrImpl(size);
-    if (mipPtr == nullptr && footer.NumMips() > 1)
+    if (mipPtr == nullptr && surface.numMips > 1)
         mipPtr = (void*)((uintptr_t)imagePtr + surface.mipOffset[0]);
 
     surface.imagePtr = imagePtr;
@@ -77,33 +86,52 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
     linearSurface.width = footer.Width();
     linearSurface.height = footer.Height();
     linearSurface.depth = 1;
-    linearSurface.numMips = footer.NumMips();
+    linearSurface.numMips = surface.numMips;
     linearSurface.format = footer.SurfaceFormat();
     linearSurface.aa = GX2_AA_MODE_1X;
     linearSurface.use = GX2_SURFACE_USE_TEXTURE;
     linearSurface.tileMode = GX2_TILE_MODE_LINEAR_SPECIAL;
     linearSurface.swizzle = 0;
 
-    GX2CalcSurfaceSizeAndAlignment(&linearSurface);
+    texture.surface.format = rio::TextureFormat(linearSurface.format);
 
-    linearSurface.imagePtr = new u8[linearSurface.imageSize];
-    if (linearSurface.mipSize > 0)
-        linearSurface.mipPtr = new u8[linearSurface.mipSize];
-    else
-        linearSurface.mipPtr = nullptr;
+    if (textureFormatIsLinear)
+    {
 
-    GX2CopySurface(&surface, 0, 0, &linearSurface, 0, 0);
+        linearSurface.imagePtr = surface.imagePtr;
+        linearSurface.mipPtr = surface.mipPtr;
+        linearSurface.imageSize = rio::Texture2DUtil::calcImageSize(texture.surface.format, linearSurface.width, linearSurface.height);
+        linearSurface.mipSize = rio::Texture2DUtil::calcMipmapSize(texture.surface.format, linearSurface.width, linearSurface.height, linearSurface.numMips, reinterpret_cast<u32*>(linearSurface.mipPtr));
 
-    for (u32 i = 1; i < footer.NumMips(); i++)
-        GX2CopySurface(&surface, i, 0, &linearSurface, i, 0);
+        // TODO: MIPMAPS ON LINEAR TEXTURES?
+        if (linearSurface.mipSize < 2)
+            linearSurface.mipPtr = nullptr;
 
-    if (!pResLoader->IsExpand())
-        rio::MemUtil::free(pData);
+    } else {
+
+        GX2CalcSurfaceSizeAndAlignment(&linearSurface);
+
+        linearSurface.imagePtr = new u8[linearSurface.imageSize];
+        if (linearSurface.mipSize > 0)
+            linearSurface.mipPtr = new u8[linearSurface.mipSize];
+        else
+            linearSurface.mipPtr = nullptr;
+
+        GX2CopySurface(&surface, 0, 0, &linearSurface, 0, 0);
+
+        for (u32 i = 1; i < linearSurface.numMips; i++)
+            GX2CopySurface(&surface, i, 0, &linearSurface, i, 0);
+
+        // TODO: THIS WAS MOVED INTO THIS BLOCK
+        // PROBABLY SHOULD CHECK IF THIS CAUSES A LEAK!!
+        if (!pResLoader->IsExpand())
+            rio::MemUtil::free(pData);
+
+    }
 
     texture.surface.width = linearSurface.width;
     texture.surface.height = linearSurface.height;
     texture.surface.mipLevels = linearSurface.numMips;
-    texture.surface.format = rio::TextureFormat(linearSurface.format);
 
     [[maybe_unused]] bool success = rio::TextureFormatUtil::getNativeTextureFormat(texture.surface.nativeFormat, texture.surface.format);
     RIO_ASSERT(success);

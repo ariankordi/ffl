@@ -48,59 +48,116 @@ u32 FFLiResourceLoader::GetShapeAlignedMaxSize(FFLiShapePartsType partsType) con
 FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePartsType partsType, u32 index)
 {
     u32 num;
-    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header()->GetTextureHeader(), partsType);
+    FFLiResourceHeader* pHeader = Header();
+    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, pHeader, partsType);
+
+    // NOTE: if this is a glass type, we are going to check...
+    // ... if the currently loaded resource has the new glass types
+    // if it does NOT then we will map the index to the ver3 table
+    // effectively loads new glasses if they are in the resource
+    // while loading the old glasses if they are not
+
+    // glass type threshold for FFLResHigh, FFLResMiddle
+    // this is what num would be if you were using those resources
+    // new switch glasses to ver3 table
+    // taken from MiiPort/include/convert_mii.h: https://github.com/Genwald/MiiPort/blob/4ee38bbb8aa68a2365e9c48d59d7709f760f9b5d/include/convert_mii.h
+    static const u8 ToVer3GlassTypeTable[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 1, 3, 7, 7, 6, 7, 8, 7, 7};
+
+    if (partsType == FFLI_TEXTURE_PARTS_TYPE_GLASS
+        // is this a higher glass type than what is in the default resource?
+        && index > FFL_GLASS_TYPE_MAX - 1
+        // well, then does this resource have more than that many?
+        && num < index
+        // finally, check the glass type is not too large for th table
+        && index < sizeof(ToVer3GlassTypeTable)
+    )
+        // ... in this case, your resource does not have that glass type
+        // assuming this is a new glass type, we will map it to ver3
+        index = ToVer3GlassTypeTable[index];
+
     if (pPartsInfo == NULL || index >= num)
         return FFL_RESULT_ERROR;
 
     const FFLiResourcePartsInfo& partsInfo = pPartsInfo[index];
 
+    // debug logging for the above (to test endiannesssss)
+    /*
+    RIO_LOG("FFLiGetTextureResoucePartsInfos(%i, %u):\n", partsType, index);
+    RIO_LOG("  dataPos: 0x%08X (%u)\n", partsInfo.dataPos, partsInfo.dataPos);
+    RIO_LOG("  dataSize: 0x%08X (%u)\n", partsInfo.dataSize, partsInfo.dataSize);
+    RIO_LOG("  compressedSize: 0x%08X (%u)\n", partsInfo.compressedSize, partsInfo.compressedSize);
+    */
+
     FFLResult result = Load(pData, pSize, partsInfo);
     if (result != FFL_RESULT_OK)
         return result;
 
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-    u32 size = *pSize;
-    if (size && ((IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED) || !IsCached()))
+    if (pHeader->m_NeedsEndianSwap)
     {
-        FFLiResourceTextureFooter& footer = FFLiResourceTextureFooter::GetFooterImpl(pData, size);
-        footer.SwapEndian();
+        u32 size = *pSize;
+        if (size && (
+                    (
+                        IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
+                    )
+                    || !IsCached()
+                )
+            )
+        {
+            FFLiResourceTextureFooter& footer = FFLiResourceTextureFooter::GetFooterImpl(pData, size);
+            footer.SwapEndian();
+        }
     }
-#endif // __BYTE_ORDER__
-
     return FFL_RESULT_OK;
 }
 
 FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsType partsType, u32 index)
 {
     u32 num;
-    FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, Header()->GetShapeHeader(), partsType);
+    FFLiResourceHeader* pHeader = Header();
+    FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, pHeader->GetShapeHeader(), partsType);
+
     if (pPartsInfo == NULL || index >= num)
         return FFL_RESULT_ERROR;
 
     const FFLiResourcePartsInfo& partsInfo = pPartsInfo[index];
 
+    /*
+    RIO_LOG("FFLiGetShapeResoucePartsInfos(%i, %u):\n", partsType, index);
+    RIO_LOG("  dataPos: 0x%08X (%u)\n", partsInfo.dataPos, partsInfo.dataPos);
+    RIO_LOG("  dataSize: 0x%08X (%u)\n", partsInfo.dataSize, partsInfo.dataSize);
+    RIO_LOG("  compressedSize: 0x%08X (%u)\n", partsInfo.compressedSize, partsInfo.compressedSize);
+    */
+
+
     FFLResult result = Load(pData, pSize, partsInfo);
     if (result != FFL_RESULT_OK)
         return result;
 
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-    u32 size = *pSize;
-    if (size && ((IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED) || !IsCached()))
+    if (pHeader->m_NeedsEndianSwap)
     {
-        FFLiSwapEndianResourceShapeElement(pData, partsType, false);
+        u32 size = *pSize;
+        if (size && (
+                    (
+                        IsCached() && partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
+                    )
+                    || !IsCached()
+                )
+            )
+        {
+            FFLiSwapEndianResourceShapeElement(pData, partsType, false);
+        }
     }
-#endif // __BYTE_ORDER__
-
     return FFL_RESULT_OK;
 }
 
 FFLResult FFLiResourceLoader::GetPointerTextureByExpandCache(void** ppPtr, u32* pSize, FFLiTexturePartsType partsType, u32 index)
 {
+    RIO_ASSERT(IsExpand());
     if (!IsExpand())
         return FFL_RESULT_FILE_LOAD_ERROR;
 
     u32 num;
-    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header()->GetTextureHeader(), partsType);
+    FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header(), partsType);
     if (pPartsInfo == NULL || index >= num)
         return FFL_RESULT_ERROR;
 
@@ -145,7 +202,10 @@ FFLResult FFLiResourceLoader::LoadFromCache(void* pData, const FFLiResourceParts
     else
     {
         if (!Uncompress(pData, ptr, &m_pBuffer->GetUncompressBuffer(), partsInfo))
+        {
+            RIO_ASSERT(false);
             return FFL_RESULT_FILE_LOAD_ERROR;
+        }
     }
 
     return FFL_RESULT_OK;
@@ -164,10 +224,16 @@ FFLResult FFLiResourceLoader::LoadFromFile(void* pData, const FFLiResourcePartsI
     else
     {
         if (ReadWithPos(m_pBuffer->GetUncompressBuffer().Buffer(), partsInfo.dataPos, partsInfo.compressedSize) != 1)
+        {
+            RIO_ASSERT(false);
             return FFL_RESULT_RES_FS_ERROR;
+        }
 
         if (!Uncompress(pData, m_pBuffer->GetUncompressBuffer().Buffer(), &m_pBuffer->GetUncompressBuffer(), partsInfo))
+        {
+            RIO_ASSERT(false);
             return FFL_RESULT_FILE_LOAD_ERROR;
+        }
     }
 
     return FFL_RESULT_OK;
@@ -180,10 +246,13 @@ bool FFLiResourceLoader::IsCached() const
 
 FFLResult FFLiResourceLoader::GetPointerFromCache(void** ppPtr, const FFLiResourcePartsInfo& partsInfo)
 {
+    RIO_ASSERT(IsCached());
     if (!IsCached())
         return FFL_RESULT_FILE_LOAD_ERROR;
 
-    *ppPtr = (u8*)m_pResourceManager->GetResourceCache().Header(m_ResourceType) + partsInfo.dataPos;
+    *ppPtr = m_pResourceManager->GetResourceCache()
+            .Header(m_ResourceType)->GetHeaderRaw()
+                                + partsInfo.dataPos;
     return FFL_RESULT_OK;
 }
 
@@ -203,7 +272,7 @@ rio::RawErrorCode FFLiResourceLoader::OpenIfClosed()
     return rio::RAW_ERROR_OK;
 }
 
-rio::RawErrorCode FFLiResourceLoader::ReadWithPos(void* pDst, u32 pos, u32 size)
+s32 FFLiResourceLoader::ReadWithPos(void* pDst, u32 pos, u32 size)
 {
     if (!m_FileHandle.trySeek(pos, rio::FileDevice::SEEK_ORIGIN_BEGIN))
     {
@@ -220,7 +289,7 @@ rio::RawErrorCode FFLiResourceLoader::ReadWithPos(void* pDst, u32 pos, u32 size)
         return status;
     }
 
-    return rio::RAW_ERROR_OK;
+    return 1;
 }
 
 rio::RawErrorCode FFLiResourceLoader::Close()
@@ -250,7 +319,9 @@ bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuf
     const void* src = pSrc;
     u32 srcSize = partsInfo.compressedSize;
 
-    return inflator.Process(&dst, &dstSize, &src, &srcSize, Z_FINISH) == Z_STREAM_END;
+    s32 ret = inflator.Process(&dst, &dstSize, &src, &srcSize, Z_FINISH);
+    RIO_ASSERT(ret == Z_STREAM_END);
+    return ret == Z_STREAM_END;
 }
 
 }

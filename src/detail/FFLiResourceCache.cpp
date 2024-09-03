@@ -12,6 +12,11 @@ FFLiResourceCache::FFLiResourceCache()
 
 FFLiResourceCache::~FFLiResourceCache()
 {
+    for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
+    {
+        if (m_Res[i].pHeader != nullptr)
+            delete m_Res[i].pHeader;
+    }
 }
 
 FFLResult FFLiResourceCache::Attach(void* pData, u32 size, FFLResourceType resourceType)
@@ -19,59 +24,73 @@ FFLResult FFLiResourceCache::Attach(void* pData, u32 size, FFLResourceType resou
     RIO_ASSERT(pData != nullptr);
     RIO_ASSERT(size >= sizeof(FFLiResourceHeader));
 
-    FFLiResourceHeader* pHeader = (FFLiResourceHeader*)pData;
+    FFLiResourceHeader* pHeader;// = (FFLiResourceHeader*)pData;
 
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-    pHeader->SwapEndian();
-#endif // __BYTE_ORDER__
+    // will be freed by destructor if it is bound
+    bool needsEndianSwap;
+    //pHeader = new FFLiResourceHeaderAFL_2_3();
+    pHeader = DetermineAndAllocateResourceHeaderType(pData, &needsEndianSwap);
+    RIO_ASSERT(pHeader != nullptr);
+
+    pHeader->SetHeader(pData);
+
+    pHeader->m_NeedsEndianSwap = needsEndianSwap;
+    if (pHeader->m_NeedsEndianSwap)
+        pHeader->SwapEndian();
 
     FFLResult result = FFLiIsVaildResourceHeader(pHeader);
     if (result != FFL_RESULT_OK)
     {
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-        pHeader->SwapEndian();
-#endif // __BYTE_ORDER__
+        if(pHeader->m_NeedsEndianSwap)
+        {
+            reinterpret_cast<FFLiResourceHeaderDefaultData*>(pData)->SwapEndian();
+            pHeader->SwapEndian();
+        }
+
+        delete pHeader;
+
         return result;
     }
 
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-    for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
+    if (pHeader->m_NeedsEndianSwap)
     {
-        u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, pHeader->GetTextureHeader(), FFLiTexturePartsType(i));
-
-        for (u32 j = 0; j < num; j++)
+        for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
         {
-            const FFLiResourcePartsInfo& partsInfo = pPartsInfo[j];
-            u32 size = partsInfo.dataSize;
-            if (size == 0 || partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED)
-                continue;
+            u32 num;
+            FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, pHeader, FFLiTexturePartsType(i));
 
-            u8* pData = (u8*)pHeader + partsInfo.dataPos;
+            for (u32 j = 0; j < num; j++)
+            {
+                const FFLiResourcePartsInfo& partsInfo = pPartsInfo[j];
+                u32 size = partsInfo.dataSize;
+                if (size == 0 || partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED)
+                    continue;
 
-            FFLiResourceTextureFooter& footer = FFLiResourceTextureFooter::GetFooterImpl(pData, size);
-            footer.SwapEndian();
+                u8* pFooterData = (u8*)pData + partsInfo.dataPos;
+
+                FFLiResourceTextureFooter& footer = FFLiResourceTextureFooter::GetFooterImpl(pFooterData, size);
+                footer.SwapEndian();
+            }
+        }
+
+        for (u32 i = 0; i < FFLI_SHAPE_PARTS_TYPE_MAX; i++)
+        {
+            u32 num;
+            FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, pHeader->GetShapeHeader(), FFLiShapePartsType(i));
+
+            for (u32 j = 0; j < num; j++)
+            {
+                const FFLiResourcePartsInfo& partsInfo = pPartsInfo[j];
+                u32 size = partsInfo.dataSize;
+                if (size == 0 || partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED)
+                    continue;
+
+                u8* pFooterData = (u8*)pData + partsInfo.dataPos;
+
+                FFLiSwapEndianResourceShapeElement(pFooterData, FFLiShapePartsType(i), false);
+            }
         }
     }
-
-    for (u32 i = 0; i < FFLI_SHAPE_PARTS_TYPE_MAX; i++)
-    {
-        u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, pHeader->GetShapeHeader(), FFLiShapePartsType(i));
-
-        for (u32 j = 0; j < num; j++)
-        {
-            const FFLiResourcePartsInfo& partsInfo = pPartsInfo[j];
-            u32 size = partsInfo.dataSize;
-            if (size == 0 || partsInfo.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED)
-                continue;
-
-            u8* pData = (u8*)pHeader + partsInfo.dataPos;
-
-            FFLiSwapEndianResourceShapeElement(pData, FFLiShapePartsType(i), false);
-        }
-    }
-#endif // __BYTE_ORDER__
 
     m_Res[resourceType].pHeader = pHeader;
     m_Res[resourceType].size = size;

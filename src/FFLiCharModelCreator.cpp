@@ -456,6 +456,12 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
         }
     }
 
+    // HACK: skip drawing nose if expression is AFL dog or cat
+    if (pModel->expression != FFL_EXPRESSION_49
+        && pModel->expression != FFL_EXPRESSION_50
+        && pModel->expression != FFL_EXPRESSION_51
+        && pModel->expression != FFL_EXPRESSION_52
+    )
     {
         f32 noseScale = pModel->charInfo.parts.noseScale * 0.175f + 0.4f;
 

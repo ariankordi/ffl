@@ -42,7 +42,7 @@ private:
     FFLResult GetPointerFromCache(void** ppPtr, const FFLiResourcePartsInfo& partsInfo);
 
     rio::RawErrorCode OpenIfClosed();
-    rio::RawErrorCode ReadWithPos(void* pDst, u32 pos, u32 size);
+    s32 ReadWithPos(void* pDst, u32 pos, u32 size);
     rio::RawErrorCode Close();
 
 private:

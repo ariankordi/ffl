@@ -119,6 +119,16 @@ FFLiManager::~FFLiManager()
 {
     if (m_pResourceMultiHeader != nullptr)
     {
+        for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
+        {
+            if (m_pResourceMultiHeader->header[i] != nullptr)
+            {
+                void* pData = m_pResourceMultiHeader->header[i]->GetHeaderRaw();
+                if (pData != nullptr)
+                    rio::MemUtil::free(pData);
+                //delete m_pResourceMultiHeader->header[i];
+            }
+        }
         rio::MemUtil::free(m_pResourceMultiHeader);
         m_pResourceMultiHeader = nullptr;
     }

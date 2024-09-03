@@ -2,38 +2,63 @@
 #include <nn/ffl/FFLiSwapEndian.h>
 #include <nn/ffl/FFLiUtil.h>
 
+#include <nn/ffl/detail/FFLiResourceTexture.h>
+
 #define SIZE_OF_MEMBER(cls, member) sizeof( ((cls*)0)->member )
 
-u32 FFLiGetTextureResourceNum(FFLiTexturePartsType partsType)
+template <typename T>
+u32 GetTextureResourceNumImpl(FFLiTexturePartsType partsType)
 {
     switch (partsType)
     {
     case FFLI_TEXTURE_PARTS_TYPE_BEARD:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoBeard) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoBeard) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_CAP:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoCap) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoCap) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_EYE:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoEye) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoEye) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_EYEBROW:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoEyebrow) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoEyebrow) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_FACELINE:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoFaceline) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoFaceline) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoFaceMakeup) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoFaceMakeup) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_GLASS:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoGlass) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoGlass) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_MOLE:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoMole) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoMole) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_MOUTH:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoMouth) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoMouth) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_MUSTACHE:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoMustache) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoMustache) / sizeof(FFLiResourcePartsInfo);
     case FFLI_TEXTURE_PARTS_TYPE_NOSELINE:
-        return SIZE_OF_MEMBER(FFLiResourceTextureHeader, partsInfoNoseline) / sizeof(FFLiResourcePartsInfo);
+        return SIZE_OF_MEMBER(T, partsInfoNoseline) / sizeof(FFLiResourcePartsInfo);
     default:
         return 0;
     }
 }
+
+
+u32 FFLiResourceHeaderDefault::GetTextureResourceNum(FFLiTexturePartsType partsType) const
+{
+    return GetTextureResourceNumImpl<FFLiResourceTextureHeader>(partsType);
+}
+
+u32 FFLiResourceHeaderAFL::GetTextureResourceNum(FFLiTexturePartsType partsType) const
+{
+    return GetTextureResourceNumImpl<FFLiResourceTextureHeaderAFL>(partsType);
+}
+
+u32 FFLiResourceHeaderAFL_2_3::GetTextureResourceNum(FFLiTexturePartsType partsType) const
+{
+    return GetTextureResourceNumImpl<FFLiResourceTextureHeaderAFL_2_3>(partsType);
+}
+
+u32 FFLiGetTextureResourceNum(FFLiResourceHeader* pHeader, FFLiTexturePartsType partsType)
+{
+    return pHeader->GetTextureResourceNum(partsType);
+}
+
 
 u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
 {
@@ -68,9 +93,9 @@ u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
     }
 }
 
-FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceTextureHeader* pHeader, FFLiTexturePartsType partsType)
+template <typename T>
+FFLiResourcePartsInfo* GetPartsInfosImpl(T* pHeader, FFLiTexturePartsType partsType)
 {
-    *pNum = FFLiGetTextureResourceNum(partsType);
     switch (partsType)
     {
     case FFLI_TEXTURE_PARTS_TYPE_BEARD:
@@ -96,8 +121,30 @@ FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceTe
     case FFLI_TEXTURE_PARTS_TYPE_NOSELINE:
         return pHeader->partsInfoNoseline;
     default:
-        return NULL;
+        return nullptr;
     }
+}
+
+
+FFLiResourcePartsInfo* FFLiResourceTextureHeader::GetPartsInfos(FFLiTexturePartsType partsType)
+{
+    return GetPartsInfosImpl(this, partsType);
+}
+
+
+FFLiResourcePartsInfo* FFLiResourceTextureHeaderAFL_2_3::GetPartsInfos(FFLiTexturePartsType partsType)
+{
+    return GetPartsInfosImpl(this, partsType);
+}
+
+FFLiResourcePartsInfo* FFLiResourceTextureHeaderAFL::GetPartsInfos(FFLiTexturePartsType partsType)
+{
+    return GetPartsInfosImpl(this, partsType);
+}
+
+FFLiResourcePartsInfo* FFLiGetTextureResoucePartsInfos(u32* pNum, FFLiResourceHeader* pResHeader, FFLiTexturePartsType partsType)
+{
+    return pResHeader->GetTextureResourcePartsInfos(pNum, partsType);
 }
 
 FFLiResourcePartsInfo* FFLiGetShapeResoucePartsInfos(u32* pNum, FFLiResourceShapeHeader* pHeader, FFLiShapePartsType partsType)
@@ -179,13 +226,13 @@ s32 FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits windowBits)
 
 FFLResult FFLiResourceHeader::GetResult() const
 {
-    if (!FFLiCheckAlignPtr(this, 4))
+    if (!FFLiCheckAlignPtr(GetHeaderRaw(), 4))
         return FFL_RESULT_ERROR;
 
-    if (m_Magic != 0x46465241)  // FFRA
+    if (GetMagic() != 0x46465241)  // FFRA
         return FFL_RESULT_FILE_INVALID;
 
-    if (m_Version != FFLI_RESOURCE_HEADER_VERSION)
+    if (GetVersion() != FFLI_RESOURCE_HEADER_VERSION)
         return FFL_RESULT_FILE_INVALID;
 
     return FFL_RESULT_OK;
@@ -208,36 +255,53 @@ void SwapEndianResourcePartsInfo(FFLiResourcePartsInfo* pPartsInfo, u32 num)
 
 }
 
-void FFLiResourceHeader::SwapEndian()
+// NOTE: both of the below SwapEndian functions
+// assume that everything before parts is already swapped
+
+template <typename T>
+void HeaderSwapEndianImpl(T* pHeader)
 {
     // This function is deleted in NSMBU.
     // Therefore, its implementation is only theoretical.
 
-    m_Magic = FFLiSwapEndianImpl<u32>(m_Magic);
-    m_Version = FFLiSwapEndianImpl<u32>(m_Version);
-    m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_UncompressBufferSize);
+    /*
+    m_Header->m_Magic = FFLiSwapEndianImpl<u32>(m_Header->m_Magic);
+    m_Header->m_Version = FFLiSwapEndianImpl<u32>(m_Header->m_Version);
+    m_Header->m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_Header->m_UncompressBufferSize);
 
-    // Dunno what to do with this
-    // _c
-
-    m_IsExpand = FFLiSwapEndianImpl<u32>(m_IsExpand);
-
-    FFLiSwapEndianArrayImpl<u32>(GetTextureHeader()->partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);
+    m_Header->m_IsExpand = FFLiSwapEndianImpl<u32>(m_Header->m_IsExpand);
+    */
+    FFLiSwapEndianArrayImpl<u32>(pHeader->m_Header->m_TextureHeader.partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);
     for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, GetTextureHeader(), FFLiTexturePartsType(i));
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, pHeader, FFLiTexturePartsType(i));
         SwapEndianResourcePartsInfo(pPartsInfo, num);
     }
 
-    FFLiSwapEndianArrayImpl<u32>(GetShapeHeader()->partsMaxSize, FFLI_SHAPE_PARTS_TYPE_MAX);
+    FFLiSwapEndianArrayImpl<u32>(pHeader->GetShapeHeader()->partsMaxSize, FFLI_SHAPE_PARTS_TYPE_MAX);
     for (u32 i = 0; i < FFLI_SHAPE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
-        FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, GetShapeHeader(), FFLiShapePartsType(i));
+        FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, pHeader->GetShapeHeader(), FFLiShapePartsType(i));
         SwapEndianResourcePartsInfo(pPartsInfo, num);
     }
 
     // Dunno what to do with this
     // _49d0
+}
+
+void FFLiResourceHeaderDefault::SwapEndian()
+{
+    return HeaderSwapEndianImpl(this);
+}
+
+void FFLiResourceHeaderAFL::SwapEndian()
+{
+    return HeaderSwapEndianImpl(this);
+}
+
+void FFLiResourceHeaderAFL_2_3::SwapEndian()
+{
+    return HeaderSwapEndianImpl(this);
 }

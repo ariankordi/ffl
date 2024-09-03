@@ -23,16 +23,16 @@ rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch);
 FFLiRenderTexture* FFLiRenderTextureAllocate();
 void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture);
 
-bool CanUseExpression(u32 expressionFlag, FFLExpression expression);
+bool CanUseExpression(FFLExpressionFlag expressionFlag, FFLExpression expression);
 
-void InitRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag);
-void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag);
+void InitRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag);
+void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag);
 
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo* pCharInfo, FFLExpression expression);
 
 }
 
-FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, u32 expressionFlag, u32 resolution, bool enableMipMap)
+FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap)
 {
     FFLExpression expression = FFL_EXPRESSION_MAX;
 
@@ -40,7 +40,7 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, u32 expressi
 
     for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
     {
-        if ((expressionFlag & 1 << i) == 0)
+        if ((expressionFlag & static_cast<FFLExpressionFlag>(1) << i) == 0)
         {
             pMaskTextures->pRenderTextures[i] = NULL;
             continue;
@@ -70,7 +70,7 @@ void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures)
     }
 }
 
-FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, u32 expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader)
+FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader)
 {
     rio::MemUtil::set(pObject, 0, sizeof(FFLiMaskTexturesTempObject));
 
@@ -93,13 +93,18 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
             desc.pTexturesEye[0] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[0]];
             desc.pTexturesEye[1] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[1]];
 
-            desc.pTexturesEyebrow[0] = pObject->partsTextures.pTextureEyebrow;
-            desc.pTexturesEyebrow[1] = pObject->partsTextures.pTextureEyebrow;
+            desc.pTexturesEyebrow[0] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
+            desc.pTexturesEyebrow[1] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
 
             desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
-            desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
-            desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
+            if (expressionCharInfo.parts.mustacheType != 0) {
+                desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
+                desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
+            } else {
+                desc.pTexturesMustache[0] = NULL;
+                desc.pTexturesMustache[1] = NULL;
+            }
 
             desc.pTextureMole = pObject->partsTextures.pTextureMole;
 
@@ -117,7 +122,7 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
     return FFL_RESULT_OK;
 }
 
-void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag, FFLResourceType resourceType)
+void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag, FFLResourceType resourceType)
 {
     for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
@@ -195,19 +200,19 @@ void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture)
     delete pRenderTexture;
 }
 
-bool CanUseExpression(u32 expressionFlag, FFLExpression expression)
+bool CanUseExpression(FFLExpressionFlag expressionFlag, FFLExpression expression)
 {
-    return (expressionFlag & 1 << expression) != 0;
+    return (expressionFlag & static_cast<FFLExpressionFlag>(1) << expression) != 0;
 }
 
-void InitRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag)
+void InitRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag)
 {
     for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
         if (CanUseExpression(expressionFlag, FFLExpression(i)))
             pObject->pRawMaskDrawParam[i] = new FFLiRawMaskDrawParam;
 }
 
-void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, u32 expressionFlag)
+void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag)
 {
     for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
@@ -224,27 +229,6 @@ struct CorrectParam
 };
 
 static const CorrectParam CORRECT_PARAM[FFL_EXPRESSION_MAX] = {
-/*
-    {   -1,   -1,  0,  0,  0 },
-    { 0x3C,   -1,  0,  0,  0 },
-    {   -1,  0xA,  2,  2,  0 },
-    {   -1,  0xC, -2, -2,  0 },
-    { 0x3D,   -1,  0,  0, -2 },
-    { 0x1A,   -1,  0,  0,  0 },
-    {   -1, 0x24,  0,  0,  0 },
-    { 0x3C, 0x24,  0,  0,  0 },
-    {   -1, 0x24,  2,  2,  0 },
-    {   -1, 0x24, -2, -2,  0 },
-    { 0x3D, 0x24,  0,  0, -2 },
-    { 0x1A, 0x24,  0,  0,  0 },
-    { 0x2F,   -1,  0,  0,  0 },
-    { 0x2F,   -1,  0,  0,  0 },
-    { 0x2F, 0x24,  0,  0,  0 },
-    { 0x2F, 0x24,  0,  0,  0 },
-    { 0x2F,   -1,  0,  0,  0 },
-    { 0x2F,   -1,  0,  0,  0 },
-    { 0x2F,  0xC,  0,  0,  0 }
-*/
     { -1, -1,  0,  0,  0 },
     { 60, -1,  0,  0,  0 },
     { -1, 10,  2,  2,  0 },
@@ -263,7 +247,61 @@ static const CorrectParam CORRECT_PARAM[FFL_EXPRESSION_MAX] = {
     { 47, 36,  0,  0,  0 },
     { 47, -1,  0,  0,  0 },
     { 47, -1,  0,  0,  0 },
-    { 47, 12,  0,  0,  0 }
+    { 47, 12,  0,  0,  0 },
+
+    // miitomo
+
+    { 64, 23, 0, 0, 0 },
+    { 64, 36, 0, 0, 0 },
+    { 26, 23, -2, -2, -2 },
+    { 26, 45, -2, -2, -2 },
+    { 47, 23, 2, 2, 0 },
+    { 47, 41, 2, 2, 0 },
+    { 62, 23, 0, 0, -1 },
+    { 62, 38, 0, 0, -1 },
+    { -1, 23, 2, 2, 0 },
+    { -1, 37, 2, 2, 0 },
+    { 47, 23, 0, -2, -3 },
+    { 47, 45, 0, -2, -3 },
+    { 60, 23, 0, 0, 0 },
+    { 60, 38, 0, 0, 0 },
+    { 75, 44, 0, 0, 0 },
+    { 75, 44, 0, 0, 0 },
+    { 65, 39, 0, 1, 0 },
+    { 65, 40, 0, 1, 0 },
+    { 64, 15, 0, 2, 0 },
+    { 64, 36, 0, 2, 0 },
+    { 69, 42, 0, 0, 2 },
+    { 69, 43, 0, 0, 2 },
+    { 63, 46, 0, 2, 0 },
+    { 63, 46, 0, 2, 0 },
+    { 66, 14, 0, 2, 1 },
+    { 66, 14, 0, 2, 1 },
+    { 47, 47, 1, 0, 0 },
+    { 47, 47, 1, 0, 0 },
+    { 74, 32, 0, 0, 0 },
+    { 74, 32, 0, 0, 0 },
+    { 67, 48, 0, 0, -1 },
+    { 67, 48, 0, 0, -1 },
+    { 68, 49, 0, 0, 0 },
+    { 68, 49, 0, 0, 0 },
+    { -1, 50, 0, 0, 0 },
+    { -1, 50, 0, 0, 0 },
+    { 72, 23, 0, -2, -3 },
+    { 72, 38, 0, -2, -3 },
+    { 70, 23, 0, -2, -2 },
+    { 70, 45, 0, -2, -2 },
+    { 23, 23, 0, -2, 0 },
+    { 23, 38, 0, -2, 0 },
+    { -1, -1, 0, 0, 0 },
+    { -1, -1, 0, 0, 0 },
+    { -1, 23, 0, -1, -2 },
+    { -1, 46, 0, -1, -2 },
+    { 76, 23, 0, -2, -3 },
+    { 76, 38, 0, -2, -3 },
+    { 79, 51, 0, 0, 0 },
+    { 79, 51, 0, 0, 0 },
+    { 78, 2, 0, 0, 0 },
 };
 
 const CorrectParam& GetCorrectParam(FFLExpression expression)
@@ -273,6 +311,89 @@ const CorrectParam& GetCorrectParam(FFLExpression expression)
 
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo*, FFLExpression expression)
 {
+    // courtesy of miitomo
+    switch(expression) {
+    case FFL_EXPRESSION_19:
+    case FFL_EXPRESSION_20:
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+    case FFL_EXPRESSION_45:
+    case FFL_EXPRESSION_46:
+    case FFL_EXPRESSION_53:
+    case FFL_EXPRESSION_54:
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        break;
+    case FFL_EXPRESSION_25:
+    case FFL_EXPRESSION_26:
+    case FFL_EXPRESSION_37:
+    case FFL_EXPRESSION_38:
+    case FFL_EXPRESSION_55:
+    case FFL_EXPRESSION_56:
+    case FFL_EXPRESSION_57:
+    case FFL_EXPRESSION_58:
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        break;
+    case FFL_EXPRESSION_33:
+    case FFL_EXPRESSION_34:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        break;
+    case FFL_EXPRESSION_35:
+    case FFL_EXPRESSION_36:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        break;
+    case FFL_EXPRESSION_39:
+    case FFL_EXPRESSION_40:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyebrowRotate = 6;
+        break;
+    case FFL_EXPRESSION_43:
+    case FFL_EXPRESSION_44:
+    case FFL_EXPRESSION_47:
+    case FFL_EXPRESSION_48:
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        break;
+    case FFL_EXPRESSION_49: // Cat
+    case FFL_EXPRESSION_50: // Cat duplicate
+    case FFL_EXPRESSION_51: // Dog
+    case FFL_EXPRESSION_52: // Dog duplicate
+        pExpressionCharInfo->parts.eyeRotate = 4;
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        pExpressionCharInfo->parts.eyeScale = 4;
+        pExpressionCharInfo->parts.eyebrowScale = 4;
+        pExpressionCharInfo->parts.eyebrowScaleY = 3;
+        pExpressionCharInfo->parts.eyebrowRotate = 6;
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        pExpressionCharInfo->parts.mouthScale = 4;
+        pExpressionCharInfo->parts.eyeSpacingX = 2;
+        pExpressionCharInfo->parts.eyePositionY = 12;
+        pExpressionCharInfo->parts.eyebrowSpacingX = 2;
+        pExpressionCharInfo->parts.eyebrowPositionY = 10;
+        pExpressionCharInfo->parts.mouthPositionY = 13;
+
+        pExpressionCharInfo->parts.mustacheType = 0;
+        break;
+    case FFL_EXPRESSION_67:
+    case FFL_EXPRESSION_68:
+        pExpressionCharInfo->parts.mouthScaleY = 3;
+        break;
+    case FFL_EXPRESSION_69:
+        pExpressionCharInfo->parts.eyeScaleY = 3;
+        break;
+    default:
+        break;
+    }
+
     const CorrectParam& param = GetCorrectParam(expression);
 
     if (param.mouthType >= 0)
@@ -281,14 +402,19 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     s32 eyeRotateOffset = param.eyeRotateOffset;
     if (param.eyeType >= 0 && param.eyeType != pExpressionCharInfo->parts.eyeType)
     {
-        eyeRotateOffset += FFLiiGetEyeRotateOffset(pExpressionCharInfo->parts.eyeType);
-        eyeRotateOffset -= FFLiiGetEyeRotateOffset(param.eyeType);
+        s32 iVar1 = FFLiiGetEyeRotateOffset(pExpressionCharInfo->parts.eyeType);
+        s32 iVar2 = FFLiiGetEyeRotateOffset(param.eyeType);
+        if (param.eyeType < 62)
+            eyeRotateOffset = (eyeRotateOffset + iVar1) - iVar2;
+        else
+            eyeRotateOffset = (eyeRotateOffset - iVar1) + iVar2;
     }
 
+    s32 eyeRotate;
     if (eyeRotateOffset != 0)
     {
         // pExpressionCharInfo->parts.eyeRotate = clamp(pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset, 0, 7);
-        s32 eyeRotate = pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset;
+        eyeRotate = pExpressionCharInfo->parts.eyeRotate + eyeRotateOffset;
         if (eyeRotate < 0)
             eyeRotate = 0;
         else if (eyeRotate > 7)
@@ -296,9 +422,24 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.eyeRotate = eyeRotate;
     }
 
-    pExpressionCharInfo->parts.eyebrowPositionY += param.eyebrowPositionY;
+    if (pExpressionCharInfo->parts.mouthType == 48)
+        pExpressionCharInfo->parts.mouthScale = 8;
+
+    s32 mouthScaleY;
+    if (expression == 67) {
+        if (pExpressionCharInfo->parts.mouthScaleY < 3) {
+            mouthScaleY = 0;
+        } else {
+            mouthScaleY = pExpressionCharInfo->parts.mouthScaleY + -3;
+            if (mouthScaleY > 6) {
+                mouthScaleY = 6;
+            }
+        }
+        pExpressionCharInfo->parts.mouthScaleY = mouthScaleY;
+    }
 
     s32 eyebrowRotateOffset = param.eyebrowRotateOffset;
+    pExpressionCharInfo->parts.eyebrowPositionY += param.eyebrowPositionY;
     if (eyebrowRotateOffset != 0)
     {
         // pExpressionCharInfo->parts.eyebrowRotate = clamp(pExpressionCharInfo->parts.eyebrowRotate + eyebrowRotateOffset, 0, 11);
