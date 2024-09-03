@@ -101,25 +101,15 @@ typedef enum FFLExpression
 FFLExpression;
 
 /* TODO: FIX THESE FLAWS
- * Hide nose and mustache
-FFL_EXPRESSION_49 (Cat)
-FFL_EXPRESSION_50 (Cat duplicate)
-FFL_EXPRESSION_51 (Dog)
-FFL_EXPRESSION_52 (Dog duplicate)
+
  * Apply eyebrow colors
    Unknown what these are supposed to be, have seen it dark and light.
 FFL_EXPRESSION_39 (Resolve)
 FFL_EXPRESSION_40 (Resolve mouth open)
+FFL_EXPRESSION_49 (Cat)
+FFL_EXPRESSION_50 (Cat duplicate)
 FFL_EXPRESSION_51 (Dog)
 FFL_EXPRESSION_52 (Dog duplicate)
- * Mouth color is wrong:
-   Don't think it changes, may have to be constant.
-FFL_EXPRESSION_45 (Raspberry)
-FFL_EXPRESSION_46 (Raspberry duplicate)
-FFL_EXPRESSION_51 (Dog)
-FFL_EXPRESSION_52 (Dog duplicate)
-FFL_EXPRESSION_53 (Tasty)
-FFL_EXPRESSION_54 (Tasty duplicate)
  * Eyes are the wrong direction?:
    The eyes may be both in the wrong spot, AND reversed.
    NOTE: This is probably not going to be easy to fix, and

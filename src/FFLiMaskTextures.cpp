@@ -98,8 +98,13 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
             desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
-            desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
-            desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
+            if (expressionCharInfo.parts.mustacheType != 0) {
+                desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
+                desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
+            } else {
+                desc.pTexturesMustache[0] = NULL;
+                desc.pTexturesMustache[1] = NULL;
+            }
 
             desc.pTextureMole = pObject->partsTextures.pTextureMole;
 
@@ -358,10 +363,10 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     case FFL_EXPRESSION_48:
         pExpressionCharInfo->parts.eyeRotate = 4;
         break;
-    case FFL_EXPRESSION_49:
-    case FFL_EXPRESSION_50:
-    case FFL_EXPRESSION_51:
-    case FFL_EXPRESSION_52:
+    case FFL_EXPRESSION_49: // Cat
+    case FFL_EXPRESSION_50: // Cat duplicate
+    case FFL_EXPRESSION_51: // Dog
+    case FFL_EXPRESSION_52: // Dog duplicate
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
         pExpressionCharInfo->parts.eyeScale = 4;
@@ -375,6 +380,8 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.eyebrowSpacingX = 2;
         pExpressionCharInfo->parts.eyebrowPositionY = 10;
         pExpressionCharInfo->parts.mouthPositionY = 13;
+
+        pExpressionCharInfo->parts.mustacheType = 0;
         break;
     case FFL_EXPRESSION_67:
     case FFL_EXPRESSION_68:
@@ -429,14 +436,6 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
             }
         }
         pExpressionCharInfo->parts.mouthScaleY = mouthScaleY;
-    }
-
-    // the below is done in AFLiExpressionTexture::setup
-    // NOTE: dont' think this worksl ol
-    if ((expression - 49 < 0xe)
-        && ((0x300fU >> ((expression - 49) & 0xff) & 1) != 0)
-    ) {
-        pExpressionCharInfo->parts.mustacheType = 0;
     }
 
     s32 eyebrowRotateOffset = param.eyebrowRotateOffset;
