@@ -98,10 +98,10 @@ FFLI_RESOURCE_STRATEGY_MAX              = 6
 
 
 # ResHeaderHint
-RES_HINT_DEFAULT = 0
-RES_HINT_AFL     = 1
-RES_HINT_AFL_2_3 = 2
-#RES_HINT_AFL_2_3_NO_2_SHAPES = 3
+RES_HINT_DEFAULT = 1
+RES_HINT_AFL     = 2
+RES_HINT_AFL_2_3 = 3
+#RES_HINT_AFL_2_3_NO_2_SHAPES = 4
 
 # big endian default
 endianness_character = '>'

@@ -248,4 +248,72 @@ private:
     friend void HeaderSwapEndianImpl(T* header);
 };
 
+class FFLiResourceHeaderAFL : public FFLiResourceHeader
+{
+public:
+    u32 GetMagic() const override { return m_Header->m_Magic; }
+    u32 GetVersion() const override { return m_Header->m_Version; }
+    u32 GetUncompressBufferSize() const override
+    {
+        return m_Header->m_UncompressBufferSize;
+    }
+    bool IsExpand() const override
+    {
+        return m_Header->m_IsExpand == 1;
+    }
+    u32 GetTextureMaxSize(FFLiTexturePartsType partsType) const override
+    {
+        return m_Header->m_TextureHeader.partsMaxSize[partsType];
+    }
+
+    u32 GetTextureResourceNum(FFLiTexturePartsType partsType) const override;
+
+    FFLiResourcePartsInfo* GetTextureResourcePartsInfos(u32* pNum, FFLiTexturePartsType partsType) override
+    {
+        *pNum = GetTextureResourceNum(partsType);
+        return m_Header->m_TextureHeader.GetPartsInfos(partsType);
+    }
+
+    FFLiResourceShapeHeader* GetShapeHeader() override
+    {
+        return &m_Header->m_ShapeHeader;
+    }
+    u32 GetShapeMaxSize(FFLiShapePartsType partsType) const override
+    {
+        return m_Header->m_ShapeHeader.partsMaxSize[partsType];
+    }
+
+    void SetHeader(void* ptr) override
+    {
+        m_Header = reinterpret_cast<decltype(m_Header)>(ptr);
+    }
+    char* GetHeaderRaw() const override
+    {
+        return reinterpret_cast<char*>(m_Header);
+    }
+    u32 GetHeaderSize() const override
+    {
+        return sizeof(decltype(*m_Header));
+    }
+
+    bool TextureFormatIsLinear() const override { return true; }
+    bool IgnoreMipMaps() const override { return true; }
+
+    void SwapEndian() override;
+
+private:
+    struct {
+        u32                           m_Magic;
+        u32                           m_Version; // STILL 0x00070000
+        u32                           m_UncompressBufferSize;
+        u32                           _c[4 / sizeof(u32)];
+        int                           m_IsExpand;
+        FFLiResourceTextureHeaderAFL  m_TextureHeader;
+        FFLiResourceShapeHeader       m_ShapeHeader;
+        u32                           _49d0[48 / sizeof(u32)];
+    } *m_Header;
+
+    template <typename T>
+    friend void HeaderSwapEndianImpl(T* header);
+};
 #endif // FFLI_RESOURCE_HEADER_H_

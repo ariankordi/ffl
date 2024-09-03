@@ -44,6 +44,11 @@ u32 FFLiResourceHeaderDefault::GetTextureResourceNum(FFLiTexturePartsType partsT
     return GetTextureResourceNumImpl<FFLiResourceTextureHeader>(partsType);
 }
 
+u32 FFLiResourceHeaderAFL::GetTextureResourceNum(FFLiTexturePartsType partsType) const
+{
+    return GetTextureResourceNumImpl<FFLiResourceTextureHeaderAFL>(partsType);
+}
+
 u32 FFLiResourceHeaderAFL_2_3::GetTextureResourceNum(FFLiTexturePartsType partsType) const
 {
     return GetTextureResourceNumImpl<FFLiResourceTextureHeaderAFL_2_3>(partsType);
@@ -128,6 +133,11 @@ FFLiResourcePartsInfo* FFLiResourceTextureHeader::GetPartsInfos(FFLiTextureParts
 
 
 FFLiResourcePartsInfo* FFLiResourceTextureHeaderAFL_2_3::GetPartsInfos(FFLiTexturePartsType partsType)
+{
+    return GetPartsInfosImpl(this, partsType);
+}
+
+FFLiResourcePartsInfo* FFLiResourceTextureHeaderAFL::GetPartsInfos(FFLiTexturePartsType partsType)
 {
     return GetPartsInfosImpl(this, partsType);
 }
@@ -282,6 +292,11 @@ void HeaderSwapEndianImpl(T* pHeader)
 }
 
 void FFLiResourceHeaderDefault::SwapEndian()
+{
+    return HeaderSwapEndianImpl(this);
+}
+
+void FFLiResourceHeaderAFL::SwapEndian()
 {
     return HeaderSwapEndianImpl(this);
 }

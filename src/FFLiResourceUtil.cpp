@@ -9,11 +9,11 @@ FFLResult FFLiIsVaildResourceHeader(const FFLiResourceHeader* pHeader)
 
 
 enum ResHeaderHint {
-    RES_HINT_DEFAULT = 0,
-    RES_HINT_AFL     = 1,
-    RES_HINT_AFL_2_3 = 2
+    RES_HINT_DEFAULT = 1,
+    RES_HINT_AFL     = 2,
+    RES_HINT_AFL_2_3 = 3
     // todo remove 2 type shapes and add a new resource header for that
-    //RES_HINT_AFL_2_3_NO_2_SHAPES = 3,
+    //RES_HINT_AFL_2_3_NO_2_SHAPES = 4,
 };
 
 FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* needsEndianSwap)
@@ -46,13 +46,10 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
     // ig old versions of FFLResource.py set it to this
     RIO_ASSERT(pHeaderDefault->m_TotalUncompressSize != 0);
 
-    if (totalUncompressSizeNoVersion == 0x239D5E0)
-        hint = RES_HINT_AFL;
     switch (hint)
     {
         case RES_HINT_AFL:
-            RIO_LOG("sorry but AFLResHigh.dat is not supported at this time, use AFLResHigh_2_3.dat\n");
-            RIO_ASSERT(false);
+            return new FFLiResourceHeaderAFL();
             break;
         case RES_HINT_AFL_2_3:
             return new FFLiResourceHeaderAFL_2_3();
@@ -61,12 +58,15 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
             break;
         // fall through to uncompress size logic below
     }
-    /* uncompress size values:
-     * AFLResHigh_2_3.dat: 0x2502DE0
-     * AFLResHigh.dat:     0x239D5E0
-     * FFLResHigh.dat:     0x0CBBDE0
-     */
-    if (totalUncompressSizeNoVersion > 0x0CBBDE0)
+
+    #define UNCOMPRESS_SIZE_AFLRESHIGH_2_3_DAT 0x2502DE0
+    #define UNCOMPRESS_SIZE_AFLRESHIGH_DAT     0x239D5E0
+    #define UNCOMPRESS_SIZE_FFLRESHIGH_DAT     0x0CBBDE0
+
+    if (totalUncompressSizeNoVersion == UNCOMPRESS_SIZE_AFLRESHIGH_DAT)
+        return new FFLiResourceHeaderAFL();
+    // assume anything larger than FFLResHigh.dat is AFLResHigh_2_3.dat
+    else if (totalUncompressSizeNoVersion > UNCOMPRESS_SIZE_FFLRESHIGH_DAT)
         return new FFLiResourceHeaderAFL_2_3();
     else
         return new FFLiResourceHeaderDefault();
