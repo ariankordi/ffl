@@ -65,9 +65,9 @@ FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePa
 
     if (partsType == FFLI_TEXTURE_PARTS_TYPE_GLASS
         // is this a higher glass type than what is in the default resource?
-        && index > FFL_GLASS_TYPE_MAX - 1
+        && index > (FFL_GLASS_TYPE_MAX - 1)
         // well, then does this resource have more than that many?
-        && num < index
+        && (num - 1) < index
         // finally, check the glass type is not too large for th table
         && index < sizeof(ToVer3GlassTypeTable)
     )
