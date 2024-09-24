@@ -84,14 +84,21 @@ void FFLiInitModulateFaceBeard(FFLModulateParam* pParam, s32 color, const rio::T
     pParam->pTexture2D = &texture2D;
 }
 
-void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, const rio::Texture2D& texture2D)
+void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, s32 color, const rio::Texture2D* texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_1;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_FACELINE;
-    pParam->pColorR = NULL;
     pParam->pColorG = NULL;
     pParam->pColorB = NULL;
-    pParam->pTexture2D = &texture2D;
+    if (texture2D == NULL) {
+        // bind it as a constant color rather than a texture
+        pParam->mode = FFL_MODULATE_MODE_0;
+        pParam->pColorR = &FFLiGetFacelineColor(color);
+        pParam->pTexture2D = NULL;
+    } else {
+        pParam->mode = FFL_MODULATE_MODE_1;
+        pParam->pColorR = NULL;
+        pParam->pTexture2D = texture2D;
+    }
 }
 
 void FFLiInitModulateShapeBeard(FFLModulateParam* pParam, s32 color)

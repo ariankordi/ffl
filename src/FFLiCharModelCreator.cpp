@@ -120,24 +120,33 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         return result;
     }
 
-    FFLiInitFacelineTexture(&pModel->facelineRenderTexture, resolution, isEnabledMipMap);
+    bool enableFacelineTexture = pModel->charInfo.parts.faceLine != 0 || pModel->charInfo.parts.faceMakeup != 0;
+    if (enableFacelineTexture)
+        FFLiInitFacelineTexture(&pModel->facelineRenderTexture, resolution, isEnabledMipMap);
+    else
+        // if faceline texture is not needed
+        pModel->facelineRenderTexture.pTexture2D = NULL;
 
-    result = FFLiInitTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->facelineRenderTexture, &pModel->charInfo, resolution, isEnabledMipMap, &resLoader);
-    if (result != FFL_RESULT_OK)
-    {
-        FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
-        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
-        FFLiDeleteMaskTextures(&pModel->maskTextures);
-        delete pModel->pTextureTempObject;
-        pModel->pTextureTempObject = NULL;
-        return result;
+    if (enableFacelineTexture) {
+        result = FFLiInitTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->facelineRenderTexture, &pModel->charInfo, resolution, isEnabledMipMap, &resLoader);
+        if (result != FFL_RESULT_OK)
+        {
+            FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
+            FFLiDeleteMaskTextures(&pModel->maskTextures);
+            delete pModel->pTextureTempObject;
+            pModel->pTextureTempObject = NULL;
+            return result;
+        }
     }
 
     result = InitShapes(pModel, &resLoader, &m_pCharModelCreateParam->GetCoordinate());
     if (result != FFL_RESULT_OK)
     {
-        FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
-        FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+        if (enableFacelineTexture) {
+            FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
+            FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+        }
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
         FFLiDeleteMaskTextures(&pModel->maskTextures);
         delete pModel->pTextureTempObject;
@@ -149,8 +158,10 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     if (result != FFL_RESULT_OK)
     {
         DeleteShapes(pModel);
-        FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
-        FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+        if (enableFacelineTexture) {
+            FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
+            FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+        }
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
         FFLiDeleteMaskTextures(&pModel->maskTextures);
         delete pModel->pTextureTempObject;
@@ -186,15 +197,17 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
         , &m_pManager->GetCopySurface()
 #endif // RIO_IS_CAFE
     );
-    FFLiRenderFacelineTexture(&pModel->facelineRenderTexture, &pModel->charInfo, resolution, &pModel->pTextureTempObject->facelineTexture, &shaderCallback
+    if (pModel->facelineRenderTexture.pTexture2D != NULL)
+        FFLiRenderFacelineTexture(&pModel->facelineRenderTexture, &pModel->charInfo, resolution, &pModel->pTextureTempObject->facelineTexture, &shaderCallback
 #if RIO_IS_CAFE
-        , &m_pManager->GetCopySurface()
+            , &m_pManager->GetCopySurface()
 #endif // RIO_IS_CAFE
-    );
+        );
 
     AfterExecuteGPUStep(pModel);
 
-    FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
+    if (pModel->facelineRenderTexture.pTexture2D != NULL)
+        FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
     FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
 
     delete pModel->pTextureTempObject;
@@ -211,11 +224,13 @@ void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
 
     DeleteTextures(pModel);
     DeleteShapes(pModel);
-    FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+    if (pModel->facelineRenderTexture.pTexture2D != NULL)
+        FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
 
     if (pModel->pTextureTempObject != NULL)
     {
-        FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
+        if (pModel->facelineRenderTexture.pTexture2D != NULL)
+            FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
 
         delete pModel->pTextureTempObject;
@@ -666,7 +681,7 @@ void SetupDrawParam(FFLiCharModel* pModel)
     FFLCullMode hairCullMode = FFL_CULL_MODE_BACK;
 
     pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE].cullMode = FFL_CULL_MODE_BACK;
-    FFLiInitModulateShapeFaceline(&pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE].modulateParam, *pModel->facelineRenderTexture.pTexture2D);
+    FFLiInitModulateShapeFaceline(&pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE].modulateParam, pModel->charInfo.parts.facelineColor, pModel->facelineRenderTexture.pTexture2D);
 
     pModel->drawParam[FFLI_SHAPE_TYPE_OPA_BEARD].cullMode = FFL_CULL_MODE_BACK;
     FFLiInitModulateShapeBeard(&pModel->drawParam[FFLI_SHAPE_TYPE_OPA_BEARD].modulateParam, pModel->charInfo.parts.beardColor);

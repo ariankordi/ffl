@@ -16,7 +16,7 @@ void FFLiInitModulateFaceMake(FFLModulateParam* pParam, const rio::Texture2D& te
 void FFLiInitModulateFaceLine(FFLModulateParam* pParam, const rio::Texture2D& texture2D);
 void FFLiInitModulateFaceBeard(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D);
 
-void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, const rio::Texture2D& texture2D);
+void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, s32 color, const rio::Texture2D* texture2D);
 void FFLiInitModulateShapeBeard(FFLModulateParam* pParam, s32 color);
 void FFLiInitModulateShapeNose(FFLModulateParam* pParam, s32 color);
 void FFLiInitModulateShapeForehead(FFLModulateParam* pParam, s32 color);
