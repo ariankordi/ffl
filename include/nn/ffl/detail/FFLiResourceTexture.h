@@ -6,10 +6,19 @@
 #include <nn/ffl/detail/FFLiResourcePartsInfo.h>
 
 #if RIO_IS_WIN
-#include <ninTexUtils/gx2/gx2Enum.h>
+    #ifdef FFL_NO_NINTEXUTILS
+        #include <gpu/rio_Texture.h>
+        typedef rio::TextureFormat FFLiSurfaceFormat;
+    #else
+        #include <ninTexUtils/gx2/gx2Enum.h>
+        typedef GX2SurfaceFormat FFLiSurfaceFormat;
+    #endif
 #elif RIO_IS_CAFE
-#include <gx2/enum.h>
+    #include <gx2/enum.h>
+    typedef GX2SurfaceFormat FFLiSurfaceFormat;
 #endif
+
+
 
 enum FFLiTextureFormat
 {
@@ -18,7 +27,7 @@ enum FFLiTextureFormat
     FFLI_TEXTURE_FORMAT_RGBA8   = 2
 };
 
-GX2SurfaceFormat FFLiGetResourceSurfaceFormat(FFLiTextureFormat textureFormat);
+FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLiTextureFormat textureFormat);
 
 class FFLiResourceHeader;
 
@@ -117,7 +126,7 @@ public:
         return m_NumMips;
     }
 
-    GX2SurfaceFormat SurfaceFormat() const;
+    FFLiSurfaceFormat SurfaceFormat() const;
 
     static FFLiResourceTextureFooter& GetFooterImpl(const void* pData, u32 size);
 

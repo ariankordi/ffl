@@ -42,3 +42,9 @@
 *.opt
 *.ti
 tgt/*
+
+# FFLResource output
+tools/*_shape
+tools/*_texture
+tools/*.json
+tools/*.dat
