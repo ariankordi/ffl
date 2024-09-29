@@ -9,6 +9,8 @@
 
 #include <filedevice/rio_FileDeviceMgr.h>
 
+#ifndef FFL_NO_DATABASE_FILE
+
 enum FFLiFsFileResult
 {
     FFLI_FS_FILE_RESULT_OK                  = 0,
@@ -517,3 +519,5 @@ FFLiFsResult CopyDatabaseOfficial(const char* pPathTo, const char* pPathFrom, FF
 }
 
 }
+
+#endif // FFL_NO_DATABASE_FILE

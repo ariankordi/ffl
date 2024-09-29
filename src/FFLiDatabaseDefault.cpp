@@ -4,6 +4,8 @@
 #include <nn/ffl/FFLiDatabaseDefault.h>
 #include <nn/ffl/FFLiMiiData.h>
 
+#ifndef FFL_NO_DATABASE_DEFAULT
+
 static inline
 FFLiCreateID* GetCreateID(FFLCreateID* pCreateID)
 {
@@ -165,3 +167,5 @@ bool FFLiDatabaseDefault::Get(FFLiCharInfo* pCharInfo, u32 index) const
     FFLiMiiDataOfficial2CharInfo(pCharInfo, m_MiiDataOfficial[index]);
     return true;
 }
+
+#endif // FFL_NO_DATABASE_DEFAULT

@@ -13,10 +13,12 @@ public:
 
     void Init(u32 seed);
 
+#ifndef FFL_NO_DATABASE_RANDOM
     FFLiRandomContext* RandomContext()
     {
         return &m_RandomContext;
     }
+#endif
 
     const FFLiAuthorID* UserID() const;
     u64 TitleID() const;
@@ -30,7 +32,9 @@ public:
     bool AfterConstruct();
 
 private:
+#ifndef FFL_NO_DATABASE_RANDOM
     FFLiRandomContext   m_RandomContext;
+#endif
     FFLiAuthorID        m_AuthorID;
     FFLiCreateIDBase    m_CreateIDBase;
     u64                 m_TitleID;

@@ -2,6 +2,8 @@
 
 #include <misc/rio_MemUtil.h>
 
+#ifndef FFL_NO_ZLIB
+
 FFLiZlibInflator::FFLiZlibInflator(s32 windowBits)
     : m_IsStreamEnd(false)
 {
@@ -32,3 +34,5 @@ s32 FFLiZlibInflator::Process(void** ppDst, u32* pDstSize, const void** ppSrc, u
 
     return ret;
 }
+
+#endif // FFL_NO_ZLIB

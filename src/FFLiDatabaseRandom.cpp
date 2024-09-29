@@ -12,6 +12,8 @@
 
 #include <cstring>
 
+#ifndef FFL_NO_DATABASE_RANDOM
+
 FFLiDatabaseRandom::FFLiDatabaseRandom(FFLiRandomContext* pContext)
     : m_pRandomContext(pContext)
 {
@@ -1085,3 +1087,5 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
 
     std::memset(&pCharInfo->authorID, 0, sizeof(FFLiAuthorID));
 }
+
+#endif // FFL_NO_DATABASE_RANDOM

@@ -8,6 +8,9 @@
 
 #include <misc/rio_MemUtil.h>
 
+#ifndef FFL_NO_DATABASE_FILE
+
+
 static u32 GetMiiDataNum();
 
 const FFLiMiiDataOfficial& FFLiDatabaseFileOfficial::GetImpl(u16 index) const
@@ -201,3 +204,5 @@ void FFLiDatabaseFileOfficial::SwapEndian(bool save)
 
     UpdateCrc();
 }
+
+#endif // FFL_NO_DATABASE_FILE

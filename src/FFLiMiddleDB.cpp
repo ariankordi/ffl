@@ -4,6 +4,8 @@
 
 #include <misc/rio_MemUtil.h>
 
+#ifndef FFL_NO_MIDDLE_DB
+
 u32 FFLiGetMiddleDBBufferSize(u16 miiDataNum)
 {
     return FFLiMiddleDB::GetBufferSize(miiDataNum);
@@ -192,3 +194,5 @@ FFLResult FFLiMiddleDB::GetCharInfo(FFLiCharInfo* pCharInfo, u16 index) const
     FFLiMiiDataOfficial2CharInfo(pCharInfo, Get(index));
     return FFL_RESULT_OK;
 }
+
+#endif // FFL_NO_MIDDLE_DB

@@ -2,6 +2,8 @@
 
 #include <nn/ffl/FFLiMiddleDB.h>
 
+#ifndef FFL_NO_MIDDLE_DB
+
 namespace {
 
 FFLiMiddleDB* GetMiddleDB(FFLMiddleDB* pMiddleDB);
@@ -52,3 +54,5 @@ const FFLiMiddleDB* GetMiddleDB(const FFLMiddleDB* pMiddleDB)
 }
 
 }
+
+#endif // FFL_NO_MIDDLE_DB

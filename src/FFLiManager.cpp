@@ -102,8 +102,12 @@ FFLiManager* FFLiManager::GetInstance()
 
 FFLiManager::FFLiManager(const FFLInitDesc* pInitDesc)
     : m_pResourceMultiHeader(static_cast<FFLiResourceMultiHeader*>(rio::MemUtil::alloc(sizeof(FFLiResourceMultiHeader), rio::FileDevice::cBufferMinAlignment)))
-    , m_pDatabaseFile(static_cast<FFLiDatabaseFile*>(rio::MemUtil::alloc(sizeof(FFLiDatabaseFile), rio::FileDevice::cBufferMinAlignment)))
-    , m_pFileWriteBuffer(static_cast<FFLiFileWriteBuffer*>(rio::MemUtil::alloc(sizeof(FFLiFileWriteBuffer), rio::FileDevice::cBufferMinAlignment)))
+#ifndef FFL_NO_DATABASE_FILE
+    ,
+    m_pDatabaseFile(static_cast<FFLiDatabaseFile*>(rio::MemUtil::alloc(sizeof(FFLiDatabaseFile), rio::FileDevice::cBufferMinAlignment)))
+    ,
+    m_pFileWriteBuffer(static_cast<FFLiFileWriteBuffer*>(rio::MemUtil::alloc(sizeof(FFLiFileWriteBuffer), rio::FileDevice::cBufferMinAlignment)))
+#endif
     , m_ResourceManager(m_pResourceMultiHeader)
     , m_DatabaseManager(m_pDatabaseFile, m_pFileWriteBuffer, &m_SystemContext)
     , m_CharModelCreateParam(&m_DatabaseManager, &m_ResourceManager, &m_ShaderCallback)
@@ -117,6 +121,7 @@ FFLiManager::FFLiManager(const FFLInitDesc* pInitDesc)
 
 FFLiManager::~FFLiManager()
 {
+#ifndef FFL_NO_FS
     if (m_pResourceMultiHeader != nullptr)
     {
         for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
@@ -132,6 +137,8 @@ FFLiManager::~FFLiManager()
         rio::MemUtil::free(m_pResourceMultiHeader);
         m_pResourceMultiHeader = nullptr;
     }
+#endif // FFL_NO_FS
+#ifndef FFL_NO_DATABASE_FILE
     if (m_pDatabaseFile != nullptr)
     {
         rio::MemUtil::free(m_pDatabaseFile);
@@ -142,6 +149,7 @@ FFLiManager::~FFLiManager()
         rio::MemUtil::free(m_pFileWriteBuffer);
         m_pFileWriteBuffer = nullptr;
     }
+#endif // FFL_NO_DATABASE_FILE
 }
 
 FFLResult FFLiManager::AfterConstruct(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pResDesc)
@@ -155,9 +163,14 @@ FFLResult FFLiManager::AfterConstruct(const FFLInitDesc* pInitDesc, const FFLRes
 
     if (pResDesc == NULL)
     {
+#ifndef FFL_NO_FS
         result = m_ResourceManager.LoadResourceHeader();
         if (result != FFL_RESULT_OK)
             return result;
+#else
+        RIO_ASSERT(false);
+        return FFL_RESULT_ERROR;
+#endif
     }
     else
     {
@@ -176,9 +189,7 @@ FFLResult FFLiManager::AfterConstruct(const FFLInitDesc* pInitDesc, const FFLRes
         }
         // if no resource was loaded then do not go further
         if (noResourceEverLoaded)
-        {
             return FFL_RESULT_ERROR;
-        }
     }
 
     result = m_DatabaseManager.AfterConstruct();

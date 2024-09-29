@@ -18,10 +18,12 @@ public:
     FFLiDatabaseManager(FFLiDatabaseFile* pFile, FFLiFileWriteBuffer* pWriteBuffer, FFLiSystemContext* pContext);
     ~FFLiDatabaseManager();
 
+#ifndef FFL_NO_DATABASE_FILE
     FFLiDatabaseFileAccessor& GetDatabaseFileAccessor()
     {
         return m_DatabaseFileAccessor;
     }
+#endif
 
     FFLResult AfterConstruct();
     FFLResult BeforeDestruct();
@@ -40,9 +42,15 @@ public:
 
 private:
     FFLiSystemContext*          m_pSystemContext;
+#ifndef FFL_NO_DATABASE_FILE
     FFLiDatabaseFileAccessor    m_DatabaseFileAccessor;
+#endif
+#ifndef FFL_NO_DATABASE_DEFAULT
     FFLiDatabaseDefault         m_DatabaseDefault;
+#endif
+#ifndef FFL_NO_DATABASE_RANDOM
     FFLiDatabaseRandom          m_DatabaseRandom;
+#endif
     bool                        m_IsEnabledSpecialMii;
     void*                       _fd4;   // Deleted
 };

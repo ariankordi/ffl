@@ -22,8 +22,12 @@ public:
 
     FFLResult AfterConstruct();
 
+#ifndef FFL_NO_FS
+
     FFLResult LoadResourceHeader();
     FFLResult LoadResourceHeaderImpl();
+
+#endif // FFL_NO_FS
 
     FFLResult AttachCache(void* pData, u32 size, FFLResourceType resourceType);
     bool IsCached() const;

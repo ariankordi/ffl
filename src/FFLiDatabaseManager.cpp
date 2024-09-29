@@ -11,12 +11,16 @@
 
 FFLiDatabaseManager::FFLiDatabaseManager(FFLiDatabaseFile* pFile, FFLiFileWriteBuffer* pWriteBuffer, FFLiSystemContext* pContext)
     : m_pSystemContext(pContext)
+#ifndef FFL_NO_DATABASE_FILE
     , m_DatabaseFileAccessor(pFile, pWriteBuffer)
+#endif
+#ifndef FFL_NO_DATABASE_RANDOM
     , m_DatabaseRandom(pContext->RandomContext())
+#endif
 {
-    #ifndef FFL_NO_OPEN_DATABASE
+#ifndef FFL_NO_DATABASE_FILE
     m_DatabaseFileAccessor.Init();
-    #endif
+#endif
 }
 
 FFLiDatabaseManager::~FFLiDatabaseManager()
@@ -25,7 +29,7 @@ FFLiDatabaseManager::~FFLiDatabaseManager()
 
 FFLResult FFLiDatabaseManager::AfterConstruct()
 {
-    #ifndef FFL_NO_OPEN_DATABASE
+#ifndef FFL_NO_DATABASE_FILE
     FFLResult result = m_DatabaseFileAccessor.AfterConstruct(m_pSystemContext->TitleID());
     if (result != FFL_RESULT_OK)
         return result;
@@ -33,24 +37,24 @@ FFLResult FFLiDatabaseManager::AfterConstruct()
     result = m_DatabaseFileAccessor.BootLoad();
     if (result != FFL_RESULT_OK)
         return result;
-    #endif
+#endif
 
     return FFL_RESULT_OK;
 }
 
 FFLResult FFLiDatabaseManager::BeforeDestruct()
 {
-    #ifndef FFL_NO_OPEN_DATABASE
+#ifndef FFL_NO_DATABASE_FILE
     FFLResult result = m_DatabaseFileAccessor.BeforeDestruct();
     if (result != FFL_RESULT_OK)
         return result;
-    #endif
+#endif
     return FFL_RESULT_OK;
 }
 
 FFLResult FFLiDatabaseManager::FlushQuota(bool force)
 {
-    #ifndef FFL_NO_OPEN_DATABASE
+#ifndef FFL_NO_DATABASE_FILE
     FFLResult result = m_DatabaseFileAccessor.BeforeFlushQuota();
     if (result != FFL_RESULT_OK)
         return result;
@@ -58,7 +62,7 @@ FFLResult FFLiDatabaseManager::FlushQuota(bool force)
     result = m_DatabaseFileAccessor.FlushQuota(force);
     if (result != FFL_RESULT_OK)
         return result;
-    #endif
+#endif
     return FFL_RESULT_OK;
 }
 
@@ -74,20 +78,23 @@ bool FFLiDatabaseManager::IsEnabledSpecialMii() const
 
 FFLResult FFLiDatabaseManager::GetCharInfoFromOfficial(FFLiCharInfo* pCharInfo, u16 index)
 {
-    #ifndef FFL_NO_OPEN_DATABASE
+#ifndef FFL_NO_DATABASE_FILE
     if (!m_DatabaseFileAccessor.GetDatabaseFile()->official.Get(pCharInfo, index, true, IsEnabledSpecialMii()))
         return FFL_RESULT_FILE_INVALID;
-    #else
-        RIO_ASSERT(false);
-    #endif
+#else
+    RIO_ASSERT(false);
+#endif
     return FFL_RESULT_OK;
 }
 
 FFLResult FFLiDatabaseManager::GetCharInfoFromDefault(FFLiCharInfo* pCharInfo, u16 index)
 {
+#ifndef FFL_NO_DATABASE_DEFAULT
     if (!m_DatabaseDefault.Get(pCharInfo, index))
         return FFL_RESULT_FILE_INVALID;
-
+#else
+    RIO_ASSERT(false);
+#endif
     return FFL_RESULT_OK;
 }
 
@@ -96,7 +103,7 @@ FFLResult FFLiDatabaseManager::GetCharInfoFromStoreData(FFLiCharInfo* pCharInfo,
     FFLResult result = FFLiStoreDataCFLToCharInfo(pCharInfo, pStoreDataCFL[index]);
     if (result != FFL_RESULT_OK)
         return result;
-
+#ifndef FFL_NO_DATABASE_FILE
     u16 miiDataIndex;
     if (dataSource == FFL_DATA_SOURCE_STORE_DATA_OFFICIAL && m_DatabaseFileAccessor.GetDatabaseFile()->official.Search(&miiDataIndex, pCharInfo->creatorID))
     {
@@ -104,7 +111,9 @@ FFLResult FFLiDatabaseManager::GetCharInfoFromStoreData(FFLiCharInfo* pCharInfo,
         if (result != FFL_RESULT_OK)
             return result;
     }
-
+#else
+    RIO_ASSERT(false);
+#endif
     return FFL_RESULT_OK;
 }
 
@@ -157,8 +166,12 @@ FFLResult FFLiDatabaseManager::PickupCharInfo(FFLiCharInfo* pCharInfo, FFLDataSo
         result = GetCharInfoFromDefault(pCharInfo, index);
         break;
     case FFL_DATA_SOURCE_MIDDLE_DB:
+#ifndef FFL_NO_MIDDLE_DB
         if (magic == 0x46464D41)    // FFMA
             result = static_cast<const FFLiMiddleDB*>(pBuffer)->GetCharInfo(pCharInfo, index);
+#else
+        RIO_ASSERT(false);
+#endif
         break;
     case FFL_DATA_SOURCE_STORE_DATA_OFFICIAL:
     case FFL_DATA_SOURCE_STORE_DATA:
@@ -197,17 +210,26 @@ FFLResult FFLiDatabaseManager::GetStoreData(FFLiStoreDataCFL* pStoreDataCFL, FFL
 
 FFLResult FFLiDatabaseManager::UpdateMiddleDB(FFLiMiddleDB* pMiddleDB)
 {
+#ifdef FFL_NO_MIDDLE_DB
+    RIO_ASSERT(false);
+    return FFL_RESULT_ERROR;
+#else
     pMiddleDB->ClearData();
 
     switch (pMiddleDB->Type())
     {
     case FFL_MIDDLE_DB_TYPE_HIDDEN_PARAM_RANDOM_UPDATE:
     case FFL_MIDDLE_DB_TYPE_HIDDEN_PARAM_TIME_UPDATE_REVERSE:
+#ifndef FFL_NO_DATABASE_FILE
     case FFL_MIDDLE_DB_TYPE_HIDDEN_PARAM_TIME_UPDATE:
         return m_DatabaseFileAccessor.GetDatabaseFile()->hidden.UpdateMiddleDB(pMiddleDB);
+#endif
+#ifndef FFL_NO_DATABASE_RANDOM
     case FFL_MIDDLE_DB_TYPE_RANDOM_PARAM:
         return m_DatabaseRandom.UpdateMiddleDB(pMiddleDB);
+#endif
     default:
         return FFL_RESULT_ERROR;
     }
+#endif // FFL_NO_MIDDLE_DB
 }

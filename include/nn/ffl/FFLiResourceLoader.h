@@ -48,7 +48,9 @@ private:
 private:
     FFLiResourceManager*        m_pResourceManager;
     FFLiResourceLoaderBuffer*   m_pBuffer;
+#ifndef FFL_NO_FS
     rio::FileHandle             m_FileHandle;
+#endif
     FFLResourceType             m_ResourceType;
 };
 //NN_STATIC_ASSERT(sizeof(FFLiResourceLoader) == 0x18);

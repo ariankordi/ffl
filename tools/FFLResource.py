@@ -118,6 +118,8 @@ total_uncompressed_size = 0
 # this will actually be the uncompressBufferSize
 maximum_compressed_size = 0
 
+force_no_compression = False
+
 class FFLiResourcePartsInfo:
     _format = endianness_character + '3I4B'
     size = struct.calcsize(_format)
@@ -190,6 +192,9 @@ class FFLiResourcePartsInfo:
 
             dataPos = currentFileSize
             dataSize = len(partsData)
+
+            if force_no_compression:
+                self.strategy = FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
 
             total_uncompressed_size += dataSize
 
@@ -2275,6 +2280,9 @@ def header_modify_afl_2_3():
     resource_header_hint = RES_HINT_AFL_2_3
     texture_header_parts_info_sizes[6] = 20  # glass type
 
+def disable_compression():
+    global force_no_compression
+    force_no_compression = True
 
 def main():
     parser = argparse.ArgumentParser(description="Unpacks and repacks FFL resource archives (FFLResHigh.dat, AFLResHigh.dat, AFLResHigh_2_3.dat, etc.)")
@@ -2296,6 +2304,7 @@ def main():
     parser.add_argument("output_file", type=str, help="Output file")
 
     parser.add_argument("-LE", action="store_true", help="Export resource header as little endian")
+    parser.add_argument("-noZlib", action="store_true", help="Force disable compression when exporting")
 
     args = parser.parse_args()
 
@@ -2309,6 +2318,10 @@ def main():
         if not os.path.isfile(args.input_file):
             print("Input file not found:", args.input_file)
             sys.exit(1)
+
+        if args.noZlib:
+            print("This resource will not use any zlib compression.")
+            disable_compression()
 
         header = FFLiResourceHeader()
         header.importFromPath(args.input_file)

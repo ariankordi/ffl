@@ -19,8 +19,12 @@ void FFLiSystemContext::Init(u32 seed)
 {
     rio::MemUtil::set(&m_AuthorID, 0, sizeof(FFLiAuthorID));
 
+#ifndef FFL_NO_DATABASE_RANDOM
     m_RandomContext.Init(seed);
+#endif
 
+    // NOTE: there should be a (private?) function that
+    // will actually change this and is used in the mii maker app
     static const FFLiCreateIDBase DEFAULT_CREATE_ID_BASE = {
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
     };

@@ -22,7 +22,9 @@ FFLiResourceLoader::FFLiResourceLoader(FFLiResourceManager* pResourceManager, FF
 
 FFLiResourceLoader::~FFLiResourceLoader()
 {
+#ifndef FFL_NO_FS
     Close();
+#endif
 }
 
 bool FFLiResourceLoader::IsExpand() const
@@ -179,9 +181,14 @@ FFLResult FFLiResourceLoader::Load(void* pData, u32* pSize, const FFLiResourcePa
         }
         else
         {
+#ifndef FFL_NO_FS
             FFLResult result = LoadFromFile(pData, partsInfo);
             if (result != FFL_RESULT_OK)
                 return result;
+#else
+            RIO_ASSERT(false);
+            return FFL_RESULT_ERROR;
+#endif
         }
     }
 
@@ -211,6 +218,8 @@ FFLResult FFLiResourceLoader::LoadFromCache(void* pData, const FFLiResourceParts
     return FFL_RESULT_OK;
 }
 
+#ifndef FFL_NO_FS
+
 FFLResult FFLiResourceLoader::LoadFromFile(void* pData, const FFLiResourcePartsInfo& partsInfo)
 {
     if (OpenIfClosed() != rio::RAW_ERROR_OK)
@@ -239,6 +248,8 @@ FFLResult FFLiResourceLoader::LoadFromFile(void* pData, const FFLiResourcePartsI
     return FFL_RESULT_OK;
 }
 
+#endif // FFL_NO_FS
+
 bool FFLiResourceLoader::IsCached() const
 {
     return m_pResourceManager->IsCached();
@@ -255,6 +266,8 @@ FFLResult FFLiResourceLoader::GetPointerFromCache(void** ppPtr, const FFLiResour
                                 + partsInfo.dataPos;
     return FFL_RESULT_OK;
 }
+
+#ifndef FFL_NO_FS
 
 rio::RawErrorCode FFLiResourceLoader::OpenIfClosed()
 {
@@ -307,10 +320,13 @@ rio::RawErrorCode FFLiResourceLoader::Close()
     return rio::RAW_ERROR_OK;
 }
 
+#endif // FFL_NO_FS
+
 namespace {
 
 bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
 {
+#ifndef FFL_NO_ZLIB
     FFLiZlibInflator inflator(FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits(partsInfo.windowBits)));
 
     void* dst = pDst;
@@ -322,6 +338,10 @@ bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuf
     s32 ret = inflator.Process(&dst, &dstSize, &src, &srcSize, Z_FINISH);
     RIO_ASSERT(ret == Z_STREAM_END);
     return ret == Z_STREAM_END;
+#else
+    RIO_ASSERT(false && "This was built with FFL_NO_ZLIB, but a resource in this file is compressed. You will have to make a completely uncompressed resource file with FFLResource.py.");
+    return false;
+#endif
 }
 
 }

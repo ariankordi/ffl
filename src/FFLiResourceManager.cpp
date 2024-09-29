@@ -6,6 +6,7 @@
 
 #include <filedevice/rio_FileDeviceMgr.h>
 
+
 namespace {
 
 const char* RESOUCE_FILE_NAME[2][FFL_RESOURCE_TYPE_MAX] = {
@@ -22,9 +23,13 @@ const char* RESOUCE_FILE_NAME[2][FFL_RESOURCE_TYPE_MAX] = {
 }
 
 FFLiResourceManager::FFLiResourceManager(FFLiResourceMultiHeader* pHeader)
+#ifndef FFL_NO_FS
     : m_pResourceMultiHeader(pHeader)
+#endif
 {
+#ifndef FFL_NO_FS
     rio::MemUtil::set(m_pResourceMultiHeader, 0, sizeof(FFLiResourceMultiHeader));
+#endif
     rio::MemUtil::set(m_Path, 0, (s32)FFL_RESOURCE_TYPE_MAX * (s32)FFL_PATH_MAX_LEN);
 }
 
@@ -32,6 +37,7 @@ FFLiResourceManager::~FFLiResourceManager()
 {
     // NOTE: m_pResourceMultiHeader is freed by FFLiResourceManager
 }
+
 
 const char* FFLiResourceManager::GetRelativeResourcePath(FFLResourceType resourceType, bool LG)
 {
@@ -55,6 +61,8 @@ FFLResult FFLiResourceManager::AfterConstruct()
     return FFL_RESULT_OK;
 }
 
+#ifndef FFL_NO_FS
+
 FFLResult FFLiResourceManager::LoadResourceHeader()
 {
     return LoadResourceHeaderImpl();
@@ -62,8 +70,6 @@ FFLResult FFLiResourceManager::LoadResourceHeader()
 
 FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
 {
-    //RIO_ASSERT(false && "AAA AAAAAAAAAAAAA FFLiResourceManager::LoadResourceHeaderImpl NOT IMPLEMENTED NOT IMPLEMENTEEEEEDDDDDDDDDDDDDDDDDDDDDD\n");
-
     rio::FileHandle fileHandle;
     rio::NativeFileDevice* device = rio::FileDeviceMgr::instance()->getNativeFileDevice();
 
@@ -150,6 +156,8 @@ FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
     return FFL_RESULT_OK;
 }
 
+#endif // FFL_NO_FS
+
 FFLResult FFLiResourceManager::AttachCache(void* pData, u32 size, FFLResourceType resourceType)
 {
     return m_ResourceCache.Attach(pData, size, resourceType);
@@ -166,7 +174,14 @@ FFLiResourceHeader* FFLiResourceManager::Header(FFLResourceType resourceType) co
         return HeaderFromCache(resourceType);
 
     else
+#ifndef FFL_NO_FS
         return HeaderFromFile(resourceType);
+#else
+        {
+            RIO_ASSERT(false);
+            return nullptr;
+        }
+#endif // FFL_NO_FS
 }
 
 FFLiResourceHeader* FFLiResourceManager::HeaderFromCache(FFLResourceType resourceType) const
@@ -174,10 +189,13 @@ FFLiResourceHeader* FFLiResourceManager::HeaderFromCache(FFLResourceType resourc
     return m_ResourceCache.Header(resourceType);
 }
 
+
+#ifndef FFL_NO_FS
 FFLiResourceHeader* FFLiResourceManager::HeaderFromFile(FFLResourceType resourceType) const
 {
     return m_pResourceMultiHeader->header[resourceType];
 }
+#endif
 
 u32 FFLiResourceManager::GetTextureAlignedMaxSize(FFLResourceType resourceType, FFLiTexturePartsType partsType) const
 {

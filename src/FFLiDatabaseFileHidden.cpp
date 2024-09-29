@@ -10,6 +10,8 @@
 
 #include <algorithm>
 
+#ifndef FFL_NO_DATABASE_FILE
+
 void FFLiOrderData::Init()
 {
     m_NextIndex = 0xffff;
@@ -269,3 +271,5 @@ static u32 GetMiiDataNum()
 {
     return 500;
 }
+
+#endif // FFL_NO_DATABASE_FILE
