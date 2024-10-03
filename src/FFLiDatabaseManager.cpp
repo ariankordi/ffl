@@ -103,17 +103,21 @@ FFLResult FFLiDatabaseManager::GetCharInfoFromStoreData(FFLiCharInfo* pCharInfo,
     FFLResult result = FFLiStoreDataCFLToCharInfo(pCharInfo, pStoreDataCFL[index]);
     if (result != FFL_RESULT_OK)
         return result;
-#ifndef FFL_NO_DATABASE_FILE
-    u16 miiDataIndex;
-    if (dataSource == FFL_DATA_SOURCE_STORE_DATA_OFFICIAL && m_DatabaseFileAccessor.GetDatabaseFile()->official.Search(&miiDataIndex, pCharInfo->creatorID))
+
+    if (dataSource == FFL_DATA_SOURCE_STORE_DATA_OFFICIAL)
     {
-        result = GetCharInfoFromOfficial(pCharInfo, miiDataIndex);
-        if (result != FFL_RESULT_OK)
-            return result;
-    }
+#ifndef FFL_NO_DATABASE_FILE
+        u16 miiDataIndex;
+        if (m_DatabaseFileAccessor.GetDatabaseFile()->official.Search(&miiDataIndex, pCharInfo->creatorID))
+        {
+            result = GetCharInfoFromOfficial(pCharInfo, miiDataIndex);
+            if (result != FFL_RESULT_OK)
+                return result;
+        }
 #else
     RIO_ASSERT(false);
 #endif
+    }
     return FFL_RESULT_OK;
 }
 

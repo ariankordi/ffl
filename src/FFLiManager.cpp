@@ -107,9 +107,11 @@ FFLiManager::FFLiManager(const FFLInitDesc* pInitDesc)
     m_pDatabaseFile(static_cast<FFLiDatabaseFile*>(rio::MemUtil::alloc(sizeof(FFLiDatabaseFile), rio::FileDevice::cBufferMinAlignment)))
     ,
     m_pFileWriteBuffer(static_cast<FFLiFileWriteBuffer*>(rio::MemUtil::alloc(sizeof(FFLiFileWriteBuffer), rio::FileDevice::cBufferMinAlignment)))
+    , m_DatabaseManager(m_pDatabaseFile, m_pFileWriteBuffer, &m_SystemContext)
+#else
+    , m_DatabaseManager(nullptr, nullptr, &m_SystemContext)
 #endif
     , m_ResourceManager(m_pResourceMultiHeader)
-    , m_DatabaseManager(m_pDatabaseFile, m_pFileWriteBuffer, &m_SystemContext)
     , m_CharModelCreateParam(&m_DatabaseManager, &m_ResourceManager, &m_ShaderCallback)
     , m_InitDesc(*pInitDesc)
 #if RIO_IS_CAFE
