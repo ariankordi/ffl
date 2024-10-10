@@ -120,7 +120,9 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         return result;
     }
 
-    bool enableFacelineTexture = pModel->charInfo.parts.faceLine != 0 || pModel->charInfo.parts.faceMakeup != 0;
+    bool enableFacelineTexture = pModel->charInfo.parts.faceLine != 0 ||
+        pModel->charInfo.parts.faceMakeup != 0 ||
+        pModel->charInfo.parts.beardType >= 4; // FFLiInitTempObjectFacelineTexture
     if (enableFacelineTexture)
         FFLiInitFacelineTexture(&pModel->facelineRenderTexture, resolution, isEnabledMipMap);
     else
