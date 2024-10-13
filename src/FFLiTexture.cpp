@@ -79,14 +79,17 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
         #endif
             texture.surface.width = footer.Width();
             texture.surface.height = footer.Height();
-            texture.surface.mipLevels = footer.NumMips();
+            if (pHeader->IgnoreMipMaps())
+                texture.surface.mipLevels = 0;
+            else
+                texture.surface.mipLevels = footer.NumMips();
             texture.surface.format = static_cast<rio::TextureFormat>(footer.SurfaceFormat());
 
             void* imagePtr = footer.GetImagePtrImpl(size);
             RIO_ASSERT(imagePtr == pData);
 
             texture.surface.image = imagePtr;
-            // NOTE: assuming that linear surfaces have no mipmaps
+            // TODO: mipmaps not supported for linear textures right now
             texture.surface.mipmaps = nullptr;
 
             texture.compMap = rio::TextureFormatUtil::getDefaultCompMap(texture.surface.format);
@@ -96,7 +99,7 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
             RIO_ASSERT(success);
 
             texture.surface.imageSize = rio::Texture2DUtil::calcImageSize(texture.surface.format, texture.surface.width, texture.surface.height);
-            texture.surface.mipmapSize = rio::Texture2DUtil::calcMipmapSize(texture.surface.format, texture.surface.width, texture.surface.height, texture.surface.mipLevels, reinterpret_cast<u32*>(texture.surface.mipmaps));
+            texture.surface.mipmapSize = 0; //rio::Texture2DUtil::calcMipmapSize(texture.surface.format, texture.surface.width, texture.surface.height, texture.surface.mipLevels, reinterpret_cast<u32*>(texture.surface.mipmaps));
 
             texture.surface.mipLevelOffset[0] = 0; // NOTE: no mipmaps
 

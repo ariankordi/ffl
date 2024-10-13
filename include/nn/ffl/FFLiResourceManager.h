@@ -8,7 +8,7 @@
 
 #include <nn/ffl/detail/FFLiResourceCache.h>
 
-struct  FFLiResourceHeader;
+class   FFLiResourceHeader;
 struct  FFLiResourceMultiHeader;
 
 class FFLiResourceManager

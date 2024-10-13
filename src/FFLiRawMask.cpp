@@ -46,7 +46,7 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     RawMasks rawMasks;
     CalcRawMask(&rawMasks, pCharInfo, resolution, leftEyeIndex, rightEyeIndex);
 
-    const rio::OrthoProjection proj = rio::OrthoProjection(-200.0f, 200.0f, 0.0f, resolution, 0.0f, resolution);
+    const rio::OrthoProjection proj = rio::OrthoProjection(-200.0f, 200.0f, 0.0f, static_cast<f32>(resolution), 0.0f, static_cast<f32>(resolution));
     const rio::BaseMtx44f& projMatrix = proj.getMatrix();
 
     if (pDesc->pTexturesMustache[0] != NULL) {

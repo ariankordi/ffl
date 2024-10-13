@@ -102,6 +102,7 @@ FFLiManager* FFLiManager::GetInstance()
 
 FFLiManager::FFLiManager(const FFLInitDesc* pInitDesc)
     : m_pResourceMultiHeader(static_cast<FFLiResourceMultiHeader*>(rio::MemUtil::alloc(sizeof(FFLiResourceMultiHeader), rio::FileDevice::cBufferMinAlignment)))
+    , m_ResourceManager(m_pResourceMultiHeader)
 #ifndef FFL_NO_DATABASE_FILE
     ,
     m_pDatabaseFile(static_cast<FFLiDatabaseFile*>(rio::MemUtil::alloc(sizeof(FFLiDatabaseFile), rio::FileDevice::cBufferMinAlignment)))
@@ -111,7 +112,6 @@ FFLiManager::FFLiManager(const FFLInitDesc* pInitDesc)
 #else
     , m_DatabaseManager(nullptr, nullptr, &m_SystemContext)
 #endif
-    , m_ResourceManager(m_pResourceMultiHeader)
     , m_CharModelCreateParam(&m_DatabaseManager, &m_ResourceManager, &m_ShaderCallback)
     , m_InitDesc(*pInitDesc)
 #if RIO_IS_CAFE
