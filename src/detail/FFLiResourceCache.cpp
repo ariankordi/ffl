@@ -41,7 +41,7 @@ FFLResult FFLiResourceCache::Attach(void* pData, u32 size, FFLResourceType resou
     FFLResult result = FFLiIsVaildResourceHeader(pHeader);
     if (result != FFL_RESULT_OK)
     {
-        if(pHeader->m_NeedsEndianSwap)
+        if (pHeader->m_NeedsEndianSwap)
         {
             reinterpret_cast<FFLiResourceHeaderDefaultData*>(pData)->SwapEndian();
             pHeader->SwapEndian();

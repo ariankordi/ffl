@@ -250,7 +250,7 @@ FFLModelType ModelFlagToModelType(u32 flag)
         if (flag & 1 << i)
             return FFLModelType(i);
 
-    return FFL_MODEL_TYPE_0;
+    return FFL_MODEL_TYPE_NORMAL;
 }
 
 FFLiShapeType ConvertShapePartsTypeToShapeType(FFLiShapePartsType partsType)
@@ -339,7 +339,7 @@ FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 ind
     if (result != FFL_RESULT_OK)
         return result;
 
-    FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, pModel->charModelDesc.modelFlag >> 3 & 1);
+    FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_FLATTEN_NOSE);
     CalcluateBoundingBox(pModel->boundingBox, &boundingBox, partsType);
     return FFL_RESULT_OK;
 }
@@ -367,18 +367,18 @@ struct ModelTypeShapePartsInfo
 const ModelTypeShapePartsInfo* GetModelTypeShapePartsInfo(u32 modelFlag)
 {
     static ModelTypeShapePartsInfo modelTypeShapePartsInfo[2 * 3] = {
-        // FFL_MODEL_TYPE_0
+        // FFL_MODEL_TYPE_NORMAL
         { false, FFLI_SHAPE_PARTS_TYPE_HAIR_1 },
         { false, FFLI_SHAPE_PARTS_TYPE_CAP_1 },
         { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1 },
-        // FFL_MODEL_TYPE_1
+        // FFL_MODEL_TYPE_HAT
         { false, FFLI_SHAPE_PARTS_TYPE_HAIR_2 },
         { false, FFLI_SHAPE_PARTS_TYPE_CAP_2 },
         { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2 }
     };
 
-    bool modelType0Enable = modelFlag & 1 << FFL_MODEL_TYPE_0;
-    bool modelType1Enable = modelFlag & 1 << FFL_MODEL_TYPE_1;
+    bool modelType0Enable = modelFlag & 1 << FFL_MODEL_TYPE_NORMAL;
+    bool modelType1Enable = modelFlag & 1 << FFL_MODEL_TYPE_HAT;
 
     modelTypeShapePartsInfo[0 * 3 + 0].enable = modelType0Enable;
     modelTypeShapePartsInfo[0 * 3 + 1].enable = modelType0Enable;
@@ -395,8 +395,8 @@ void DeleteShape_Hair(FFLiCharModel* pModel, u32 count = 2 * 3)
 {
     u32 modelFlag = pModel->charModelDesc.modelFlag & 7;
 
-    if (modelFlag & (1 << FFL_MODEL_TYPE_0 |
-                     1 << FFL_MODEL_TYPE_1))
+    if (modelFlag & (1 << FFL_MODEL_TYPE_NORMAL |
+                     1 << FFL_MODEL_TYPE_HAT))
     {
         const ModelTypeShapePartsInfo* modelTypeShapePartsInfo = GetModelTypeShapePartsInfo(modelFlag);
         for (u32 j = count; j > 0; j--)
@@ -439,8 +439,8 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
     if (result != FFL_RESULT_OK)
         return result;
 
-    if (modelFlag & (1 << FFL_MODEL_TYPE_0 |
-                     1 << FFL_MODEL_TYPE_1))
+    if (modelFlag & (FFL_MODEL_FLAG_NORMAL |
+                     FFL_MODEL_FLAG_HAT))
     {
         const ModelTypeShapePartsInfo* modelTypeShapePartsInfo = GetModelTypeShapePartsInfo(modelFlag);
 
@@ -664,9 +664,9 @@ const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
 {
     switch (type)
     {
-    case FFL_MODEL_TYPE_0:
+    case FFL_MODEL_TYPE_NORMAL:
         return SHAPE_TYPE_INFO_0;
-    case FFL_MODEL_TYPE_1:
+    case FFL_MODEL_TYPE_HAT:
         return SHAPE_TYPE_INFO_1;
     default:
         return SHAPE_TYPE_INFO_0;
@@ -674,8 +674,8 @@ const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
 }
 
 static const FFLModelType MODEL_TYPE[2] = {
-    FFL_MODEL_TYPE_0,
-    FFL_MODEL_TYPE_1
+    FFL_MODEL_TYPE_NORMAL,
+    FFL_MODEL_TYPE_HAT
 };
 
 void SetupDrawParam(FFLiCharModel* pModel)

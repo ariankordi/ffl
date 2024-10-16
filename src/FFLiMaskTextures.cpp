@@ -34,19 +34,35 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
 
 FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap)
 {
-    FFLExpression expression = FFL_EXPRESSION_MAX;
+    FFLExpression expression = static_cast<FFLExpression>(FFL_EXPRESSION_LIMIT);
 
     u32 numMips = enableMipMap ? FFLiGetMipMapNum(resolution, resolution) : 1;
 
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+
+    for (u32 i = 0; expressionFlag != 0; i++, expressionFlag >>= 1)
+    {
+        //RIO_LOG("FFLiInitMaskTextures iteration: %i\n", i);
+
+        if ((expressionFlag & 1) == 0)
+        {
+            pMaskTextures->pRenderTextures[i] = NULL;
+            continue;
+        }
+
+/*
+    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
     {
         if ((expressionFlag & static_cast<FFLExpressionFlag>(1) << i) == 0)
         {
             pMaskTextures->pRenderTextures[i] = NULL;
             continue;
         }
+*/
+        //RIO_LOG("FFLiInitMaskTextures passing: %i\n", i);
+        //RIO_ASSERT(i < FFL_EXPRESSION_LIMIT);
+        // ... but FFLiCharModelCreateParam::CheckModelDesc makes sure of the above
 
-        if (expression == FFL_EXPRESSION_MAX)
+        if (expression == FFL_EXPRESSION_LIMIT)
             expression = FFLExpression(i);
 
         pMaskTextures->pRenderTextures[i] = FFLiRenderTextureAllocate();
@@ -59,7 +75,7 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressio
 
 void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures)
 {
-    for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
+    for (u32 j = FFL_EXPRESSION_LIMIT; j > 0; j--)
     {
         if (pMaskTextures->pRenderTextures[j - 1] != NULL)
         {
@@ -80,43 +96,49 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
     InitRawMask(pObject, expressionFlag);
 
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+/*    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
     {
-        if (CanUseExpression(expressionFlag, FFLExpression(i)))
-        {
-            FFLiRawMaskTextureDesc desc;
-            FFLiCharInfo expressionCharInfo = *pCharInfo;
-            const FFLiEyeMouthTypeElement& element = FFLiGetEyeMouthTypeElement(FFLExpression(i));
+        RIO_LOG("FFLiInitTempObjectMaskTextures iteration: %i\n", i);
+        if (!CanUseExpression(expressionFlag, FFLExpression(i)))
+            continue;
+*/
+    for (u32 i = 0; expressionFlag != 0; i++, expressionFlag >>= 1)
+    {
+        if ((expressionFlag & 1) == 0)
+            continue;
+        //RIO_LOG("FFLiInitTempObjectMaskTextures passing: %i\n", i);
+        FFLiRawMaskTextureDesc desc;
+        FFLiCharInfo expressionCharInfo = *pCharInfo;
+        const FFLiEyeMouthTypeElement& element = FFLiGetEyeMouthTypeElement(FFLExpression(i));
 
-            SetupExpressionCharInfo(&expressionCharInfo, pCharInfo, FFLExpression(i));
+        SetupExpressionCharInfo(&expressionCharInfo, pCharInfo, FFLExpression(i));
 
-            desc.pTexturesEye[0] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[0]];
-            desc.pTexturesEye[1] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[1]];
+        desc.pTexturesEye[0] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[0]];
+        desc.pTexturesEye[1] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[1]];
 
-            desc.pTexturesEyebrow[0] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
-            desc.pTexturesEyebrow[1] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
+        desc.pTexturesEyebrow[0] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
+        desc.pTexturesEyebrow[1] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
 
-            desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
+        desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
-            if (expressionCharInfo.parts.mustacheType != 0) {
-                desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
-                desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
-            } else {
-                desc.pTexturesMustache[0] = NULL;
-                desc.pTexturesMustache[1] = NULL;
-            }
-
-            desc.pTextureMole = pObject->partsTextures.pTextureMole;
-
-            FFLiInitDrawParamRawMask(
-                pObject->pRawMaskDrawParam[i],
-                &expressionCharInfo,
-                resolution,
-                FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[0]),
-                FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[1]),
-                &desc
-            );
+        if (expressionCharInfo.parts.mustacheType != 0) {
+            desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
+            desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
+        } else {
+            desc.pTexturesMustache[0] = NULL;
+            desc.pTexturesMustache[1] = NULL;
         }
+
+        desc.pTextureMole = pObject->partsTextures.pTextureMole;
+
+        FFLiInitDrawParamRawMask(
+            pObject->pRawMaskDrawParam[i],
+            &expressionCharInfo,
+            resolution,
+            FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[0]),
+            FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[1]),
+            &desc
+        );
     }
 
     return FFL_RESULT_OK;
@@ -124,7 +146,7 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
 void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag, FFLResourceType resourceType)
 {
-    for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
+    for (u32 j = FFL_EXPRESSION_LIMIT; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
             FFLiDeleteDrawParamRawMask(pObject->pRawMaskDrawParam[j - 1]);
 
@@ -143,7 +165,7 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
 
     FFLiInvalidatePartsTextures(&pObject->partsTextures);
 
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
     {
         if (pMaskTextures->pRenderTextures[i] != NULL && pObject->pRawMaskDrawParam[i] != NULL)
         {
@@ -207,14 +229,14 @@ bool CanUseExpression(FFLExpressionFlag expressionFlag, FFLExpression expression
 
 void InitRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag)
 {
-    for (u32 i = 0; i < FFL_EXPRESSION_MAX; i++)
+    for (u32 i = 0; i < FFL_EXPRESSION_LIMIT; i++)
         if (CanUseExpression(expressionFlag, FFLExpression(i)))
             pObject->pRawMaskDrawParam[i] = new FFLiRawMaskDrawParam;
 }
 
 void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag)
 {
-    for (u32 j = FFL_EXPRESSION_MAX; j > 0; j--)
+    for (u32 j = FFL_EXPRESSION_LIMIT; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
             delete pObject->pRawMaskDrawParam[j - 1];
 }

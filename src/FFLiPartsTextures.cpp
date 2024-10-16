@@ -454,7 +454,6 @@ void DeleteTextures_Mouth(FFLiPartsTextures* pPartsTextures, FFLExpressionFlag e
 
 void DeleteTextures_Eyebrow(FFLiPartsTextures* pPartsTextures, FFLExpressionFlag expressionFlag, bool isExpand)
 {
-
     bool useFlag[FFLI_EYEBROW_TEXTURE_TYPE_MAX];
     ExpressionToEyebrowUseFlag(useFlag, expressionFlag);
 

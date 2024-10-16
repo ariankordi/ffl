@@ -45,7 +45,7 @@ FFLiResourceShapeElementType GetElementType(FFLAttributeBufferType type);
 
 u32 GetStride(FFLAttributeBufferType type, u32 size);
 
-void EndianSwap(void* ptr, u32 size);
+//void EndianSwap(void* ptr, u32 size);
 
 template <typename T>
 void AdjustAttribute(T* pVec, u32 num, f32 scaleX, f32 scaleY, f32 scaleZ, const FFLVec3* pTranslate, bool flipX, const FFLiCoordinate* pCoordinate);
@@ -189,6 +189,7 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
             pCoordinate
         );
 
+/*
     for (u32 i = 0; i < FFL_ATTRIBUTE_BUFFER_TYPE_MAX; i++)
     {
         FFLAttributeBuffer& attribute = pDrawParam->attributeBufferParam.attributeBuffers[i];
@@ -202,6 +203,7 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
             primitive.pIndexBuffer,
             sizeof(u16) * primitive.indexCount  // Apparently Nintendo forgot the index count is 4
         );
+*/
 }
 
 void FFLiInvalidateShape(FFLDrawParam* pDrawParam)
@@ -295,10 +297,13 @@ u32 GetStride(FFLAttributeBufferType type, u32 size)
     return stride;
 }
 
+// NOTE: This does literally nothing
+/*
 void EndianSwap(void* ptr, u32 size)
 {
     FFLiBugEndianSwap(ptr, size);
 }
+*/
 
 template <typename T>
 void AdjustAttribute(T* pVec, u32 num, f32 scaleX, f32 scaleY, f32 scaleZ, const FFLVec3* pTranslate, bool flipX, const FFLiCoordinate* pCoordinate)

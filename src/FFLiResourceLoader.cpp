@@ -77,10 +77,22 @@ FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePa
         // assuming this is a new glass type, we will map it to ver3
         index = ToVer3GlassTypeTable[index];
 
-    if (pPartsInfo == NULL || index >= num)
+    if (pPartsInfo == NULL
+#ifndef FFL_PART_INDEX_WRAP
+        || index >= num)
+#else
+    )
+#endif
         return FFL_RESULT_ERROR;
 
-    const FFLiResourcePartsInfo& partsInfo = pPartsInfo[index];
+    const u32 partIndex =
+#ifdef FFL_PART_INDEX_WRAP
+        index % num;
+#else
+        index;
+#endif
+
+    const FFLiResourcePartsInfo& partsInfo = pPartsInfo[partIndex];
 
     // debug logging for the above (to test endiannesssss)
     /*
@@ -118,10 +130,22 @@ FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsT
     FFLiResourceHeader* pHeader = Header();
     FFLiResourcePartsInfo* pPartsInfo = FFLiGetShapeResoucePartsInfos(&num, pHeader->GetShapeHeader(), partsType);
 
-    if (pPartsInfo == NULL || index >= num)
+    if (pPartsInfo == NULL
+#ifndef FFL_PART_INDEX_WRAP
+        || index >= num)
+#else
+    )
+#endif
         return FFL_RESULT_ERROR;
 
-    const FFLiResourcePartsInfo& partsInfo = pPartsInfo[index];
+    const u32 partIndex =
+#ifdef FFL_PART_INDEX_WRAP
+        index % num;
+#else
+        index;
+#endif
+
+    const FFLiResourcePartsInfo& partsInfo = pPartsInfo[partIndex];
 
     /*
     RIO_LOG("FFLiGetShapeResoucePartsInfos(%i, %u):\n", partsType, index);
