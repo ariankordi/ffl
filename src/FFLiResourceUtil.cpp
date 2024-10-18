@@ -65,9 +65,9 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
 
     if (totalUncompressSizeNoVersion == UNCOMPRESS_SIZE_AFLRESHIGH_DAT)
         return new FFLiResourceHeaderAFL();
-    // assume anything larger than FFLResHigh.dat is AFLResHigh_2_3.dat
-    else if (totalUncompressSizeNoVersion > UNCOMPRESS_SIZE_FFLRESHIGH_DAT)
+    else if (totalUncompressSizeNoVersion == UNCOMPRESS_SIZE_AFLRESHIGH_2_3_DAT)
         return new FFLiResourceHeaderAFL_2_3();
     else
+        // assume default FFL resource format
         return new FFLiResourceHeaderDefault();
 }

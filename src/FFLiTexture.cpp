@@ -95,7 +95,7 @@ FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTextureP
             texture.compMap = rio::TextureFormatUtil::getDefaultCompMap(texture.surface.format);
 
             // Initialize nativeFormat based on rio::TextureFormat
-            bool success = rio::TextureFormatUtil::getNativeTextureFormat(texture.surface.nativeFormat, texture.surface.format);
+            [[maybe_unused]] bool success = rio::TextureFormatUtil::getNativeTextureFormat(texture.surface.nativeFormat, texture.surface.format);
             RIO_ASSERT(success);
 
             texture.surface.imageSize = rio::Texture2DUtil::calcImageSize(texture.surface.format, texture.surface.width, texture.surface.height);

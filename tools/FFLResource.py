@@ -749,7 +749,8 @@ class FFLiResourceTextureHeader:
                 if gx2Texture is None:
                     continue
 
-                gx2Texture.surface.tileMode = tile_mode
+                if tile_mode != GX2TileMode.Default:
+                    gx2Texture.surface.tileMode = tile_mode
 
                 textureFormat = [
                     GX2SurfaceFormat.Unorm_R8,
