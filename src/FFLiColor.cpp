@@ -500,7 +500,7 @@ struct CommonColorTable {
 // NOTE: FFLiColorContainer contains the color in linear/normal gamma and THEN sRGB
 // NOTE NOTE IF YOU ARE READING: YOU WANT THE SECOND COLORS IN THESE ARRAYS
 
-const FFLColor nnmiiCommonColors[NNMII_COMMON_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
+const FFLColor nnmiiCommonColors[FFLI_NN_MII_COMMON_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
     { { 0.02624122f, 0.02121902f, 0.02121902f, 1.0f }, { 0.1764706f, 0.1568628f, 0.1568628f, 1.0f } },
     { { 0.05126946f, 0.01444384f, 0.00518152f, 1.0f }, { 0.2509804f, 0.1254902f, 0.0627451f, 1.0f } },
     { { 0.1070232f, 0.00913407f, 0.00303527f, 1.0f }, { 0.3607844f, 0.0941177f, 0.0392157f, 1.0f } },
@@ -608,7 +608,7 @@ const FFLColor nnmiiCommonColors[NNMII_COMMON_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX
 // as a CommonColorElement without last two ints
 // Switch Upper Lip (MouthGreen) Colors
 // Referenced by GetMouthGreenColor
-const FFLColor nnmiiUpperLipColors[NNMII_COMMON_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
+const FFLColor nnmiiUpperLipColors[FFLI_NN_MII_COMMON_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
     { { 0.00856813f, 0.00699541f, 0.00699541f, 1.0f }, { 0.0901961f, 0.0784314f, 0.0784314f, 1.0f } },
     { { 0.01444384f, 0.00518152f, 0.00242822f, 1.0f }, { 0.1254902f, 0.0627451f, 0.0313726f, 1.0f } },
     { { 0.0273209f, 0.00367651f, 0.00151764f, 1.0f }, { 0.1803922f, 0.0470589f, 0.0196079f, 1.0f } },
@@ -727,7 +727,7 @@ struct FacelineColorElement {
  * GetOrderIndexByFacelineColor
  * GetFacelineColorToVer3
  */
-const FFLColor nnmiiFacelineColors[NNMII_FACELINE_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
+const FFLColor nnmiiFacelineColors[FFLI_NN_MII_FACELINE_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
     // NOTE: these are passed to switch shaders with A = 0
     { { 1.0f, 0.6514057f, 0.4178851f, 1.0f }, { 1.0f, 0.827451f, 0.6784314f, 1.0f } },
     { { 1.0f, 0.4677839f, 0.1470273f, 1.0f }, { 1.0f, 0.7137255f, 0.4196079f, 1.0f } },
@@ -750,29 +750,31 @@ const FFLColor& GetFacelineColor(const FFLiColorContainer& container, s32 index)
 
 const FFLColor& GetBeardColor(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0
+)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetEyebrowColor(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0
+)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetMustacheColor(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetHairColor(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
@@ -788,30 +790,30 @@ const FFLColor& GetEyeColorG(const FFLiColorContainer& container, s32 index)
 
 const FFLColor& GetEyeColorB(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_EYE_COLOR_B_0 + index];
 }
 
 const FFLColor& GetGlassColor(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_GLASS_COLOR_0 + index];
 }
 
 const FFLColor& GetMouthColorR(const FFLiColorContainer& container, s32 index)
 {
-    if (isCommonColorMarked(index))
-        return nnmiiCommonColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_R_0 + index];
 }
 
 const FFLColor& GetMouthColorG(const FFLiColorContainer& container, s32 index)
 {
     // NOTE: supposed to be slightly darker than the lower lip color
-    if (isCommonColorMarked(index))
-        return nnmiiUpperLipColors[unmarkCommonColor(index)][1];
+    if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
+        return nnmiiUpperLipColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
     return container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_G_0 + index];
 }
 
@@ -845,15 +847,4 @@ const FFLColor& GetNoselineColor(const FFLiColorContainer& container)
     return container.colors[FFLI_COLOR_TYPE_FACE_LINE];
 }
 
-}
-
-// outside of the namespace so that this is exported
-bool isCommonColorMarked(s32 index) {
-    return (index & COMMON_COLOR_MARK_BIT) != 0;
-}
-s32 markCommonColor(s32 index) {
-    return index | COMMON_COLOR_MARK_BIT;
-}
-s32 unmarkCommonColor(s32 index) {
-    return index & ~COMMON_COLOR_MARK_BIT;
 }

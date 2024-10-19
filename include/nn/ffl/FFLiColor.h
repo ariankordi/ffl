@@ -58,12 +58,10 @@ void FFLiGetColorContainer(FFLiColorContainer* pContainer, FFLiContainerType typ
 
 // Somewhat of a HACK: Mark s32 color values as being colors
 // meant to be looked up in the common color table (Switch Mii colors)
-#define COMMON_COLOR_MARK_BIT 0x80000000
-bool isCommonColorMarked(s32 index);
-s32 markCommonColor(s32 index);
-s32 unmarkCommonColor(s32 index);
+#define FFLI_NN_MII_COMMON_COLOR_MASK 0x7FFFFFFF
+#define FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK 1 << 31
 
-#define NNMII_COMMON_COLOR_MAX 100
-#define NNMII_FACELINE_COLOR_MAX 10
+#define FFLI_NN_MII_COMMON_COLOR_MAX 100
+#define FFLI_NN_MII_FACELINE_COLOR_MAX 10
 
 #endif // FFLI_COLOR_H_
