@@ -146,6 +146,12 @@ void FFLiDeleteShape(void** ppShapeData, FFLDrawParam* pDrawParam)
     }
 }
 
+#ifdef FFL_NORMAL_ATTRIBUTE_IS_SNORM_8_8_8_8
+    #define FFLI_NORMAL_ATTRIBUTE_TYPE FFLiSnorm8_8_8_8
+#else
+    #define FFLI_NORMAL_ATTRIBUTE_TYPE FFLiSnorm10_10_10_2
+#endif
+
 void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32 scaleX, f32 scaleY, const FFLVec3* pTranslate, bool flipX, const FFLiCoordinate* pCoordinate, FFLiShapePartsType partsType, bool limitNoseScaleZ)
 {
     f32 scaleZ = (scaleX + scaleY) * 0.5f;
@@ -165,9 +171,9 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
         pCoordinate
     );
 
-    AdjustAttributeWithoutScale<FFLiSnorm10_10_10_2>(
-        static_cast<FFLiSnorm10_10_10_2*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].ptr),
-        pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].size / sizeof(FFLiSnorm10_10_10_2),
+    AdjustAttributeWithoutScale<FFLI_NORMAL_ATTRIBUTE_TYPE>(
+        static_cast<FFLI_NORMAL_ATTRIBUTE_TYPE*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].ptr),
+        pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].size / sizeof(FFLI_NORMAL_ATTRIBUTE_TYPE),
         flipX,
         pCoordinate
     );
