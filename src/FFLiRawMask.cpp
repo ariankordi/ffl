@@ -33,13 +33,10 @@ void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolut
 
 }
 
-#define EXCLUDE_COLOR_FROM_EYE_TEXTURE_TYPES_SIZE 4
-
-const s32 excludeColorFromEyeTextureTypes[EXCLUDE_COLOR_FROM_EYE_TEXTURE_TYPES_SIZE] = {
-    0x49, 0x48, 0x41, 0x3E
-    /*FFLI_EYE_TEXTURE_TYPE_22, FFLI_EYE_TEXTURE_TYPE_21,
-    FFLI_EYE_TEXTURE_TYPE_14, FFLI_EYE_TEXTURE_TYPE_11*/
+const s32 excludeColorFromEyeTextureTypes[] = {
+    60, 62, 65, 69, 70, 71, 72, 73, 74, 75, 78, 79 // in AFLResHigh
 };
+const s32 excludeColorFromMouthTypeThreshold = 36;
 
 void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex, const FFLiRawMaskTextureDesc* pDesc)
 {
@@ -66,9 +63,9 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     FFLiInitModulateMouth(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, *pDesc->pTextureMouth);
     FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, &rawMasks.rawMaskPartsDescMouth, &projMatrix);
 
-    // for all new AFL/miitomo mouth types past 37/type 12...
+    // for all new AFL/miitomo mouth types starting from 37/type 12...
     // ... they actually do not need colors
-    if (pCharInfo->parts.mouthType > 37)
+    if (pCharInfo->parts.mouthType > excludeColorFromMouthTypeThreshold)
         pDrawParam->drawParamRawMaskPartsMouth.modulateParam.mode = FFL_MODULATE_MODE_1;
 
 
@@ -91,7 +88,7 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
 
     // for certain eye indices (only testing left eye index for now)...
     // ... exclude color entirely by setting modulate mode to 1
-    for (s32 i = 0; i < EXCLUDE_COLOR_FROM_EYE_TEXTURE_TYPES_SIZE; i++) {
+    for (u32 i = 0; i < (sizeof(excludeColorFromEyeTextureTypes) / sizeof(u32)); i++) {
         if (excludeColorFromEyeTextureTypes[i] == leftEyeIndex) {
             pDrawParam->drawParamRawMaskPartsEye[0].modulateParam.mode = FFL_MODULATE_MODE_1;
             pDrawParam->drawParamRawMaskPartsEye[1].modulateParam.mode = FFL_MODULATE_MODE_1;

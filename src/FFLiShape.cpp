@@ -110,12 +110,12 @@ FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundin
         {
             const FFLiResourceShapeHairTransform* pTransform = static_cast<const FFLiResourceShapeHairTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR_1));
 
-            pModel->partsTransform._18 = pTransform->Get(0);
-            pModel->partsTransform._c  = pTransform->Get(1);
-            pModel->partsTransform._30 = pTransform->Get(2);
-            pModel->partsTransform._24 = pTransform->Get(3);
-            pModel->partsTransform._48 = pTransform->Get(4);
-            pModel->partsTransform._3c = pTransform->Get(5);
+            pModel->partsTransform.headFrontTranslate = pTransform->Get(0);
+            pModel->partsTransform.headFrontRotate  = pTransform->Get(1);
+            pModel->partsTransform.headSideTranslate = pTransform->Get(2);
+            pModel->partsTransform.headSideRotate = pTransform->Get(3);
+            pModel->partsTransform.headTopTranslate = pTransform->Get(4);
+            pModel->partsTransform.headTopRotate = pTransform->Get(5);
         }
         else if (partsType == FFLI_SHAPE_PARTS_TYPE_FACELINE)
         {
@@ -125,7 +125,7 @@ FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundin
             pModel->hairPos         = pTransform->GetHairPosition();
             pModel->faceCenterPos   = pTransform->GetFaceCenterPosition();
 
-            pModel->partsTransform._0 = pTransform->GetHairPosition();
+            pModel->partsTransform.hatTranslate = pTransform->GetHairPosition();
         }
 
         rio::MemUtil::copy(pBoundingBox, FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BOUNDING_BOX), sizeof(FFLBoundingBox));

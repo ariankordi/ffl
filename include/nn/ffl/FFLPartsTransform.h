@@ -9,13 +9,13 @@ extern "C" {
 
 typedef struct FFLPartsTransform
 {
-    FFLVec3 _0;
-    FFLVec3 _c;
-    FFLVec3 _18;
-    FFLVec3 _24;
-    FFLVec3 _30;
-    FFLVec3 _3c;
-    FFLVec3 _48;
+    FFLVec3 hatTranslate;
+    FFLVec3 headFrontRotate;
+    FFLVec3 headFrontTranslate;
+    FFLVec3 headSideRotate;
+    FFLVec3 headSideTranslate;
+    FFLVec3 headTopRotate;
+    FFLVec3 headTopTranslate;
 }
 FFLPartsTransform;
 NN_STATIC_ASSERT(sizeof(FFLPartsTransform) == 0x54);

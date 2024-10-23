@@ -82,7 +82,7 @@ typedef enum FFLExpression
     FFL_EXPRESSION_54  = 54,  // Tasty duplicate
     FFL_EXPRESSION_55  = 55,  // Money mouth straight
     FFL_EXPRESSION_56  = 56,  // Money
-    FFL_EXPRESSION_57  = 57,  // Spiral mouth straight
+    FFL_EXPRESSION_57  = 57,  // Confused mouth straight
     FFL_EXPRESSION_58  = 58,  // Confused
     FFL_EXPRESSION_59  = 59,  // Cheerful mouth straight
     FFL_EXPRESSION_60  = 60,  // Cheerful

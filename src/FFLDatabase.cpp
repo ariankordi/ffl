@@ -48,6 +48,16 @@ bool FFLIsRegularOfficialData(u16 index)
     return false;
 }
 
+void FFLiEnableSpecialMii(u32 key)
+{
+    if (!FFLiManager::IsConstruct())
+        return;
+
+    FFLiManager::GetInstance()->GetDatabaseManager().EnableSpecialMii(key);
+}
+
+#endif // !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
+
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion)
 {
     if (!FFLiManager::IsConstruct())
@@ -60,13 +70,3 @@ FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource
         FFLiGetAdditionalInfo(pAdditionalInfo, &charInfo, checkFontRegion, pManager->GetInitDesc().fontRegion);
     return result;
 }
-
-void FFLiEnableSpecialMii(u32 key)
-{
-    if (!FFLiManager::IsConstruct())
-        return;
-
-    FFLiManager::GetInstance()->GetDatabaseManager().EnableSpecialMii(key);
-}
-
-#endif // !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)

@@ -628,17 +628,17 @@ void AddVec3(FFLVec3* pDst, FFLVec3 vec)
 
 void AdjustPartsTransform(FFLiCharModel* pModel, const FFLiCoordinate* pCoordinate)
 {
-    AddVec3(&pModel->partsTransform._18, pModel->hairPos);
-    AddVec3(&pModel->partsTransform._30, pModel->hairPos);
-    AddVec3(&pModel->partsTransform._48, pModel->hairPos);
+    AddVec3(&pModel->partsTransform.headFrontTranslate, pModel->hairPos);
+    AddVec3(&pModel->partsTransform.headSideTranslate, pModel->hairPos);
+    AddVec3(&pModel->partsTransform.headTopTranslate, pModel->hairPos);
 
-    pCoordinate->Transform              (&pModel->partsTransform._0);
-    pCoordinate->TransformWithoutScale  (&pModel->partsTransform._c);
-    pCoordinate->Transform              (&pModel->partsTransform._18);
-    pCoordinate->TransformWithoutScale  (&pModel->partsTransform._24);
-    pCoordinate->Transform              (&pModel->partsTransform._30);
-    pCoordinate->TransformWithoutScale  (&pModel->partsTransform._3c);
-    pCoordinate->Transform              (&pModel->partsTransform._48);
+    pCoordinate->Transform              (&pModel->partsTransform.hatTranslate);
+    pCoordinate->TransformWithoutScale  (&pModel->partsTransform.headFrontRotate);
+    pCoordinate->Transform              (&pModel->partsTransform.headFrontTranslate);
+    pCoordinate->TransformWithoutScale  (&pModel->partsTransform.headSideRotate);
+    pCoordinate->Transform              (&pModel->partsTransform.headSideTranslate);
+    pCoordinate->TransformWithoutScale  (&pModel->partsTransform.headTopRotate);
+    pCoordinate->Transform              (&pModel->partsTransform.headTopTranslate);
 }
 
 struct FFLiShapeTypeInfo
