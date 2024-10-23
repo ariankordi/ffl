@@ -136,6 +136,14 @@ FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundin
 
 void FFLiDeleteShape(void** ppShapeData, FFLDrawParam* pDrawParam)
 {
+#ifdef FFL_USE_ADJUST_MTX
+    if (pDrawParam->primitiveParam.pAdjustMatrix != NULL)
+    {
+        //RIO_LOG("free pAdjustMatrix: %p\n", pDrawParam->primitiveParam.pAdjustMatrix);
+        delete pDrawParam->primitiveParam.pAdjustMatrix;
+    }
+#endif
+
     void*& pData = *ppShapeData;
     if (pData != nullptr)
     {
@@ -161,7 +169,26 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
     {
         scaleZ = 1.1f;
     }
+#ifdef FFL_USE_ADJUST_MTX
+    if (scaleX != 1.0f || scaleY != 1.0f || scaleZ != 1.0f || pTranslate != NULL)
+    { // otherwise it will be left null and will be ok
+        // Allocate the new model matrix
+        rio::Matrix34f* modelMtx = new rio::Matrix34f(rio::Matrix34f::ident);
+        //RIO_LOG("malloc pAdjustMatrix: %p\n", modelMtx);
 
+        // Apply translation
+        if (pTranslate != NULL)
+            modelMtx->applyTranslationLocal({ pTranslate->x, pTranslate->y, pTranslate->z });
+
+        // Apply flipping and scaling
+        modelMtx->applyScaleLocal({ flipX ? -scaleX : scaleX, scaleY, scaleZ });
+
+        pDrawParam->primitiveParam.pAdjustMatrix = modelMtx;
+    }
+    // TODO: BOUNDING BOX?
+    // TODO: NON DEFAULT COORDINATE????
+
+#else
     AdjustAttribute<FFLVec4>(
         static_cast<FFLVec4*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr),
         pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].size / sizeof(FFLVec4),
@@ -210,6 +237,9 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
             sizeof(u16) * primitive.indexCount  // Apparently Nintendo forgot the index count is 4
         );
 */
+
+#endif
+
 }
 
 void FFLiInvalidateShape(FFLDrawParam* pDrawParam)

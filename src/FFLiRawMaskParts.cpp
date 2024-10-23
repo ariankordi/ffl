@@ -42,6 +42,10 @@ void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const 
     InitPrimitive(&pDrawParam->primitiveParam);
     InitAttributes(&pDrawParam->attributeBufferParam, pDesc->originPos, &mvpMatrix);
     pDrawParam->cullMode = FFL_CULL_MODE_MAX;
+
+#ifdef FFL_USE_ADJUST_MTX
+    pDrawParam->primitiveParam.pAdjustMatrix = NULL;
+#endif
 }
 
 void FFLiDeleteDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam)

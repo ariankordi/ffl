@@ -339,6 +339,9 @@ FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 ind
     if (result != FFL_RESULT_OK)
         return result;
 
+#ifdef FFL_USE_ADJUST_MTX
+    pDrawParam->primitiveParam.pAdjustMatrix = NULL;
+#endif
     FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_FLATTEN_NOSE);
     CalcluateBoundingBox(pModel->boundingBox, &boundingBox, partsType);
     return FFL_RESULT_OK;

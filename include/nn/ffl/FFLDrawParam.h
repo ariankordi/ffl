@@ -4,6 +4,9 @@
 #include <nn/ffl/FFLModulateParam.h>
 
 #include <gpu/rio_Drawer.h>
+#ifdef FFL_USE_ADJUST_MTX
+    #include <math/rio_Matrix.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +43,11 @@ typedef struct FFLPrimitiveParam
 {
     rio::Drawer::PrimitiveMode  primitiveType;
     u32                         indexCount;
+#ifdef FFL_USE_ADJUST_MTX
+    rio::Matrix34f*             pAdjustMatrix;
+#else
     u32                         _8; // Deleted
+#endif
     void*                       pIndexBuffer;
 }
 FFLPrimitiveParam;
