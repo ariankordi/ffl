@@ -195,11 +195,11 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
     FFLiSetupRenderTexture(&renderTexture, &facelineColor, NULL, 0, pCallback);
 
     if (pObject->pTextureFaceMake != NULL)
-        pCallback->CallDraw(pObject->drawParamFaceMake);
+        pCallback->CallDraw(&pObject->drawParamFaceMake);
     if (pObject->pTextureFaceLine != NULL)
-        pCallback->CallDraw(pObject->drawParamFaceLine);
+        pCallback->CallDraw(&pObject->drawParamFaceLine);
     if (pObject->pTextureFaceBeard != NULL)
-        pCallback->CallDraw(pObject->drawParamFaceBeard);
+        pCallback->CallDraw(&pObject->drawParamFaceBeard);
 
     if (renderTexture.pTexture2D->getNumMips() > 1)
     {

@@ -35,8 +35,8 @@ public:
     }
 
     void CallApplyAlphaTest(bool enable, rio::Graphics::CompareFunc func, f32 ref) const;
-    void CallSetMatrix(const rio::BaseMtx44f& mat) const;
-    void CallDraw(const FFLDrawParam& drawParam) const;
+    void CallSetMatrix(const rio::BaseMtx44f* mat) const;
+    void CallDraw(const FFLDrawParam* drawParam) const;
 
 private:
     const FFLShaderCallback*    m_pShaderCallback;

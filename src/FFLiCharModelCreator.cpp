@@ -192,7 +192,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     mvpMatrix.m[1][1] *= -1.f;
 #endif
 
-    shaderCallback.CallSetMatrix(mvpMatrix);
+    shaderCallback.CallSetMatrix(&mvpMatrix);
 
     FFLiRenderMaskTextures(&pModel->maskTextures, &pModel->pTextureTempObject->maskTextures, &shaderCallback
 #if RIO_IS_CAFE

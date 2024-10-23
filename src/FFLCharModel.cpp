@@ -95,27 +95,27 @@ void FFLDrawOpaWithCallback(const FFLCharModel* pModel, const FFLShaderCallback*
 
     pDrawParam = FFLGetDrawParamOpaFaceline(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamOpaBeard(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamOpaNose(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamOpaForehead(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamOpaHair(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamOpaCap(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 }
 
 const FFLDrawParam* FFLGetDrawParamXluMask(const FFLCharModel* pModel)
@@ -151,15 +151,15 @@ void FFLDrawXluWithCallback(const FFLCharModel* pModel, const FFLShaderCallback*
 
     pDrawParam = FFLGetDrawParamXluMask(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamXluNoseLine(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 
     pDrawParam = FFLGetDrawParamXluGlass(pModel);
     if (pDrawParam != NULL)
-        shaderCallback.CallDraw(*pDrawParam);
+        shaderCallback.CallDraw(pDrawParam);
 }
 
 void FFLSetExpression(FFLCharModel* pModel, FFLExpression expression)

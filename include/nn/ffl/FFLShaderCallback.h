@@ -19,8 +19,8 @@ typedef struct FFLShaderCallback
     bool                facelineColorIsTransparent;
 
     void (*pApplyAlphaTestFunc)(void* pObj, bool enable, rio::Graphics::CompareFunc func, f32 ref);
-    void (*pDrawFunc)(void* pObj, const FFLDrawParam& drawParam);
-    void (*pSetMatrixFunc)(void* pObj, const rio::BaseMtx44f& matrix);
+    void (*pDrawFunc)(void* pObj, const FFLDrawParam* drawParam);
+    void (*pSetMatrixFunc)(void* pObj, const rio::BaseMtx44f* matrix);
 }
 FFLShaderCallback;
 NN_STATIC_ASSERT32(sizeof(FFLShaderCallback) == 0x14);

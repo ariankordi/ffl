@@ -75,7 +75,7 @@ void FFLiDeleteDrawParamRawMaskPartsFill(FFLiRawMaskPartsDrawParam* pDrawParam)
 
 void FFLiDrawRawMaskParts(const FFLiRawMaskPartsDrawParam* pDrawParam, const FFLiShaderCallback* pCallback)
 {
-    pCallback->CallDraw(*pDrawParam);
+    pCallback->CallDraw(pDrawParam);
 }
 
 namespace {
