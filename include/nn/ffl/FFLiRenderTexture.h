@@ -3,6 +3,15 @@
 
 #include <nn/ffl/types.h>
 
+#ifndef __cplusplus
+
+typedef struct FFLiRenderTexture
+{
+    void* _0[4]; // only for headers!
+}
+FFLiRenderTexture;
+#else
+
 #include <gpu/rio_RenderBuffer.h>
 #include <gpu/rio_RenderTarget.h>
 
@@ -14,6 +23,7 @@ struct FFLiRenderTexture
     rio::RenderTargetColor* pColorTarget;
     rio::RenderTargetDepth* pDepthTarget;
 };
+
 NN_STATIC_ASSERT32(sizeof(FFLiRenderTexture) == 0x10);
 
 struct FFLColor;
@@ -25,5 +35,7 @@ void FFLiDeleteRenderTexture(FFLiRenderTexture* pRenderTexture);
 void FFLiInvalidateRenderTexture(FFLiRenderTexture* pRenderTexture);
 void FFLiSetupRenderTexture(FFLiRenderTexture* pRenderTexture, const FFLColor* pClearColor, rio::Texture2D* pDepthBuffer, u32 mipLevel, const FFLiShaderCallback* pCallback);
 void FFLiFlushRenderTexture(FFLiRenderTexture* pRenderTexture);
+
+#endif // __cplusplus
 
 #endif // FFLI_RENDER_TEXTURE_H_

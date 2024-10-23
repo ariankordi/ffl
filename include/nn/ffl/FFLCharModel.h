@@ -13,6 +13,20 @@ extern "C" {
 
 #define FFL_CHAR_MODEL_SIZE sizeof(FFLiCharModel)
 
+
+
+/*
+#if INTPTR_MAX == INT64_MAX
+    #if FFL_EXPRESSION_LIMIT == FFL_EXPRESSION_MAX
+        #define FFL_CHAR_MODEL_SIZE 3088
+    #else // assuming it is lower, so like 31
+        #define FFL_CHAR_MODEL_SIZE 3056
+    #endif
+#else // assuming 32 bit
+    #define FFL_CHAR_MODEL_SIZE 2116 // 2144
+#endif
+*/
+
 typedef struct FFLCharModel
 {
     union

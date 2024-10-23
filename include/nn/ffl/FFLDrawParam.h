@@ -3,7 +3,6 @@
 
 #include <nn/ffl/FFLModulateParam.h>
 
-#include <gpu/rio_Drawer.h>
 #ifdef FFL_USE_ADJUST_MTX
     #include <math/rio_Matrix.h>
 #endif
@@ -41,7 +40,7 @@ NN_STATIC_ASSERT32(sizeof(FFLAttributeBufferParam) == 0x3C);
 
 typedef struct FFLPrimitiveParam
 {
-    rio::Drawer::PrimitiveMode  primitiveType;
+    FFLRIOPrimitiveMode         primitiveType;
     u32                         indexCount;
 #ifdef FFL_USE_ADJUST_MTX
     rio::Matrix34f*             pAdjustMatrix;

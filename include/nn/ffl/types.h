@@ -19,22 +19,6 @@
     #error "Host must be either big- or little-endian"
 #endif
 
-#include <misc/rio_Types.h>
-
-/*
-#ifdef __cplusplus
-    #include <type_traits>
-
-    #define NN_STATIC_ASSERT static_assert
-    #define NN_STATIC_ASSERT_IS_POD(T)  static_assert(std::is_trivial<T>::value)
-#else // __cplusplus
-    #include <assert.h>
-
-    #define NN_STATIC_ASSERT _Static_assert
-    #define NN_STATIC_ASSERT_IS_POD(T)  ((void)0)
-#endif
-*/
-
 
 #ifdef __cplusplus
     #include <type_traits>
@@ -63,7 +47,7 @@
 #ifdef __cplusplus
     #include <type_traits>
 
-    #if defined(NDEBUG) || INTPTR_MAX == INT64_MAX
+    #if defined(NDEBUG) || (!defined(__WUT__) && INTPTR_MAX == INT64_MAX)
         #define NN_STATIC_ASSERT32(condition) static_assert(true, "")
     #else
         #define NN_STATIC_ASSERT32 NN_STATIC_ASSERT
@@ -78,6 +62,100 @@
     #endif
 #endif
 
+
+#ifdef __cplusplus
+    #include <misc/rio_Types.h>
+    // Define typedefs that are exported in public headers
+    #include <gpu/rio_Texture.h>
+    typedef rio::Texture2D FFLRIOTexture2D;
+    #include <math/rio_Matrix.h>
+    typedef rio::BaseMtx44f FFLRIOBaseMtx44f;
+    #include <gfx/rio_Graphics.h>
+    typedef rio::Graphics::CompareFunc FFLRIOCompareFunc;
+    #include <gpu/rio_Drawer.h>
+    typedef rio::Drawer::PrimitiveMode FFLRIOPrimitiveMode;
+
+    #define FFL_GET_RIO_NATIVE_TEXTURE_HANDLE(texture2D) (texture2D)->getNativeTextureHandle()
+#else
+    // Typedefs that RIO would have otherwise imported
+
+    #if defined(__WUT__)
+        #define RIO_IS_WIN  0
+        #define RIO_IS_CAFE 1
+    #else
+        #define RIO_IS_WIN  1
+        #define RIO_IS_CAFE 0
+    #endif
+
+    #include <stdint.h>
+    #include <stddef.h>
+    #include <assert.h>
+    #include <stdbool.h>
+    typedef  int8_t s8;
+    typedef uint8_t u8;
+
+    typedef  int16_t s16;
+    typedef uint16_t u16;
+
+    typedef  int32_t s32;
+    typedef uint32_t u32;
+
+    typedef  int64_t s64;
+    typedef uint64_t u64;
+
+    typedef float  f32;
+    typedef double f64;
+
+    static_assert(sizeof(s8)  == sizeof(u8)  && sizeof(u8)  == sizeof(char) && sizeof(char) == 1);
+    static_assert(sizeof(s16) == sizeof(u16) && sizeof(u16) == 2);
+    static_assert(sizeof(s32) == sizeof(u32) && sizeof(u32) == 4);
+    static_assert(sizeof(s64) == sizeof(u64) && sizeof(u64) == 8);
+    static_assert(sizeof(f32) == 4);
+    static_assert(sizeof(f64) == 8);
+    // end of rio_Types.h typedefs
+
+    // float 4x4 matrix
+    #include <nn/ffl/FFLVec.h>
+    typedef struct FFLRIOBaseMtx44f
+    {
+        union
+        {
+            // rio::BaseMtx44<float>
+            f32         m[4][4];
+            f32         a[4*4];
+            FFLVec4     v[4];
+        };
+    }
+    FFLRIOBaseMtx44f;
+
+    typedef u32 FFLRIOCompareFunc; // TODO: not tested
+#if RIO_IS_CAFE
+    typedef GX2PrimitiveMode FFLRIOPrimitiveMode; // TODO: not tested
+#elif RIO_IS_WIN
+    typedef unsigned int FFLRIOPrimitiveMode; // should map directly..
+#endif
+    // only needed for below structure
+#if RIO_IS_CAFE
+    typedef const GX2Texture* FFLRIONativeTexture2DHandle;
+    typedef GX2Texture FFLRIONativeTexture2D;
+#elif RIO_IS_WIN
+    typedef unsigned int FFLRIONativeTexture2DHandle;
+    // below is SOLELY used as padding - rio::NativeTexture2D does NOT have pointers (only a u64?) so this constant size should be fine
+    typedef u8 FFLRIONativeTexture2D[128]; // sizeof(rio::NativeTexture2D)
+#endif
+
+    // Substitutes for RIO structs that are used in public headers
+    typedef struct FFLRIOTexture2D
+    {
+        FFLRIONativeTexture2D mTextureInner;
+        // Only mHandle is needed to bind the texture on OpenGL
+        FFLRIONativeTexture2DHandle mHandle; // OpenGL texture handle
+        bool mSelfAllocated;
+    } FFLRIOTexture2D;
+
+    #define FFL_GET_RIO_NATIVE_TEXTURE_HANDLE(texture2D) (texture2D)->mHandle
+
+#endif
 
 
 #ifdef __cplusplus

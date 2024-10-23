@@ -9,15 +9,21 @@
 #include <nn/ffl/FFLPartsTransform.h>
 #include <nn/ffl/FFLResult.h>
 
-#include <nn/ffl/FFLiMaskTextures.h>
 #include <nn/ffl/FFLiRenderTexture.h>
+#include <nn/ffl/FFLiMaskTextures.h>
 #include <nn/ffl/FFLiShapeType.h>
 
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
+#ifndef __cplusplus
+typedef struct FFLiTextureTempObject FFLiTextureTempObject;
+typedef struct FFLCharModelSource FFLCharModelSource;
+typedef struct FFLShaderCallback FFLShaderCallback;
+#endif
+
 struct FFLiTextureTempObject;
 
-struct FFLiCharModel
+typedef struct FFLiCharModel
 {
     FFLiCharInfo            charInfo;
     FFLCharModelDesc        charModelDesc;
@@ -26,9 +32,9 @@ struct FFLiCharModel
     FFLDrawParam            drawParam[FFLI_SHAPE_TYPE_MAX];
     void*                   pShapeData[FFLI_SHAPE_TYPE_MAX];
     FFLiRenderTexture       facelineRenderTexture;
-    rio::Texture2D*         pCapTexture;
-    rio::Texture2D*         pGlassTexture;
-    rio::Texture2D*         pNoselineTexture;
+    FFLRIOTexture2D*        pCapTexture;
+    FFLRIOTexture2D*        pGlassTexture;
+    FFLRIOTexture2D*        pNoselineTexture;
     FFLiMaskTextures        maskTextures;
     FFLVec3                 beardPos;
     FFLVec3                 hairPos;
@@ -36,7 +42,8 @@ struct FFLiCharModel
     FFLPartsTransform       partsTransform;
     FFLModelType            modelType;
     FFLBoundingBox          boundingBox[3];
-};
+}
+FFLiCharModel;
 NN_STATIC_ASSERT32(sizeof(FFLiCharModel) == 0x844);
 
 struct FFLCharModelSource;

@@ -5,15 +5,18 @@
 #include <nn/ffl/FFLResourceType.h>
 #include <nn/ffl/FFLResult.h>
 
-#include <misc/rio_Types.h>
+//#include <misc/rio_Types.h>
 
 struct FFLiRenderTexture;
 
-struct FFLiMaskTextures
+typedef struct FFLiMaskTextures
 {
     FFLiRenderTexture*  pRenderTextures[FFL_EXPRESSION_MAX];
-};
+}
+FFLiMaskTextures;
 NN_STATIC_ASSERT32(sizeof(FFLiMaskTextures) == 0x118);
+
+#ifdef __cplusplus
 
 struct  FFLiCharInfo;
 #if RIO_IS_CAFE
@@ -35,5 +38,7 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
     , FFLiCopySurface* pCopySurface
 #endif // RIO_IS_CAFE
 );
+
+#endif // __cplusplus
 
 #endif // FFLI_MASK_TEXTURES_H_
