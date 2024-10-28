@@ -89,14 +89,14 @@ public:
         return m_SlotIndex;
     }
 
-    void SetFlagBit24To27(u16 value)
+    void SetAuthorType(u16 value)
     {
-        _0_24_27 = value;
+        m_AuthorType = value;
     }
 
-    u16 FlagBit24To27() const
+    u16 AuthorType() const
     {
-        return _0_24_27;
+        return m_AuthorType;
     }
 
     void SetBirthPlatform(u16 platform)
@@ -662,13 +662,13 @@ private:
             u32 m_PageIndex     : 4;
             u32 m_SlotIndex     : 4;
 
-            u32 _0_24_27        : 4;
+            u32 m_AuthorType    : 4;
             u32 m_BirthPlatform : 3;
             u32                 : 1;    // Unused (MSB)
 #else
             u32                 : 1;    // Unused (MSB)
             u32 m_BirthPlatform : 3;
-            u32 _0_24_27        : 4;
+            u32 m_AuthorType    : 4;
 
             u32 m_SlotIndex     : 4;
             u32 m_PageIndex     : 4;

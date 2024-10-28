@@ -66,7 +66,7 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     // for all new AFL/miitomo mouth types starting from 37/type 12...
     // ... they actually do not need colors
     if (pCharInfo->parts.mouthType > excludeColorFromMouthTypeThreshold)
-        pDrawParam->drawParamRawMaskPartsMouth.modulateParam.mode = FFL_MODULATE_MODE_1;
+        pDrawParam->drawParamRawMaskPartsMouth.modulateParam.mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
 
 
     if (pDesc->pTexturesEyebrow[0] != NULL) {
@@ -90,8 +90,8 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     // ... exclude color entirely by setting modulate mode to 1
     for (u32 i = 0; i < (sizeof(excludeColorFromEyeTextureTypes) / sizeof(u32)); i++) {
         if (excludeColorFromEyeTextureTypes[i] == leftEyeIndex) {
-            pDrawParam->drawParamRawMaskPartsEye[0].modulateParam.mode = FFL_MODULATE_MODE_1;
-            pDrawParam->drawParamRawMaskPartsEye[1].modulateParam.mode = FFL_MODULATE_MODE_1;
+            pDrawParam->drawParamRawMaskPartsEye[0].modulateParam.mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
+            pDrawParam->drawParamRawMaskPartsEye[1].modulateParam.mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
             break;
         }
     }

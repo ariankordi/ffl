@@ -9,41 +9,41 @@ extern "C" {
 
 typedef enum FFLModulateMode
 {
-    FFL_MODULATE_MODE_0 = 0,    // No Texture
-                                // Has Color (R)
-                                // FragmentRGB = ColorR
-                                // FragmentA = 1.0f
-                                // Used by: ShapeBeard, ShapeNose, ShapeForehead, ShapeHair, Fill
+    FFL_MODULATE_MODE_CONSTANT        = 0, // No Texture
+                                           // Has Color (R)
+                                           // FragmentRGB = ColorR
+                                           // FragmentA = 1.0f
+                                           // Used by: ShapeBeard, ShapeNose, ShapeForehead, ShapeHair, Fill
 
-    FFL_MODULATE_MODE_1 = 1,    // Has Texture
-                                // No Color
-                                // FragmentRGB = TextureRGB
-                                // FragmentA = TextureA
-                                // Used by: FaceMake, ShapeFaceline, ShapeMask
+    FFL_MODULATE_MODE_TEXTURE_DIRECT  = 1, // Has Texture
+                                           // No Color
+                                           // FragmentRGB = TextureRGB
+                                           // FragmentA = TextureA
+                                           // Used by: FaceMake, ShapeFaceline, ShapeMask
 
-    FFL_MODULATE_MODE_2 = 2,    // Has Texture
-                                // Has Color (R + G + B)
-                                // FragmentRGB = ColorR * TextureR + ColorG * TextureG + ColorB * TextureB
-                                // FragmentA = TextureA
-                                // Used By: Mouth, Eye
+    FFL_MODULATE_MODE_RGB_LAYERED     = 2, // Has Texture
+                                           // Has Color (R + G + B)
+                                           // FragmentRGB = ColorR * TextureR + ColorG * TextureG + ColorB * TextureB
+                                           // FragmentA = TextureA
+                                           // Used By: Mouth, Eye
 
-    FFL_MODULATE_MODE_3 = 3,    // Has Texture
-                                // Has Color (R)
-                                // FragmentRGB = ColorR * TextureR
-                                // FragmentA = TextureR
-                                // Used by: Mustache, Eyebrow, Mole, FaceLine, FaceBeard, ShapeNoseline
+    FFL_MODULATE_MODE_ALPHA           = 3, // Has Texture
+                                           // Has Color (R)
+                                           // FragmentRGB = ColorR * TextureR
+                                           // FragmentA = TextureR
+                                           // Used by: Mustache, Eyebrow, Mole, FaceLine, FaceBeard, ShapeNoseline
 
-    FFL_MODULATE_MODE_4 = 4,    // Has Texture
-                                // Has Color (R)
-                                // FragmentR = ColorR * TextureG
-                                // FragmentA = TextureR
-                                // Used by: ShapeGlass
+    FFL_MODULATE_MODE_LUMINANCE_ALPHA = 4, // Has Texture
+                                           // Has Color (R)
+                                           // FragmentR = ColorR * TextureG
+                                           // FragmentA = TextureR
+                                           // Used by: ShapeGlass
 
-    FFL_MODULATE_MODE_5 = 5     // Has Texture
-                                // Has Color (R)
-                                // FragmentRGB = ColorR * TextureR
-                                // FragmentA = 1.0f
-                                // Used by: ShapeCap
+    FFL_MODULATE_MODE_ALPHA_OPA       = 5  // Has Texture
+                                           // Has Color (R)
+                                           // FragmentRGB = ColorR * TextureR
+                                           // FragmentA = 1.0f
+                                           // Used by: ShapeCap
 }
 FFLModulateMode;
 

@@ -56,18 +56,33 @@ bool FFLiIsSpecialMiiID(const FFLCreateID* pCreateID)
     return !FFLiIsNormalMiiID(pCreateID);
 }
 
+
+bool FFLiIsWiiMiiID(const FFLCreateID* pCreateID)
+{
+    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
+    return type == FFLI_CREATE_ID_TYPE_WII;
+}
+
 bool FFLiIsNTRMiiID(const FFLCreateID* pCreateID)
 {
-    u8 flags = GetCreateID(pCreateID)->flags;
-    
-    if (flags & FFLI_CREATE_ID_FLAG_UNKNOWN_0)
-        return false;
-    
-    if (!(flags & FFLI_CREATE_ID_FLAG_UNKNOWN_2))
-        return false;
-    
-    return true;
+    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
+    return type == FFLI_CREATE_ID_TYPE_NTR;
 }
+
+bool FFLiIsCTRMiiID(const FFLCreateID* pCreateID)
+{
+    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
+    return type == FFLI_CREATE_ID_TYPE_CTR;
+}
+
+bool FFLiIsWiiUMiiID(const FFLCreateID* pCreateID)
+{
+    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
+    return type == FFLI_CREATE_ID_TYPE_WIIU;
+}
+
+
+
 
 bool FFLiIsTemporaryMiiID(const FFLCreateID* pCreateID)
 {

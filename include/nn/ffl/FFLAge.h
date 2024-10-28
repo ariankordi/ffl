@@ -9,10 +9,10 @@ extern "C" {
 
 typedef enum FFLAge
 {
-    FFL_AGE_0   = 0,
-    FFL_AGE_1   = 1,
-    FFL_AGE_2   = 2,
-    FFL_AGE_MAX = 3
+    FFL_AGE_CHILD = 0,
+    FFL_AGE_ADULT = 1,
+    FFL_AGE_ELDER = 2,
+    FFL_AGE_MAX   = 3
 }
 FFLAge;
 

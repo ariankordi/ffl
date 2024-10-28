@@ -9,11 +9,12 @@ extern "C" {
 
 typedef struct FFLInitDesc
 {
-    const void*             _0; // Deleted
-    void*                   _4; // Deleted
+    const void*             _0;  // pShaderData, deleted
+    void*                   _4;  // pChangeParams, deleted
     FFLFontRegion           fontRegion;
-    int                     _c;
-    int                     _10;
+    int                     _c;  // Completely unused
+    int                     _10; // FFLiManager::GetBufferSize
+                                 // Unused in RIO
 }
 FFLInitDesc;
 NN_STATIC_ASSERT32(sizeof(FFLInitDesc) == 0x14);

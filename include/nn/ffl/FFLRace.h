@@ -9,9 +9,9 @@ extern "C" {
 
 typedef enum FFLRace
 {
-    FFL_RACE_0      = 0,
-    FFL_RACE_1      = 1,
-    FFL_RACE_2      = 2,
+    FFL_RACE_BLACK  = 0,
+    FFL_RACE_WHITE  = 1,
+    FFL_RACE_ASIAN  = 2,
     FFL_RACE_MAX    = 3
 }
 FFLRace;

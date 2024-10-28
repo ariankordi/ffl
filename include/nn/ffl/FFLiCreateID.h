@@ -21,10 +21,15 @@ typedef struct FFLiCreateIDBase
 FFLiCreateIDBase;
 NN_STATIC_ASSERT(sizeof(FFLiCreateIDBase) == FFLI_CREATE_ID_BASE_SIZE);
 
-#define FFLI_CREATE_ID_FLAG_UNKNOWN_0   (1 << 4)
-#define FFLI_CREATE_ID_FLAG_TEMPORARY   (1 << 5)
-#define FFLI_CREATE_ID_FLAG_UNKNOWN_2   (1 << 6)
-#define FFLI_CREATE_ID_FLAG_NORMAL      (1 << 7)
+#define FFLI_CREATE_ID_FLAG_TEMPORARY (1 << 5)
+#define FFLI_CREATE_ID_FLAG_NORMAL    (1 << 7)
+
+#define FFLI_CREATE_ID_TYPE_MASK      ((1 << 6) | (1 << 4))
+
+#define FFLI_CREATE_ID_TYPE_WII       0x00 // Bits 6 and 4 are 0
+#define FFLI_CREATE_ID_TYPE_CTR       (1 << 4)
+#define FFLI_CREATE_ID_TYPE_NTR       (1 << 6)
+#define FFLI_CREATE_ID_TYPE_WIIU      ((1 << 6) | (1 << 4))
 
 typedef struct FFLiCreateID
 {
@@ -43,7 +48,12 @@ void FFLiGetTemporaryMiiID(FFLCreateID* pCreateID);
 
 bool FFLiIsNormalMiiID(const FFLCreateID* pCreateID);
 bool FFLiIsSpecialMiiID(const FFLCreateID* pCreateID);
+
+bool FFLiIsWiiMiiID(const FFLCreateID* pCreateID);
 bool FFLiIsNTRMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsCTRMiiID(const FFLCreateID* pCreateID);
+bool FFLiIsWiiUMiiID(const FFLCreateID* pCreateID);
+
 bool FFLiIsTemporaryMiiID(const FFLCreateID* pCreateID);
 
 bool FFLiIsValidMiiID(const FFLCreateID* pCreateID);

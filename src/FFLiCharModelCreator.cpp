@@ -380,8 +380,8 @@ const ModelTypeShapePartsInfo* GetModelTypeShapePartsInfo(u32 modelFlag)
         { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2 }
     };
 
-    bool modelType0Enable = modelFlag & 1 << FFL_MODEL_TYPE_NORMAL;
-    bool modelType1Enable = modelFlag & 1 << FFL_MODEL_TYPE_HAT;
+    bool modelType0Enable = modelFlag & FFL_MODEL_FLAG_NORMAL;
+    bool modelType1Enable = modelFlag & FFL_MODEL_FLAG_HAT;
 
     modelTypeShapePartsInfo[0 * 3 + 0].enable = modelType0Enable;
     modelTypeShapePartsInfo[0 * 3 + 1].enable = modelType0Enable;
@@ -398,8 +398,8 @@ void DeleteShape_Hair(FFLiCharModel* pModel, u32 count = 2 * 3)
 {
     u32 modelFlag = pModel->charModelDesc.modelFlag & 7;
 
-    if (modelFlag & (1 << FFL_MODEL_TYPE_NORMAL |
-                     1 << FFL_MODEL_TYPE_HAT))
+    if (modelFlag & (FFL_MODEL_FLAG_NORMAL |
+                     FFL_MODEL_FLAG_HAT))
     {
         const ModelTypeShapePartsInfo* modelTypeShapePartsInfo = GetModelTypeShapePartsInfo(modelFlag);
         for (u32 j = count; j > 0; j--)

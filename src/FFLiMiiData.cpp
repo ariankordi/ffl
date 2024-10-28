@@ -97,7 +97,7 @@ bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreR
 
     pCharInfo->gender = FFLGender(miiDataCoreRFL.Gender());
 
-    pCharInfo->favoriteColor = miiDataCoreRFL.FavoriteColor();
+    pCharInfo->favoriteColor = FFLFavoriteColor(miiDataCoreRFL.FavoriteColor());
 
     pCharInfo->favoriteMii = miiDataCoreRFL.FavoriteMii();
     pCharInfo->copyable = false;
@@ -105,12 +105,12 @@ bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreR
     pCharInfo->localOnly = miiDataCoreRFL.LocalOnly();
 
     pCharInfo->regionMove = 0;
-    pCharInfo->fontRegion = FFL_FONT_REGION_0;
+    pCharInfo->fontRegion = FFL_FONT_REGION_JP_US_EU;
 
     pCharInfo->pageIndex = 0;
     pCharInfo->slotIndex = 0;
 
-    pCharInfo->_114 = 0;
+    pCharInfo->authorType = 0;
 
     rio::MemUtil::set(&pCharInfo->authorID, 0, sizeof(FFLiAuthorID));
 
@@ -203,7 +203,7 @@ void FFLiMiiDataCore2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCore& mi
 
     pCharInfo->gender = FFLGender(miiDataCore.Gender());
 
-    pCharInfo->favoriteColor = miiDataCore.FavoriteColor();
+    pCharInfo->favoriteColor = FFLFavoriteColor(miiDataCore.FavoriteColor());
 
     pCharInfo->favoriteMii = miiDataCore.FavoriteMii();
     pCharInfo->copyable = miiDataCore.Copyable();
@@ -218,7 +218,7 @@ void FFLiMiiDataCore2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCore& mi
 
     pCharInfo->birthPlatform = FFLBirthPlatform(miiDataCore.BirthPlatform());
 
-    pCharInfo->_114 = miiDataCore.FlagBit24To27();
+    pCharInfo->authorType = miiDataCore.AuthorType();
 
     rio::MemUtil::copy(&pCharInfo->authorID, &miiDataCore.AuthorID(), sizeof(FFLiAuthorID));
 
@@ -249,7 +249,7 @@ void FFLiCharInfo2MiiDataCore(FFLiMiiDataCore* pMiiDataCore, const FFLiCharInfo&
     pMiiDataCore->SetFontRegion(charInfo.fontRegion);
     pMiiDataCore->SetPageIndex(charInfo.pageIndex);
     pMiiDataCore->SetSlotIndex(charInfo.slotIndex);
-    pMiiDataCore->SetFlagBit24To27(charInfo._114);
+    pMiiDataCore->SetAuthorType(charInfo.authorType);
     pMiiDataCore->SetBirthPlatform(charInfo.birthPlatform);
     rio::MemUtil::copy(&pMiiDataCore->AuthorID(), &charInfo.authorID, sizeof(FFLiAuthorID));
     rio::MemUtil::copy(&pMiiDataCore->CreatorID(), &charInfo.creatorID, sizeof(FFLCreateID));

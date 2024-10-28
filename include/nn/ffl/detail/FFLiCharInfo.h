@@ -5,6 +5,7 @@
 #include <nn/ffl/FFLCreateID.h>
 #include <nn/ffl/FFLFontRegion.h>
 #include <nn/ffl/FFLGender.h>
+#include <nn/ffl/FFLFavoriteColor.h>
 
 #include <nn/ffl/FFLiAuthorID.h>
 
@@ -18,9 +19,9 @@ typedef struct FFLiCharInfo
     struct
     {
         s32             faceType;
-        s32             facelineColor;
-        s32             faceLine;
-        s32             faceMakeup;
+        s32             facelineColor; // faceColor
+        s32             faceLine;      // faceTex
+        s32             faceMakeup;    // faceMake
         s32             hairType;
         s32             hairColor;
         s32             hairDir;
@@ -67,7 +68,7 @@ typedef struct FFLiCharInfo
     FFLGender           gender;
     u32                 birthMonth;
     u32                 birthDay;
-    u32                 favoriteColor;
+    FFLFavoriteColor    favoriteColor; // NOTE: u32
     u8                  favoriteMii;
     u8                  copyable;
     u8                  ngWord;
@@ -78,8 +79,8 @@ typedef struct FFLiCharInfo
     u32                 slotIndex;
     FFLBirthPlatform    birthPlatform;
     FFLCreateID         creatorID;
-    u16                 _112;   // Set to zero
-    u32                 _114;   // Set to FFLiMiiDataCore._0_24_27
+    u16                 _112;   // Padding
+    u32                 authorType;   // previously _0_24_27
     FFLiAuthorID        authorID;
 }
 FFLiCharInfo;

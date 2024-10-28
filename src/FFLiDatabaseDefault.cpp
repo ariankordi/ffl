@@ -132,7 +132,7 @@ namespace {
 void GetDefaultCreateID(FFLCreateID* pCreateID, u32 index)
 {
     static const FFLiCreateID defaultCreateID = {
-        FFLI_CREATE_ID_FLAG_UNKNOWN_0 | FFLI_CREATE_ID_FLAG_UNKNOWN_2 | FFLI_CREATE_ID_FLAG_NORMAL,
+        FFLI_CREATE_ID_TYPE_WIIU | FFLI_CREATE_ID_FLAG_NORMAL,
         0,
         0,
         0,

@@ -14,7 +14,7 @@ typedef struct FFLCharModelDesc
     FFLExpressionFlag expressionFlag;
     u32               modelFlag;
     FFLResourceType   resourceType;
-    int             _10;    // Deleted
+    int               _10;    // Deleted
 }
 FFLCharModelDesc;
 //NN_STATIC_ASSERT(sizeof(FFLCharModelDesc) == 0x20);

@@ -6,7 +6,7 @@
 
 void FFLiInitModulateMustache(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_3;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_MUSTACHE;
     pParam->pColorR = &FFLiGetSrgbFetchMustacheColor(color);
     pParam->pColorG = NULL;
@@ -16,7 +16,7 @@ void FFLiInitModulateMustache(FFLModulateParam* pParam, s32 color, const rio::Te
 
 void FFLiInitModulateMouth(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_2;
+    pParam->mode = FFL_MODULATE_MODE_RGB_LAYERED;
     pParam->type = FFL_MODULATE_TYPE_MOUTH;
     pParam->pColorR = &FFLiGetSrgbFetchMouthColorR(color);
     pParam->pColorG = &FFLiGetSrgbFetchMouthColorG(color);
@@ -26,7 +26,7 @@ void FFLiInitModulateMouth(FFLModulateParam* pParam, s32 color, const rio::Textu
 
 void FFLiInitModulateEyebrow(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_3;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_EYEBROW;
     pParam->pColorR = &FFLiGetSrgbFetchEyebrowColor(color);
     pParam->pColorG = NULL;
@@ -36,7 +36,7 @@ void FFLiInitModulateEyebrow(FFLModulateParam* pParam, s32 color, const rio::Tex
 
 void FFLiInitModulateEye(FFLModulateParam* pParam, s32 colorGB, s32 colorR, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_2;
+    pParam->mode = FFL_MODULATE_MODE_RGB_LAYERED;
     pParam->type = FFL_MODULATE_TYPE_EYE;
     pParam->pColorR = &FFLiGetSrgbFetchEyeColorR(colorR);
     pParam->pColorG = &FFLiGetSrgbFetchEyeColorG(colorGB);
@@ -46,7 +46,7 @@ void FFLiInitModulateEye(FFLModulateParam* pParam, s32 colorGB, s32 colorR, cons
 
 void FFLiInitModulateMole(FFLModulateParam* pParam, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_3;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_MOLE;
     pParam->pColorR = &FFLiGetSrgbFetchMoleColor();
     pParam->pColorG = NULL;
@@ -56,7 +56,7 @@ void FFLiInitModulateMole(FFLModulateParam* pParam, const rio::Texture2D& textur
 
 void FFLiInitModulateFaceMake(FFLModulateParam* pParam, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_1;
+    pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
     pParam->type = FFL_MODULATE_TYPE_FACE_MAKE;
     pParam->pColorR = NULL;
     pParam->pColorG = NULL;
@@ -66,7 +66,7 @@ void FFLiInitModulateFaceMake(FFLModulateParam* pParam, const rio::Texture2D& te
 
 void FFLiInitModulateFaceLine(FFLModulateParam* pParam, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_3;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_FACE_LINE;
     pParam->pColorR = &FFLiGetFaceLine();
     pParam->pColorG = NULL;
@@ -76,7 +76,7 @@ void FFLiInitModulateFaceLine(FFLModulateParam* pParam, const rio::Texture2D& te
 
 void FFLiInitModulateFaceBeard(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_3;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_FACE_BEARD;
     pParam->pColorR = &FFLiGetSrgbFetchBeardColor(color);
     pParam->pColorG = NULL;
@@ -91,11 +91,11 @@ void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, s32 color, const ri
     pParam->pColorB = NULL;
     if (texture2D == NULL) {
         // bind it as a constant color rather than a texture
-        pParam->mode = FFL_MODULATE_MODE_0;
+        pParam->mode = FFL_MODULATE_MODE_CONSTANT;
         pParam->pColorR = &FFLiGetFacelineColor(color);
         pParam->pTexture2D = NULL;
     } else {
-        pParam->mode = FFL_MODULATE_MODE_1;
+        pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
         pParam->pColorR = NULL;
         pParam->pTexture2D = texture2D;
     }
@@ -103,7 +103,7 @@ void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, s32 color, const ri
 
 void FFLiInitModulateShapeBeard(FFLModulateParam* pParam, s32 color)
 {
-    pParam->mode = FFL_MODULATE_MODE_0;
+    pParam->mode = FFL_MODULATE_MODE_CONSTANT;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_BEARD;
     pParam->pColorR = &FFLiGetHairColor(color);
     pParam->pColorG = NULL;
@@ -113,7 +113,7 @@ void FFLiInitModulateShapeBeard(FFLModulateParam* pParam, s32 color)
 
 void FFLiInitModulateShapeNose(FFLModulateParam* pParam, s32 color)
 {
-    pParam->mode = FFL_MODULATE_MODE_0;
+    pParam->mode = FFL_MODULATE_MODE_CONSTANT;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_NOSE;
     pParam->pColorR = &FFLiGetFacelineColor(color);
     pParam->pColorG = NULL;
@@ -123,7 +123,7 @@ void FFLiInitModulateShapeNose(FFLModulateParam* pParam, s32 color)
 
 void FFLiInitModulateShapeForehead(FFLModulateParam* pParam, s32 color)
 {
-    pParam->mode = FFL_MODULATE_MODE_0;
+    pParam->mode = FFL_MODULATE_MODE_CONSTANT;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_FOREHEAD;
     pParam->pColorR = &FFLiGetFacelineColor(color);
     pParam->pColorG = NULL;
@@ -133,7 +133,7 @@ void FFLiInitModulateShapeForehead(FFLModulateParam* pParam, s32 color)
 
 void FFLiInitModulateShapeHair(FFLModulateParam* pParam, s32 color)
 {
-    pParam->mode = FFL_MODULATE_MODE_0;
+    pParam->mode = FFL_MODULATE_MODE_CONSTANT;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_HAIR;
     pParam->pColorR = &FFLiGetHairColor(color);
     pParam->pColorG = NULL;
@@ -143,7 +143,7 @@ void FFLiInitModulateShapeHair(FFLModulateParam* pParam, s32 color)
 
 void FFLiInitModulateShapeCap(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_5;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA_OPA;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_CAP;
     pParam->pColorR = &FFLiGetCapColor(color);
     pParam->pColorG = NULL;
@@ -153,7 +153,7 @@ void FFLiInitModulateShapeCap(FFLModulateParam* pParam, s32 color, const rio::Te
 
 void FFLiInitModulateShapeMask(FFLModulateParam* pParam, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_1;
+    pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_MASK;
     pParam->pColorR = NULL;
     pParam->pColorG = NULL;
@@ -163,7 +163,7 @@ void FFLiInitModulateShapeMask(FFLModulateParam* pParam, const rio::Texture2D& t
 
 void FFLiInitModulateShapeNoseline(FFLModulateParam* pParam, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_3;
+    pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_NOSELINE;
     pParam->pColorR = &FFLiGetNoselineColor();
     pParam->pColorG = NULL;
@@ -173,7 +173,7 @@ void FFLiInitModulateShapeNoseline(FFLModulateParam* pParam, const rio::Texture2
 
 void FFLiInitModulateShapeGlass(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
-    pParam->mode = FFL_MODULATE_MODE_4;
+    pParam->mode = FFL_MODULATE_MODE_LUMINANCE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_SHAPE_GLASS;
     pParam->pColorR = &FFLiGetGlassColor(color);
     pParam->pColorG = NULL;
@@ -187,7 +187,7 @@ static const FFLColor FILL_COLOR = {
 
 void FFLiInitModulateFill(FFLModulateParam* pParam)
 {
-    pParam->mode = FFL_MODULATE_MODE_0;
+    pParam->mode = FFL_MODULATE_MODE_CONSTANT;
     pParam->type = FFL_MODULATE_TYPE_FILL;
     pParam->pColorR = &FILL_COLOR;
     pParam->pColorG = NULL;

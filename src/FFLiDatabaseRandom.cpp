@@ -75,10 +75,10 @@ void FFLiDatabaseRandom::DetermineParam(FFLGender* pGender, FFLAge* pAge, FFLRac
         u32 rnd = m_pRandomContext->Random(10);
         *pAge =
             rnd < 4
-                ? FFL_AGE_0
+                ? FFL_AGE_CHILD
                 : (rnd < 8
-                    ? FFL_AGE_1
-                    : FFL_AGE_2);
+                    ? FFL_AGE_ADULT
+                    : FFL_AGE_ELDER);
     }
 
     if (*pRace == FFL_RACE_MAX)
@@ -86,10 +86,10 @@ void FFLiDatabaseRandom::DetermineParam(FFLGender* pGender, FFLAge* pAge, FFLRac
         u32 rnd = m_pRandomContext->Random(10);
         *pRace =
             rnd < 4
-                ? FFL_RACE_2
+                ? FFL_RACE_ASIAN
                 : (rnd < 8
-                    ? FFL_RACE_1
-                    : FFL_RACE_0);
+                    ? FFL_RACE_WHITE
+                    : FFL_RACE_BLACK);
     }
 }
 
@@ -952,7 +952,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->miiVersion = 3;
 
     s32 basePositionY = 0;
-    if (gender == FFL_GENDER_FEMALE || age == FFL_AGE_0)
+    if (gender == FFL_GENDER_FEMALE || age == FFL_AGE_CHILD)
         basePositionY = m_pRandomContext->Random(3);
 
     pCharInfo->parts.faceType = GetRandomParts(RANDOM_PARTS_ARRAY_FACE_TYPE[gender][age][race], m_pRandomContext);
@@ -1015,7 +1015,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->parts.mouthPositionY = basePositionY + 13;
 
     s32 mustacheType, beardType, mustachePositionY;
-    if ((age == FFL_AGE_1 || age == FFL_AGE_2) && m_pRandomContext->Random(10) < 2)
+    if ((age == FFL_AGE_ADULT || age == FFL_AGE_ELDER) && m_pRandomContext->Random(10) < 2)
     {
         mustacheType = 0;
         bool randomBeardType = false;
@@ -1076,7 +1076,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->localOnly = false;
 
     pCharInfo->regionMove = 0;
-    pCharInfo->fontRegion = FFL_FONT_REGION_0;
+    pCharInfo->fontRegion = FFL_FONT_REGION_JP_US_EU;
 
     pCharInfo->pageIndex = 0;
     pCharInfo->slotIndex = 0;
