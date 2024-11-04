@@ -12,15 +12,16 @@ typedef struct FFLDrawParam FFLDrawParam;
 typedef struct FFLShaderCallback
 {
     void*               pObj;
-    // allow shader to specify that faceline color should have A set to 0
+#ifdef FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
+    // allow shader to specify that faceline color should have A set to 0, needed for switch shader when drawType is set to faceline
     bool                facelineColorIsTransparent;
-
+#endif // FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
     void (*pApplyAlphaTestFunc)(void* pObj, bool enable, FFLRIOCompareFunc func, f32 ref);
     void (*pDrawFunc)(void* pObj, const FFLDrawParam* drawParam);
     void (*pSetMatrixFunc)(void* pObj, const FFLRIOBaseMtx44f* matrix);
 }
 FFLShaderCallback;
-NN_STATIC_ASSERT32(sizeof(FFLShaderCallback) == 0x14);
+NN_STATIC_ASSERT32(sizeof(FFLShaderCallback) == 0x10);
 
 void FFLSetShaderCallback(const FFLShaderCallback* pCallback);
 

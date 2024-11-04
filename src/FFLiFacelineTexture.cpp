@@ -187,10 +187,12 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
     FFLiInvalidateRenderTexture(&renderTexture);
     RIO_ASSERT(renderTexture.pTexture2D->getTextureFormat() == rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM);
 
+#ifdef FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
     // NOTE: switch shader needs faceline color's alpha to be 0
     // this value is set by the shader AFTER calling FFLSetShaderCallback
     if (pCallback->Get()->facelineColorIsTransparent)
         facelineColor.a = 0.0f;
+#endif
 
     FFLiSetupRenderTexture(&renderTexture, &facelineColor, NULL, 0, pCallback);
 
