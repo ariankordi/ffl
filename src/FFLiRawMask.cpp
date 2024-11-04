@@ -154,17 +154,20 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     renderState.setCullingMode(rio::Graphics::CULLING_MODE_NONE);
     renderState.setBlendFactorSeparate(
         rio::Graphics::BLEND_MODE_ONE_MINUS_DST_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA,
+#ifdef FFL_NO_DRAW_MASK_ALPHA_VALUES
+        rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA
+#else
         rio::Graphics::BLEND_MODE_ONE, rio::Graphics::BLEND_MODE_ONE
+#endif
     );
-    renderState.setBlendEquationSeparate(
-        rio::Graphics::BLEND_FUNC_ADD,
-        rio::Graphics::BLEND_FUNC_MAX
-    );
+    renderState.setBlendEquation(rio::Graphics::BLEND_FUNC_ADD);
+
     renderState.apply();
 
     pCallback->CallApplyAlphaTestEnable();
-// i am not personally sure why it is even drawing twice
-#ifndef FFL_NO_DRAW_MASK_TWICE
+// does not make a huge difference but mask is
+// a bit inaccurate, has outlines without this
+#ifndef FFL_NO_DRAW_MASK_ALPHA_VALUES
     if (pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D != NULL)
         FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
     if (pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D != NULL)
@@ -189,6 +192,7 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsFill, pCallback);
 
     renderState.setBlendFactor(rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_ONE);
+    renderState.setBlendFactorSrcAlpha(rio::Graphics::BLEND_MODE_ONE);
     renderState.applyBlendAndFastZ();
     pCallback->CallApplyAlphaTestEnable();
 #endif

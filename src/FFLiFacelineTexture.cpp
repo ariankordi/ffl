@@ -174,10 +174,8 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
         rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_ONE_MINUS_SRC_ALPHA,
         rio::Graphics::BLEND_MODE_ONE, rio::Graphics::BLEND_MODE_ONE
     );
-    renderState.setBlendEquationSeparate(
-        rio::Graphics::BLEND_FUNC_ADD,
-        rio::Graphics::BLEND_FUNC_MAX
-    );
+    renderState.setBlendEquation(rio::Graphics::BLEND_FUNC_ADD);
+
     renderState.apply();
 
     pCallback->CallApplyAlphaTestDisable();
