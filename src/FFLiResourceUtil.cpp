@@ -14,6 +14,13 @@ enum ResHeaderHint {
     RES_HINT_AFL_2_3 = 3
     // todo remove 2 type shapes and add a new resource header for that
     //RES_HINT_AFL_2_3_NO_2_SHAPES = 4,
+    /* future optimization ideas?:
+     * texture compression (S3TC/BCn)
+     * texture compression (ASTC, PVRTC???)
+     * meshes using half float
+       - or, normals using 8_8_8_8_SNORM
+     * draco mesh compression
+     */
 };
 
 FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* needsEndianSwap)

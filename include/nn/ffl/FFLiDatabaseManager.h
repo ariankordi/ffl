@@ -54,6 +54,8 @@ private:
     bool                        m_IsEnabledSpecialMii;
     void*                       _fd4;   // Deleted
 };
+#if !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
 NN_STATIC_ASSERT32(sizeof(FFLiDatabaseManager) == 0xFD8);
+#endif
 
 #endif // FFLI_DATABASE_MANAGER_H_

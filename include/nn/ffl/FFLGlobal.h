@@ -2,6 +2,7 @@
 #define FFL_GLOBAL_H_
 
 #include <nn/ffl/FFLColor.h>
+#include <nn/ffl/FFLFontRegion.h>
 #include <nn/ffl/FFLResult.h>
 
 #ifdef __cplusplus
@@ -12,6 +13,7 @@ typedef struct FFLInitDesc FFLInitDesc;
 typedef struct FFLResourceDesc FFLResourceDesc;
 
 FFLResult FFLInitResEx(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pResDesc);
+FFLResult FFLInitRes(FFLFontRegion fontRegion, const FFLResourceDesc* pResDesc);
 void FFLInitResGPUStep(void);
 FFLResult FFLFlushQuota(void);
 FFLResult FFLExit(void);

@@ -44,7 +44,9 @@ typedef struct FFLiCharModel
     FFLBoundingBox          boundingBox[3];
 }
 FFLiCharModel;
+#ifndef __EMSCRIPTEN__
 NN_STATIC_ASSERT32(sizeof(FFLiCharModel) == 0x844);
+#endif
 
 struct FFLCharModelSource;
 struct FFLShaderCallback;

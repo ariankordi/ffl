@@ -1258,6 +1258,8 @@ public:
         return m_MoleFlag >> 1 & 0x1F;
     }
 
+    void SwapEndian();
+
 public:
     u16 m_Flag;
     u16 m_Name[10];

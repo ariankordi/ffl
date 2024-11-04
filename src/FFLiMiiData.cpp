@@ -31,8 +31,14 @@ bool ReplaceNameFromRFL(u16* s, s32 size, s32 maxNumberCharCount);
 
 bool FFLiMiiDataCoreRFL2MiiDataCore(FFLiMiiDataCore* pMiiDataCore, const FFLiMiiDataCoreRFL& miiDataCoreRFL, bool replaceName)
 {
+    FFLiMiiDataCoreRFL miiDataCoreRFLCopy;
+    rio::MemUtil::copy((char*)&miiDataCoreRFLCopy, (char*)&miiDataCoreRFL, sizeof(FFLiMiiDataCoreRFL));
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+    miiDataCoreRFLCopy.SwapEndian();
+#endif // __BYTE_ORDER__
+
     FFLiCharInfo charInfo;
-    bool ret = FFLiMiiDataCoreRFL2CharInfo(&charInfo, miiDataCoreRFL, NULL, replaceName);
+    bool ret = FFLiMiiDataCoreRFL2CharInfo(&charInfo, miiDataCoreRFLCopy, NULL, replaceName);
     FFLiCharInfo2MiiDataCore(pMiiDataCore, charInfo, false);
     return ret;
 }
