@@ -4,6 +4,8 @@
 #include <nn/ffl/FFLiDatabaseDefault.h>
 #include <nn/ffl/FFLiMiiData.h>
 
+#include <misc/rio_MemUtil.h>
+
 #ifndef FFL_NO_DATABASE_DEFAULT
 
 static inline
@@ -147,7 +149,16 @@ void GetDefaultCreateID(FFLCreateID* pCreateID, u32 index)
 
 void FFLiDatabaseDefault::InitElement(FFLiMiiDataOfficial* pMiiDataOfficial, const FFLiMiiDataCoreRFL* pMiiDataCoreRFL, u32 index)
 {
+    // not efficient but eh
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+    FFLiMiiDataCoreRFL miiDataCoreRFLCopy;
+    rio::MemUtil::copy((char*)&miiDataCoreRFLCopy, (char*)pMiiDataCoreRFL, sizeof(FFLiMiiDataCoreRFL));
+    miiDataCoreRFLCopy.SwapEndian();
+    // the function below will always flip the endiannness of FFLiMiiDataCoreRFL
+    FFLiMiiDataCoreRFL2MiiDataCore(pMiiDataOfficial, miiDataCoreRFLCopy, true);
+#else
     FFLiMiiDataCoreRFL2MiiDataCore(pMiiDataOfficial, *pMiiDataCoreRFL, true);
+#endif // __BYTE_ORDER__
     GetDefaultCreateID(&pMiiDataOfficial->CreatorID(), index);
     FFLiClearCreatorNameFromOfficial(pMiiDataOfficial);
     pMiiDataOfficial->SetBirthPlatform(FFL_BIRTH_PLATFORM_WII_U);

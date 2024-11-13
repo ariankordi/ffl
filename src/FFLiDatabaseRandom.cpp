@@ -991,7 +991,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->parts.eyebrowRotate = 6;
     pCharInfo->parts.eyebrowSpacingX = 2;
     s32 eyebrowRotateOffsetTarget;
-    if (race == FFL_RACE_2)
+    if (race == FFL_RACE_ASIAN)
     {
         pCharInfo->parts.eyebrowPositionY = basePositionY + 9;
         eyebrowRotateOffsetTarget = FFLiiGetEyebrowRotateOffset(6);
@@ -1068,7 +1068,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->birthMonth = 0;
     pCharInfo->birthDay = 0;
 
-    pCharInfo->favoriteColor = m_pRandomContext->Random(FFL_FAVORITE_COLOR_MAX);
+    pCharInfo->favoriteColor = static_cast<FFLFavoriteColor>(m_pRandomContext->Random(FFL_FAVORITE_COLOR_MAX));
 
     pCharInfo->favoriteMii = false;
     pCharInfo->copyable = true;
@@ -1083,7 +1083,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
 
     pCharInfo->birthPlatform = FFL_BIRTH_PLATFORM_WII_U;
 
-    pCharInfo->_114 = 0;
+    pCharInfo->authorType = 0;
 
     std::memset(&pCharInfo->authorID, 0, sizeof(FFLiAuthorID));
 }
