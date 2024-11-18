@@ -1,5 +1,5 @@
-#ifndef FFL_VECTOR_H_
-#define FFL_VECTOR_H_
+#ifndef FFL_VEC_H_
+#define FFL_VEC_H_
 
 #include <nn/ffl/types.h>
 
@@ -65,4 +65,4 @@ NN_STATIC_ASSERT(sizeof(FFLiSnorm8_8_8_8) == 4);
 }
 #endif
 
-#endif // FFL_VECTOR_H_
+#endif // FFL_VEC_H_

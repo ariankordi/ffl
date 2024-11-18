@@ -141,20 +141,26 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
             return result;
         }
     }
-
-    result = InitShapes(pModel, &resLoader, &m_pCharModelCreateParam->GetCoordinate());
-    if (result != FFL_RESULT_OK)
+#ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
+    if (!(pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_NEW_MASK_ONLY))
     {
-        if (enableFacelineTexture) {
-            FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
-            FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+#endif
+        result = InitShapes(pModel, &resLoader, &m_pCharModelCreateParam->GetCoordinate());
+        if (result != FFL_RESULT_OK)
+        {
+            if (enableFacelineTexture) {
+                FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
+                FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+            }
+            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
+            FFLiDeleteMaskTextures(&pModel->maskTextures);
+            delete pModel->pTextureTempObject;
+            pModel->pTextureTempObject = NULL;
+            return result;
         }
-        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
-        FFLiDeleteMaskTextures(&pModel->maskTextures);
-        delete pModel->pTextureTempObject;
-        pModel->pTextureTempObject = NULL;
-        return result;
+#ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
     }
+#endif
 
     result = InitTextures(pModel, &resLoader);
     if (result != FFL_RESULT_OK)
@@ -171,8 +177,15 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         return result;
     }
 
-    AdjustPartsTransform(pModel, &m_pCharModelCreateParam->GetCoordinate());
-    SetupDrawParam(pModel);
+#ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
+    if (!(pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_NEW_MASK_ONLY))
+    {
+#endif
+        AdjustPartsTransform(pModel, &m_pCharModelCreateParam->GetCoordinate());
+        SetupDrawParam(pModel);
+#ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
+    }
+#endif
 
     return FFL_RESULT_OK;
 }

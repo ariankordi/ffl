@@ -23,6 +23,9 @@ typedef enum FFLModelFlag
     FFL_MODEL_FLAG_HAT           = 1 << FFL_MODEL_TYPE_HAT,
     FFL_MODEL_FLAG_FACE_ONLY     = 1 << FFL_MODEL_TYPE_FACE_ONLY,
     FFL_MODEL_FLAG_FLATTEN_NOSE  = 1 << 3,
+#ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
+    FFL_MODEL_FLAG_NEW_MASK_ONLY = 1 << 5,
+#endif
 } FFLModelFlag;
 
 #ifdef __cplusplus

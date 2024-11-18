@@ -43,7 +43,11 @@ bool FFLiCharModelCreateParam::CheckModelDesc(const FFLCharModelDesc* pDesc)
     if ((pDesc->expressionFlag & FFL_MAX_EXPRESSION_FLAG_MASK) == 0)
         return false;
 
+#ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
+    if ((pDesc->modelFlag & 63) == 0)
+#else
     if ((pDesc->modelFlag & 7) == 0)
+#endif
         return false;
 
     return true;
