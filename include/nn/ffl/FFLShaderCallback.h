@@ -3,6 +3,16 @@
 
 #include <nn/ffl/types.h>
 
+#if FFL_USE_RIO
+    #include <gfx/rio_Graphics.h>
+    typedef rio::Graphics::CompareFunc FFLRIOCompareFunc;
+
+    #include <math/rio_Matrix.h>
+    typedef rio::BaseMtx44f FFLRIOBaseMtx44f;
+#else
+    #include <nn/ffl/FFLRIOInterop.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

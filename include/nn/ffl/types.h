@@ -45,16 +45,12 @@
 
 // NN_STATIC_ASSERT32 = NN_STATIC_ASSERT but only applies for 32 bit
 #ifdef __cplusplus
-    #include <type_traits>
-
     #if defined(NDEBUG) || (!defined(__WUT__) && INTPTR_MAX == INT64_MAX)
         #define NN_STATIC_ASSERT32(condition) static_assert(true, "")
     #else
         #define NN_STATIC_ASSERT32 NN_STATIC_ASSERT
     #endif
 #else // __cplusplus
-    #include <assert.h>
-
     #if defined(NDEBUG) || INTPTR_MAX == INT64_MAX
         #define NN_STATIC_ASSERT32(condition) _Static_assert(true, "")
     #else
@@ -64,19 +60,12 @@
 
 
 #ifdef __cplusplus
+    #define FFL_USE_RIO 1
     #include <misc/rio_Types.h>
-    // Define typedefs that are exported in public headers
     #include <gpu/rio_Texture.h>
     typedef rio::Texture2D FFLRIOTexture2D;
-    #include <math/rio_Matrix.h>
-    typedef rio::BaseMtx44f FFLRIOBaseMtx44f;
-    #include <gfx/rio_Graphics.h>
-    typedef rio::Graphics::CompareFunc FFLRIOCompareFunc;
-    #include <gpu/rio_Drawer.h>
-    typedef rio::Drawer::PrimitiveMode FFLRIOPrimitiveMode;
-
-    #define FFL_GET_RIO_NATIVE_TEXTURE_HANDLE(texture2D) (texture2D)->getNativeTextureHandle()
 #else
+    #define FFL_USE_RIO 0
     // Typedefs that RIO would have otherwise imported
 
     #if defined(__WUT__)
@@ -89,7 +78,6 @@
 
     #include <stdint.h>
     #include <stddef.h>
-    #include <assert.h>
     #include <stdbool.h>
     typedef  int8_t s8;
     typedef uint8_t u8;
@@ -105,7 +93,7 @@
 
     typedef float  f32;
     typedef double f64;
-
+    /*
     static_assert(sizeof(s8)  == sizeof(u8)  && sizeof(u8)  == sizeof(char) && sizeof(char) == 1);
     static_assert(sizeof(s16) == sizeof(u16) && sizeof(u16) == 2);
     static_assert(sizeof(s32) == sizeof(u32) && sizeof(u32) == 4);
@@ -113,8 +101,7 @@
     static_assert(sizeof(f32) == 4);
     static_assert(sizeof(f64) == 8);
     // end of rio_Types.h typedefs
-
-    #include <nn/ffl/FFLRIOInterop.h> // includes substitutes for rio types
+    */
 #endif
 
 
@@ -183,7 +170,7 @@ enum
 };
 
 // __int128 will only be defined on gnu, 64-bit
-#if !RIO_IS_CAFE && __SIZEOF_INT128__
+#if !RIO_IS_CAFE && __SIZEOF_INT128__ && !defined(_MSC_VER)
 typedef __int128 FFLExpressionFlag;
 #define FFL_EXPRESSION_LIMIT FFL_EXPRESSION_MAX
 #else

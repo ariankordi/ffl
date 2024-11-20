@@ -2,6 +2,7 @@
 #define FFL_MODULATE_PARAM_H_
 
 #include <nn/ffl/types.h>
+#include <nn/ffl/FFLTexture.h>
 
 #ifdef __cplusplus
 extern "C" {

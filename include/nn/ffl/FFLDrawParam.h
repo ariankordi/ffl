@@ -7,6 +7,16 @@
     #include <math/rio_Matrix.h>
 #endif
 
+#if FFL_USE_RIO
+    #include <gpu/rio_Drawer.h>
+    #ifndef FFL_RIO_PRIMITIVE_MODE_
+        #define FFL_RIO_PRIMITIVE_MODE_
+        typedef rio::Drawer::PrimitiveMode FFLRIOPrimitiveMode;
+    #endif
+#else
+    #include <nn/ffl/FFLRIOInterop.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

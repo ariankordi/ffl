@@ -1,6 +1,7 @@
 #ifndef FFL_RIO_INTEROP_H_
 #define FFL_RIO_INTEROP_H_
 
+#include <nn/ffl/types.h>
 #include <nn/ffl/FFLVec.h>
 
 #ifdef __cplusplus
@@ -44,7 +45,8 @@ typedef struct FFLRIOTexture2D
 	// Only mHandle is needed to bind the texture on OpenGL
 	FFLRIONativeTexture2DHandle mHandle; // OpenGL texture handle
 	bool mSelfAllocated;
-} FFLRIOTexture2D;
+}
+FFLRIOTexture2D;
 
 #define FFL_GET_RIO_NATIVE_TEXTURE_HANDLE(texture2D) (texture2D)->mHandle
 
