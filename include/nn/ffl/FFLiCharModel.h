@@ -13,15 +13,14 @@
 #include <nn/ffl/FFLiMaskTextures.h>
 #include <nn/ffl/FFLiShapeType.h>
 
+#include <nn/ffl/FFLiTextureTempObject.h>
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
 #ifndef __cplusplus
-typedef struct FFLiTextureTempObject FFLiTextureTempObject;
 typedef struct FFLCharModelSource FFLCharModelSource;
 typedef struct FFLShaderCallback FFLShaderCallback;
 #endif
 
-struct FFLiTextureTempObject;
 
 typedef struct FFLiCharModel
 {

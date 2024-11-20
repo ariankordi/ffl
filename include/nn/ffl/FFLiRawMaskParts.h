@@ -4,12 +4,16 @@
 #include <nn/ffl/FFLDrawParam.h>
 #include <nn/ffl/FFLVec.h>
 
-#include <math/rio_MathTypes.h>
-
+#ifdef __cplusplus
 struct FFLiRawMaskPartsDrawParam : FFLDrawParam
 {
 };
+#else
+typedef FFLDrawParam FFLiRawMaskPartsDrawParam;
+#endif
 NN_STATIC_ASSERT32(sizeof(FFLiRawMaskPartsDrawParam) == 0x68);
+
+#ifdef __cplusplus
 
 enum FFLiOriginPosition
 {
@@ -27,6 +31,9 @@ struct FFLiRawMaskPartsDesc
 };
 NN_STATIC_ASSERT(sizeof(FFLiRawMaskPartsDesc) == 0x18);
 
+
+#include <math/rio_MathTypes.h>
+
 class FFLiShaderCallback;
 
 void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const FFLiRawMaskPartsDesc* pDesc, const rio::BaseMtx44f* pProjMatrix);
@@ -35,5 +42,7 @@ void FFLiInvalidateDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam);
 void FFLiInitDrawParamRawMaskPartsFill(FFLiRawMaskPartsDrawParam* pDrawParam);
 void FFLiDeleteDrawParamRawMaskPartsFill(FFLiRawMaskPartsDrawParam* pDrawParam);
 void FFLiDrawRawMaskParts(const FFLiRawMaskPartsDrawParam* pDrawParam, const FFLiShaderCallback* pCallback);
+
+#endif // __cplusplus
 
 #endif // FFLI_RAW_MASK_PARTS_H_

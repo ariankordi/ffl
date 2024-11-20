@@ -16,6 +16,8 @@
 
 #include <misc/rio_MemUtil.h>
 
+#include <gpu/rio_RenderState.h>
+
 namespace {
 
 rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch);
@@ -170,6 +172,22 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
         if (pMaskTextures->pRenderTextures[i] != NULL && pObject->pRawMaskDrawParam[i] != NULL)
         {
             FFLiInvalidateRawMask(pObject->pRawMaskDrawParam[i]);
+
+            rio::RenderState renderState;
+            renderState.setBlendEnable(true);
+            renderState.setDepthEnable(false, false);
+            renderState.setCullingMode(rio::Graphics::CULLING_MODE_NONE);
+            renderState.setBlendFactorSeparate(
+                rio::Graphics::BLEND_MODE_ONE_MINUS_DST_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA,
+#ifdef FFL_NO_DRAW_MASK_ALPHA_VALUES
+                rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA
+#else
+                rio::Graphics::BLEND_MODE_ONE, rio::Graphics::BLEND_MODE_ONE
+#endif
+            );
+            renderState.setBlendEquation(rio::Graphics::BLEND_FUNC_ADD);
+
+            renderState.apply();
 
             FFLiRenderTexture& renderTexture = *(pMaskTextures->pRenderTextures[i]);
 

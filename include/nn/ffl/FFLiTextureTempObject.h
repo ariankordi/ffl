@@ -4,11 +4,21 @@
 #include <nn/ffl/FFLiFacelineTextureTempObject.h>
 #include <nn/ffl/FFLiMaskTexturesTempObject.h>
 
-struct FFLiTextureTempObject
+#ifdef __cplusplus
+extern "C" {
+#else
+#include <nn/ffl/FFLiRawMask.h>
+#endif
+
+typedef struct FFLiTextureTempObject
 {
     FFLiMaskTexturesTempObject      maskTextures;
     FFLiFacelineTextureTempObject   facelineTexture;
-};
+} FFLiTextureTempObject;
 NN_STATIC_ASSERT32(sizeof(FFLiTextureTempObject) == 0x4D4);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FFLI_TEXTURE_TEMP_OBJECT_H_

@@ -7,11 +7,20 @@
 
 //#include <misc/rio_Types.h>
 
-struct FFLiRenderTexture;
+#ifdef __cplusplus
+    struct FFLiRenderTexture;
+#else
+    #include <nn/ffl/FFLiMaskTexturesTempObject.h>
+#endif
 
 typedef struct FFLiMaskTextures
 {
-    FFLiRenderTexture*  pRenderTextures[FFL_EXPRESSION_MAX];
+#ifdef __cplusplus
+    FFLiRenderTexture*
+#else
+    FFLRIOTexture2D**
+#endif
+    pRenderTextures[FFL_EXPRESSION_MAX];
 }
 FFLiMaskTextures;
 NN_STATIC_ASSERT32(sizeof(FFLiMaskTextures) == 0x118);
@@ -31,7 +40,6 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressio
 void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures);
 
 FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader);
-void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
 
 void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTempObject* pObject, const FFLiShaderCallback* pCallback
 #if RIO_IS_CAFE
@@ -39,6 +47,13 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
 #endif // RIO_IS_CAFE
 );
 
-#endif // __cplusplus
+extern "C" {
+#endif
+
+void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FFLI_MASK_TEXTURES_H_

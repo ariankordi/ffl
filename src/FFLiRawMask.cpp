@@ -148,22 +148,6 @@ void FFLiInvalidateRawMask(FFLiRawMaskDrawParam* pDrawParam)
 
 void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCallback* pCallback)
 {
-    rio::RenderState renderState;
-    renderState.setBlendEnable(true);
-    renderState.setDepthEnable(false, false);
-    renderState.setCullingMode(rio::Graphics::CULLING_MODE_NONE);
-    renderState.setBlendFactorSeparate(
-        rio::Graphics::BLEND_MODE_ONE_MINUS_DST_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA,
-#ifdef FFL_NO_DRAW_MASK_ALPHA_VALUES
-        rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA
-#else
-        rio::Graphics::BLEND_MODE_ONE, rio::Graphics::BLEND_MODE_ONE
-#endif
-    );
-    renderState.setBlendEquation(rio::Graphics::BLEND_FUNC_ADD);
-
-    renderState.apply();
-
     pCallback->CallApplyAlphaTestEnable();
 // does not make a huge difference but mask is
 // a bit inaccurate, has outlines without this
@@ -182,6 +166,7 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     if (pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D != NULL)
         FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
 
+    rio::RenderState renderState;
     renderState.setColorMask(false, false, false, true);
     renderState.applyColorMask();
     renderState.setBlendFactor(rio::Graphics::BLEND_MODE_ZERO, rio::Graphics::BLEND_MODE_ZERO);
@@ -209,9 +194,10 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), pCallback);
     if (pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D != NULL)
         FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
-
+#ifndef FFL_NO_DRAW_MASK_ALPHA_VALUES
     renderState.setColorMask(true, true, true, true);
     renderState.applyColorMask();
+#endif
     pCallback->CallApplyAlphaTestDisable();
 }
 

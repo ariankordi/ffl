@@ -5,7 +5,11 @@
 #include <nn/ffl/FFLResourceType.h>
 #include <nn/ffl/FFLResult.h>
 
-#include <gpu/rio_Texture.h>
+#include <nn/ffl/FFLTexture.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum FFLiEyeTextureType {
     FFLI_EYE_TEXTURE_TYPE_0   = 0,
@@ -80,15 +84,22 @@ enum FFLiEyebrowTextureType {
     FFLI_EYEBROW_TEXTURE_TYPE_MAX = 28
 };
 
-struct FFLiPartsTextures
+typedef struct FFLiPartsTextures
 {
-    rio::Texture2D* pTexturesEye[FFLI_EYE_TEXTURE_TYPE_MAX];
-    rio::Texture2D* pTexturesMouth[FFLI_MOUTH_TEXTURE_TYPE_MAX];
-    rio::Texture2D* pTexturesEyebrow[FFLI_EYEBROW_TEXTURE_TYPE_MAX];
-    rio::Texture2D* pTextureMustache;
-    rio::Texture2D* pTextureMole;
-};
+    FFLRIOTexture2D* pTexturesEye[FFLI_EYE_TEXTURE_TYPE_MAX];
+    FFLRIOTexture2D* pTexturesMouth[FFLI_MOUTH_TEXTURE_TYPE_MAX];
+    FFLRIOTexture2D* pTexturesEyebrow[FFLI_EYEBROW_TEXTURE_TYPE_MAX];
+    FFLRIOTexture2D* pTextureMustache;
+    FFLRIOTexture2D* pTextureMole;
+}
+FFLiPartsTextures;
 NN_STATIC_ASSERT32(sizeof(FFLiPartsTextures) == 0x154);
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
 
 struct FFLiEyeMouthTypeElement
 {
@@ -108,12 +119,22 @@ s32 FFLiCharInfoAndTypeToEyebrowIndex(const FFLiCharInfo* pCharInfo, FFLiEyebrow
 FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, FFLiResourceLoader* pResLoader);
 void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
 
-void FFLiInvalidatePartsTextures(FFLiPartsTextures* pPartsTextures);
-
 const FFLiEyeMouthTypeElement& FFLiGetEyeMouthTypeElement(FFLExpression expression);
 
 u32 FFLiGetMaxMouthNum(FFLExpressionFlag expressionFlagCount);
 u32 FFLiGetMaxEyeNum(FFLExpressionFlag expressionFlagCount);
 u32 FFLiGetMaxEyebrowNum(FFLExpressionFlag expressionFlagCount);
+
+#endif // __cplusplus
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void FFLiInvalidatePartsTextures(FFLiPartsTextures* pPartsTextures); // EXPORT THIS
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FFLI_PARTS_TEXTURES_H_

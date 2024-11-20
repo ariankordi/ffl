@@ -141,16 +141,8 @@ void FFLiDeleteTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObject,
     DeleteTexture_FaceLine(pObject, isExpand);
 }
 
-void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiCharInfo* pCharInfo, u32 resolution, FFLiFacelineTextureTempObject* pObject, const FFLiShaderCallback* pCallback
-#if RIO_IS_CAFE
-    , FFLiCopySurface* pCopySurface
-#endif // RIO_IS_CAFE
-)
+void FFLiInvalidateTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObject)
 {
-#if RIO_IS_CAFE
-    bool enableBeardTexture = pCharInfo->parts.beardType >= 4;
-#endif // RIO_IS_CAFE
-
     InvalidateDrawParam(&pObject->drawParamFaceLine);
     InvalidateDrawParam(&pObject->drawParamFaceMake);
     InvalidateDrawParam(&pObject->drawParamFaceBeard);
@@ -160,9 +152,28 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
         InvalidateTexture(pObject->pTextureFaceLine->getNativeTexture());
     if (pObject->pTextureFaceMake != NULL)
         InvalidateTexture(pObject->pTextureFaceMake->getNativeTexture());
-    if (enableBeardTexture)
+    if (pObject->pTextureFaceBeard != NULL)
         InvalidateTexture(pObject->pTextureFaceBeard->getNativeTexture());
 #endif // RIO_IS_CAFE
+}
+
+void FFLiDrawFacelineTexture(FFLiFacelineTextureTempObject* pObject, const FFLiShaderCallback* pCallback)
+{
+    if (pObject->pTextureFaceMake != NULL)
+        pCallback->CallDraw(&pObject->drawParamFaceMake);
+    if (pObject->pTextureFaceLine != NULL)
+        pCallback->CallDraw(&pObject->drawParamFaceLine);
+    if (pObject->pTextureFaceBeard != NULL)
+        pCallback->CallDraw(&pObject->drawParamFaceBeard);
+}
+
+void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiCharInfo* pCharInfo, u32 resolution, FFLiFacelineTextureTempObject* pObject, const FFLiShaderCallback* pCallback
+#if RIO_IS_CAFE
+    , FFLiCopySurface* pCopySurface
+#endif // RIO_IS_CAFE
+)
+{
+    FFLiInvalidateTempObjectFacelineTexture(pObject);
 
     FFLColor facelineColor = FFLiGetSrgbFetchFacelineColor(pCharInfo->parts.facelineColor);
 
@@ -194,12 +205,7 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
 
     FFLiSetupRenderTexture(&renderTexture, &facelineColor, NULL, 0, pCallback);
 
-    if (pObject->pTextureFaceMake != NULL)
-        pCallback->CallDraw(&pObject->drawParamFaceMake);
-    if (pObject->pTextureFaceLine != NULL)
-        pCallback->CallDraw(&pObject->drawParamFaceLine);
-    if (pObject->pTextureFaceBeard != NULL)
-        pCallback->CallDraw(&pObject->drawParamFaceBeard);
+    FFLiDrawFacelineTexture(pObject, pCallback);
 
     if (renderTexture.pTexture2D->getNumMips() > 1)
     {

@@ -3,21 +3,28 @@
 
 #include <nn/ffl/FFLDrawParam.h>
 
-#include <gpu/rio_Texture.h>
+#include <nn/ffl/FFLTexture.h>
 
-struct  FFLiRenderTexture;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-struct FFLiFacelineTextureTempObject
+typedef struct FFLiFacelineTextureTempObject
 {
-    rio::Texture2D* pTextureFaceLine;
-    FFLDrawParam    drawParamFaceLine;
-    rio::Texture2D* pTextureFaceMake;
-    FFLDrawParam    drawParamFaceMake;
-    rio::Texture2D* pTextureFaceBeard;
-    FFLDrawParam    drawParamFaceBeard;
-    void*           _144;   // Deleted
-    void*           _148;   // Deleted
-};
+    FFLRIOTexture2D* pTextureFaceLine;
+    FFLDrawParam     drawParamFaceLine;
+    FFLRIOTexture2D* pTextureFaceMake;
+    FFLDrawParam     drawParamFaceMake;
+    FFLRIOTexture2D* pTextureFaceBeard;
+    FFLDrawParam     drawParamFaceBeard;
+    void*            _144;   // Deleted
+    void*            _148;   // Deleted
+}
+FFLiFacelineTextureTempObject;
 NN_STATIC_ASSERT32(sizeof(FFLiFacelineTextureTempObject) == 0x14C);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FFLI_FACELINE_TEXTURE_TEMP_OBJECT_H_
