@@ -234,7 +234,6 @@ FFLResult FFLiResourceLoader::LoadFromCache(void* pData, const FFLiResourceParts
     {
         if (!Uncompress(pData, ptr, &m_pBuffer->GetUncompressBuffer(), partsInfo))
         {
-            RIO_ASSERT(false);
             return FFL_RESULT_FILE_LOAD_ERROR;
         }
     }
@@ -264,7 +263,6 @@ FFLResult FFLiResourceLoader::LoadFromFile(void* pData, const FFLiResourcePartsI
 
         if (!Uncompress(pData, m_pBuffer->GetUncompressBuffer().Buffer(), &m_pBuffer->GetUncompressBuffer(), partsInfo))
         {
-            RIO_ASSERT(false);
             return FFL_RESULT_FILE_LOAD_ERROR;
         }
     }

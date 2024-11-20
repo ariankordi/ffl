@@ -139,6 +139,10 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
             resolution,
             FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[0]),
             FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[1]),
+
+            FFLiCharInfoAndTypeToEyebrowIndex(pCharInfo, element.eyebrowTextureType),
+            FFLiCharInfoAndTypeToMouthIndex(pCharInfo, element.mouthTextureType),
+
             &desc
         );
     }

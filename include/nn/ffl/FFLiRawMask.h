@@ -39,7 +39,7 @@ NN_STATIC_ASSERT32(sizeof(FFLiRawMaskTextureDesc) == 0x20);
 struct  FFLiCharInfo;
 class   FFLiShaderCallback;
 
-void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex, const FFLiRawMaskTextureDesc* pDesc);
+void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex, s32 eyebrowIndex, s32 mouthIndex, const FFLiRawMaskTextureDesc* pDesc); // eyebrowIndex and mouthIndex are from AFL
 void FFLiDeleteDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam);
 
 #endif // __cplusplus

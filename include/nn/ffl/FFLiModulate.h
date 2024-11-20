@@ -9,8 +9,13 @@ struct FFLModulateParam;
 
 void FFLiInitModulateMustache(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D);
 void FFLiInitModulateMouth(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D);
+// NOTE: all "Ex" functions are from AFL
+// and always use texture direct modulate mode
+void FFLiInitModulateMouthEx(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D);
 void FFLiInitModulateEyebrow(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D);
+void FFLiInitModulateEyebrowEx(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D);
 void FFLiInitModulateEye(FFLModulateParam* pParam, s32 colorGB, s32 colorR, const rio::Texture2D& texture2D);
+void FFLiInitModulateEyeEx(FFLModulateParam* pParam, s32 colorGB, s32 colorR, const rio::Texture2D& texture2D);
 void FFLiInitModulateMole(FFLModulateParam* pParam, const rio::Texture2D& texture2D);
 void FFLiInitModulateFaceMake(FFLModulateParam* pParam, const rio::Texture2D& texture2D);
 void FFLiInitModulateFaceLine(FFLModulateParam* pParam, const rio::Texture2D& texture2D);

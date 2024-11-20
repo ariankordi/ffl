@@ -24,11 +24,33 @@ void FFLiInitModulateMouth(FFLModulateParam* pParam, s32 color, const rio::Textu
     pParam->pTexture2D = &texture2D;
 }
 
+void FFLiInitModulateMouthEx(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
+{
+    pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
+    pParam->type = FFL_MODULATE_TYPE_MOUTH;
+    pParam->pColorR = NULL;
+    pParam->pColorG = NULL;
+    pParam->pColorB = NULL;
+    pParam->pTexture2D = &texture2D;
+}
+
 void FFLiInitModulateEyebrow(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
 {
     pParam->mode = FFL_MODULATE_MODE_ALPHA;
     pParam->type = FFL_MODULATE_TYPE_EYEBROW;
     pParam->pColorR = &FFLiGetSrgbFetchEyebrowColor(color);
+    pParam->pColorG = NULL;
+    pParam->pColorB = NULL;
+    pParam->pTexture2D = &texture2D;
+}
+
+void FFLiInitModulateEyebrowEx(FFLModulateParam* pParam, s32 color, const rio::Texture2D& texture2D)
+{
+    // this is what AFL is setting but... doesn't really
+    // work when this is R8, you would need to set comp sel
+    pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
+    pParam->type = FFL_MODULATE_TYPE_EYEBROW;
+    pParam->pColorR = NULL;
     pParam->pColorG = NULL;
     pParam->pColorB = NULL;
     pParam->pTexture2D = &texture2D;
@@ -41,6 +63,16 @@ void FFLiInitModulateEye(FFLModulateParam* pParam, s32 colorGB, s32 colorR, cons
     pParam->pColorR = &FFLiGetSrgbFetchEyeColorR(colorR);
     pParam->pColorG = &FFLiGetSrgbFetchEyeColorG(colorGB);
     pParam->pColorB = &FFLiGetSrgbFetchEyeColorB(colorGB);
+    pParam->pTexture2D = &texture2D;
+}
+
+void FFLiInitModulateEyeEx(FFLModulateParam* pParam, s32 colorGB, s32 colorR, const rio::Texture2D& texture2D)
+{
+    pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
+    pParam->type = FFL_MODULATE_TYPE_EYE;
+    pParam->pColorR = NULL;
+    pParam->pColorG = NULL;
+    pParam->pColorB = NULL;
     pParam->pTexture2D = &texture2D;
 }
 
