@@ -37,6 +37,11 @@ public:
         return m_Coordinate;
     }
 
+    void SetScale(f32 scale)
+    {
+        m_Coordinate.SetScale(scale);
+    }
+
 private:
     FFLiDatabaseManager*    m_pDatabaseManager;
     FFLiResourceManager*    m_pResourceManager;

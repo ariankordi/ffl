@@ -56,6 +56,20 @@ void FFLiInitCharModelGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pC
 
 void FFLiDeleteCharModel(FFLiCharModel* pModel);
 
+#ifdef __cplusplus
+
+void FFLiGetCharInfoFromCharModel(FFLiCharInfo* pCharInfo, const FFLiCharModel* pModel);
+bool FFLiIsAvailableExpression(const FFLiCharModel* pModel, FFLExpression expression);
+//FFLiGetDrawParamFromCharModel(FFLiCharModel const *, FFLDrawType)
+    // Meant to be exported as FFLGetDrawParamFromCharModel
+    // ... but it needs FFLDrawType enum which is used in shader stuff
+//FFLiGetModelInfo
+//FFLiSetModelInfo // Calls FFLInitCharModel
+//FFLiInitCharModel(FFLiCharModel *, FFLDataSource, void const *, unsigned short, FFLResolution, unsigned int, unsigned int, void *)
+//FFLiCopyCharModel(FFLiCharModel *, void *, unsigned int, FFLiCharModel const *)
+
+#endif // __cplusplus
+
 void FFLiSetExpression(FFLiCharModel* pModel, FFLExpression expression);
 FFLExpression FFLiGetExpression(const FFLiCharModel* pModel);
 
@@ -73,5 +87,15 @@ const FFLDrawParam* FFLiGetDrawParamOpaCapFromCharModel(const FFLiCharModel* pMo
 const FFLDrawParam* FFLiGetDrawParamXluMaskFromCharModel(const FFLiCharModel* pModel);
 const FFLDrawParam* FFLiGetDrawParamXluNoseLineFromCharModel(const FFLiCharModel* pModel);
 const FFLDrawParam* FFLiGetDrawParamXluGlassFromCharModel(const FFLiCharModel* pModel);
+
+#ifdef __cplusplus
+
+// Deleted in NSMBU:
+const FFLiRenderTexture* FFLiGetFaceTextureFromCharModel(const FFLiCharModel* pModel);
+const FFLiRenderTexture* FFLiGetMaskTextureFromCharModel(const FFLiCharModel* pModel, FFLExpression expression);
+
+#endif // __cplusplus
+
+void FFLiSetScale(f32 scale);
 
 #endif // FFLI_CHAR_MODEL_H_

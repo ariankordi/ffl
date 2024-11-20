@@ -144,6 +144,17 @@ bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreR
     return nameReplaced || creatorNameReplaced;
 }
 
+bool FFLiMiiDataOfficialRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataOfficialRFL& miiDataOfficialRFL, bool replaceName)
+{
+    FFLiMiiDataOfficialRFL miiDataOfficialRFLCopy;
+    rio::MemUtil::copy((char*)&miiDataOfficialRFLCopy, (char*)&miiDataOfficialRFL, sizeof(FFLiMiiDataOfficialRFL));
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+    miiDataOfficialRFLCopy.SwapEndian();
+#endif // __BYTE_ORDER__
+
+    return FFLiMiiDataCoreRFL2CharInfo(pCharInfo, miiDataOfficialRFLCopy, miiDataOfficialRFLCopy.CreatorName(), false);
+}
+
 void FFLiClearCreatorNameFromOfficial(FFLiMiiDataOfficial* pMiiDataOfficial)
 {
     rio::MemUtil::set(pMiiDataOfficial->CreatorName(), 0, sizeof(u16) * 10);

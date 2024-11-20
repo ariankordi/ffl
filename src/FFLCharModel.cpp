@@ -181,3 +181,31 @@ void FFLSetViewModelType(FFLCharModel* pModel, FFLModelType type)
 {
     FFLiSetViewModelType(GetCharModel(pModel), type);
 }
+
+// Deleted in NSMBU:
+bool FFLIsAvailableExpression(const FFLCharModel* pModel, FFLExpression expression)
+{
+    return FFLiIsAvailableExpression(GetCharModel(pModel), expression);
+}
+void FFLSetScale(f32 scale)
+{
+    FFLiSetScale(scale);
+}
+
+// The methods below are deleted in NSMBU, though they
+// are in this file because they call GetCharModel.
+
+const FFLiRenderTexture* FFLiGetFaceTextureFromCharModel(const FFLCharModel* pModel)
+{
+    return FFLiGetFaceTextureFromCharModel(GetCharModel(pModel));
+}
+
+const FFLiRenderTexture* FFLiGetMaskTextureFromCharModel(const FFLCharModel* pModel, FFLExpression expression)
+{
+    return FFLiGetMaskTextureFromCharModel(GetCharModel(pModel), expression);
+}
+
+void FFLiGetCharInfoFromCharModel(FFLiCharInfo* pCharInfo, const FFLCharModel* pModel)
+{
+    return FFLiGetCharInfoFromCharModel(pCharInfo, GetCharModel(pModel));
+}

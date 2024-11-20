@@ -106,3 +106,8 @@ bool FFLiCoordinate::IsDefault() const
 
     return true;
 }
+
+void FFLiCoordinate::SetScale(f32 scale)
+{
+    m_Scale = scale;
+};

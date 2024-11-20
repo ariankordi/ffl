@@ -68,10 +68,18 @@ void FFLDrawXluWithCallback(const FFLCharModel* pModel, const FFLShaderCallback*
 
 void FFLSetExpression(FFLCharModel* pModel, FFLExpression expression);
 FFLExpression FFLGetExpression(const FFLCharModel* pModel);
+bool FFLIsAvailableExpression(const FFLCharModel* pModel, FFLExpression expression); // Deleted in NSMBU
 
 void FFLGetPartsTransform(FFLPartsTransform* pTransform, const FFLCharModel* pModel);
 
 void FFLSetViewModelType(FFLCharModel* pModel, FFLModelType type);
+
+void FFLSetScale(f32 scale);
+
+// Not sure how else to expose these
+const FFLiRenderTexture* FFLiGetFaceTextureFromCharModel(const FFLCharModel* pModel);
+const FFLiRenderTexture* FFLiGetMaskTextureFromCharModel(const FFLCharModel* pModel, FFLExpression expression);
+void FFLiGetCharInfoFromCharModel(FFLiCharInfo* pCharInfo, const FFLCharModel* pModel);
 
 #ifdef __cplusplus
 }

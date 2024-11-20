@@ -72,3 +72,9 @@ void FFLiMiiDataCoreRFL::SwapEndian()
 {
     FFLiSwapEndianGroup(this, SWAP_ENDIAN_DESC_RFL, sizeof(SWAP_ENDIAN_DESC_RFL) / sizeof(FFLiSwapEndianDesc));
 }
+
+void FFLiMiiDataOfficialRFL::SwapEndian()
+{
+    FFLiMiiDataCoreRFL::SwapEndian();
+    FFLiSwapEndianArrayImpl<u16>(m_CreatorName, 10);
+}

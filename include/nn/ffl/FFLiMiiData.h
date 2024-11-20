@@ -6,13 +6,14 @@
 struct  FFLiCharInfo;
 class   FFLiMiiDataCore;
 class   FFLiMiiDataCoreRFL;
+class   FFLiMiiDataOfficialRFL;
 class   FFLiMiiDataOfficial;
 struct  FFLiStoreDataCFL;
 
 bool FFLiMiiDataCoreRFL2MiiDataCore(FFLiMiiDataCore* pMiiDataCore, const FFLiMiiDataCoreRFL& miiDataCoreRFL, bool replaceName);
 
 bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreRFL& miiDataCoreRFL, const u16* pCreatorName, bool replaceName);
-// bool FFLiMiiDataOfficialRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataOfficialRFL& miiDataOfficialRFL, bool replaceName);   // Deleted in NSMBU
+bool FFLiMiiDataOfficialRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataOfficialRFL& miiDataOfficialRFL, bool replaceName);   // Deleted in NSMBU
 
 void FFLiClearCreatorNameFromOfficial(FFLiMiiDataOfficial* pMiiDataOfficial);
 

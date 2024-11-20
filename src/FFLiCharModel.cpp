@@ -5,6 +5,8 @@
 #include <nn/ffl/FFLiModulate.h>
 #include <nn/ffl/FFLiTextureTempObject.h>
 
+#include <misc/rio_MemUtil.h>
+
 FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc)
 {
     if (!FFLiManager::IsConstruct())
@@ -162,4 +164,42 @@ const FFLDrawParam* FFLiGetDrawParamXluGlassFromCharModel(const FFLiCharModel* p
         pModel->pGlassTexture == NULL
             ? NULL
             : &(pModel->drawParam[FFLI_SHAPE_TYPE_XLU_GLASS]);
+}
+
+
+const FFLiRenderTexture* FFLiGetFaceTextureFromCharModel(const FFLiCharModel* pModel)
+{
+    return &pModel->facelineRenderTexture;
+}
+
+const FFLiRenderTexture* FFLiGetMaskTextureFromCharModel(const FFLiCharModel* pModel, FFLExpression expression)
+{
+    return pModel->maskTextures.pRenderTextures[expression];
+}
+
+void FFLiGetCharInfoFromCharModel(FFLiCharInfo* pCharInfo, const FFLiCharModel* pModel)
+{
+    rio::MemUtil::copy(pCharInfo, &pModel->charInfo, sizeof(FFLiCharInfo));
+}
+bool FFLiIsAvailableExpression(const FFLiCharModel* pModel, FFLExpression expression)
+{
+    if (pModel != NULL && expression < FFL_EXPRESSION_MAX)
+        return pModel->maskTextures.pRenderTextures[expression] != NULL;
+    return false;
+}
+
+
+void FFLiSetScale(f32 scale)
+{
+    // This function is deleted in NSMBU.
+    // Therefore, its implementation is only theoretical.
+
+    if (!FFLiManager::IsConstruct())
+        return;
+
+    FFLiManager* pManager = FFLiManager::GetInstance();
+
+    FFLiCharModelCreateParam& createParam = pManager->GetCharModelCreateParam();
+
+    return createParam.SetScale(scale);
 }

@@ -1015,7 +1015,9 @@ public:
     void SwapEndian();  // Deleted in NSMBU
 
 private:
-    u32 _48[12 / sizeof(u32)];  // Actual type unknown
+    // Theoretical fields copied from CFLiPackedMiiDataHidden
+    u8 m_DateTime[4]; // one u32
+    u8 m_ApplicationID[8]; // CFLiApplicationID (unknown)
 };
 NN_STATIC_ASSERT_IS_POD(FFLiMiiDataHidden);
 NN_STATIC_ASSERT(sizeof(FFLiMiiDataHidden) == 0x54);
@@ -1279,5 +1281,27 @@ public:
 };
 NN_STATIC_ASSERT_IS_POD(FFLiMiiDataCoreRFL);
 NN_STATIC_ASSERT(sizeof(FFLiMiiDataCoreRFL) == 0x36);
+
+// Same as RFLCharData:
+class FFLiMiiDataOfficialRFL : public FFLiMiiDataCoreRFL
+{
+public:
+    u16* CreatorName()
+    {
+        return m_CreatorName;
+    }
+
+    const u16* CreatorName() const
+    {
+        return m_CreatorName;
+    }
+
+    void SwapEndian();
+
+private:
+    u16 m_CreatorName[10];  // Wstring
+};
+NN_STATIC_ASSERT_IS_POD(FFLiMiiDataOfficialRFL);
+NN_STATIC_ASSERT(sizeof(FFLiMiiDataOfficialRFL) == 0x4A);
 
 #endif // FFLI_MIIDATA_CORE_H_

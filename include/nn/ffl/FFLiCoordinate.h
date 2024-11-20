@@ -29,6 +29,8 @@ public:
     static u32 FlipValue(FFLiSnorm10_10_10_2* pVec, u32 value);
     static s8 FlipValue(FFLiSnorm8_8_8_8* pVec, s8 value);
 
+    void SetScale(f32 scale);
+
     bool IsDefault() const;
 
 private:
