@@ -24,6 +24,12 @@ public:
         return m_DatabaseFileAccessor;
     }
 #endif
+#ifndef FFL_NO_DATABASE_RANDOM
+    FFLiDatabaseRandom& GetDatabaseRandom() // may not be in FFL
+    {
+        return m_DatabaseRandom;
+    }
+#endif
 
     FFLResult AfterConstruct();
     FFLResult BeforeDestruct();

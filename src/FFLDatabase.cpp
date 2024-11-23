@@ -6,6 +6,18 @@
 
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
+#ifndef FFL_NO_DATABASE_RANDOM
+void FFLiGetRandomCharInfo(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge age, FFLRace race)
+{
+    if (!FFLiManager::IsConstruct())
+        return;
+
+    FFLiManager* pManager = FFLiManager::GetInstance();
+
+    return pManager->GetDatabaseManager().GetDatabaseRandom().Get(pCharInfo,gender,age,race);
+}
+#endif
+
 #if !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM) // then what is the point to any of these functions even being here huh
 
 FFLResult FFLiGetStoreData(FFLStoreData* pStoreData, FFLDataSource dataSource, u16 index)
@@ -70,3 +82,4 @@ FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource
         FFLiGetAdditionalInfo(pAdditionalInfo, &charInfo, checkFontRegion, pManager->GetInitDesc().fontRegion);
     return result;
 }
+

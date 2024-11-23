@@ -1015,7 +1015,8 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->parts.mouthPositionY = basePositionY + 13;
 
     s32 mustacheType, beardType, mustachePositionY;
-    if ((age == FFL_AGE_ADULT || age == FFL_AGE_ELDER) && m_pRandomContext->Random(10) < 2)
+
+    if (gender == FFL_GENDER_MALE && (age == FFL_AGE_ADULT || age == FFL_AGE_ELDER) && m_pRandomContext->Random(10) < 2)
     {
         mustacheType = 0;
         bool randomBeardType = false;

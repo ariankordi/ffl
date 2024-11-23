@@ -17,10 +17,10 @@ public:
     ~FFLiDatabaseRandom();
 
     FFLResult UpdateMiddleDB(FFLiMiddleDB* pMiddleDB);
+    void Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge age, FFLRace race);
 
 private:
     void DetermineParam(FFLGender* pGender, FFLAge* pAge, FFLRace* pRace);
-    void Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge age, FFLRace race);
 
 private:
     FFLiRandomContext*  m_pRandomContext;
