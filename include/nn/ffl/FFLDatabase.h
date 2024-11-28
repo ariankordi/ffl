@@ -12,7 +12,11 @@ typedef struct FFLAdditionalInfo FFLAdditionalInfo;
 typedef struct FFLStoreData FFLStoreData;
 
 #ifndef FFL_NO_DATABASE_RANDOM
-#include <nn/ffl/FFLiDatabaseRandom.h>
+
+typedef struct FFLiCharInfo FFLiCharInfo;
+#include <nn/ffl/FFLGender.h>
+#include <nn/ffl/FFLAge.h>
+#include <nn/ffl/FFLRace.h>
 
 void FFLiGetRandomCharInfo(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge age, FFLRace race);
 #endif // FFL_NO_DATABASE_RANDOM

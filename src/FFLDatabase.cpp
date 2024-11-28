@@ -14,7 +14,7 @@ void FFLiGetRandomCharInfo(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge age
 
     FFLiManager* pManager = FFLiManager::GetInstance();
 
-    return pManager->GetDatabaseManager().GetDatabaseRandom().Get(pCharInfo,gender,age,race);
+    return pManager->GetDatabaseManager().GetDatabaseRandom().Get(pCharInfo, gender, age, race);
 }
 #endif
 
