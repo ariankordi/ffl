@@ -6,12 +6,12 @@
 
 #include <nn/ffl/FFLiTexturePartsType.h>
 
-#include <gpu/rio_Texture.h>
+#include <nn/ffl/FFLTexture.h>
 
 class FFLiResourceLoader;
 class FFLiResourceManager;
 
-FFLResult FFLiLoadTextureWithAllocate(rio::Texture2D** ppTexture2D, FFLiTexturePartsType partsType, u32 index, FFLiResourceLoader* pResLoader);
-void FFLiDeleteTexture(rio::Texture2D** ppTexture2D, bool isExpand);
+FFLResult FFLiLoadTextureWithAllocate(FFLTexture** ppTexture2D, FFLiTexturePartsType partsType, u32 index, FFLiResourceLoader* pResLoader);
+void FFLiDeleteTexture(FFLTexture** ppTexture2D, bool isExpand);
 
 #endif // FFLI_TEXTURE_H_

@@ -1,3 +1,5 @@
+#ifndef FFL_NO_RENDER_TEXTURE
+
 #include <nn/ffl/FFLColor.h>
 
 #include <nn/ffl/FFLiMipMapUtil.h>
@@ -18,7 +20,7 @@
 
 void FFLiInitRenderTexture(FFLiRenderTexture* pRenderTexture, u32 width, u32 height, rio::TextureFormat format, u32 numMips)
 {
-    rio::Texture2D* pTexture2D = new rio::Texture2D(
+    FFLTexture* pTexture2D = new rio::Texture2D(
         format,
         width,
         height,
@@ -36,7 +38,7 @@ void FFLiInitRenderTexture(FFLiRenderTexture* pRenderTexture, u32 width, u32 hei
 
 void FFLiDeleteRenderTexture(FFLiRenderTexture* pRenderTexture)
 {
-    rio::Texture2D* pTexture2D = pRenderTexture->pTexture2D;
+    FFLTexture* pTexture2D = pRenderTexture->pTexture2D;
     rio::RenderBuffer* pRenderBuffer = pRenderTexture->pRenderBuffer;
     rio::RenderTargetColor* pColorTarget = pRenderTexture->pColorTarget;
     rio::RenderTargetDepth* pDepthTarget = pRenderTexture->pDepthTarget;
@@ -47,8 +49,7 @@ void FFLiDeleteRenderTexture(FFLiRenderTexture* pRenderTexture)
     pRenderTexture->pDepthTarget = nullptr;
 
     delete pRenderBuffer;
-    // NOTE: both of the below show the following warning
-    // warning: deleting object of polymorphic class type 'rio::RenderTargetColor/rio::RenderTargetDepth' which has non-virtual destructor might cause undefined behavior
+
     delete pColorTarget;
     delete pDepthTarget;
 
@@ -70,7 +71,7 @@ void FFLiInvalidateRenderTexture(FFLiRenderTexture* pRenderTexture)
 
 void FFLiSetupRenderTexture(FFLiRenderTexture* pRenderTexture, const FFLColor* pClearColor, rio::Texture2D* pDepthBuffer, u32 mipLevel, const FFLiShaderCallback* pCallback)
 {
-    rio::Texture2D* pTexture2D = pRenderTexture->pTexture2D;
+    FFLTexture* pTexture2D = pRenderTexture->pTexture2D;
     rio::RenderBuffer* pRenderBuffer = pRenderTexture->pRenderBuffer;
     rio::RenderTargetColor* pColorTarget = pRenderTexture->pColorTarget;
     rio::RenderTargetDepth* pDepthTarget = pRenderTexture->pDepthTarget;
@@ -135,3 +136,15 @@ void FFLiFlushRenderTexture(FFLiRenderTexture* pRenderTexture)
     RIO_ASSERT(pRenderBuffer->getRenderTargetColor());
     pRenderBuffer->getRenderTargetColor()->invalidateGPUCache();
 }
+
+#else
+
+#include <nn/ffl/FFLiRenderTexture.h>
+
+void FFLiDeleteRenderTexture(FFLiRenderTexture* pRenderTexture)
+{
+    // may have been set to 0x01 previously
+    pRenderTexture->pTexture2D = nullptr;
+}
+
+#endif // FFL_NO_RENDER_TEXTURE

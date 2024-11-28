@@ -103,7 +103,7 @@ void DeleteTexture_Mole(FFLiPartsTextures* pPartsTextures, bool isExpand);
 void InvalidateTexture(const GX2Texture& texture);
 #endif // RIO_IS_CAFE
 
-void InvalidateTextures(rio::Texture2D** ppTextures, u32 count);
+void InvalidateTextures(FFLTexture** ppTextures, u32 count);
 
 }
 
@@ -487,7 +487,7 @@ void InvalidateTexture(const GX2Texture& texture)
 
 #endif // RIO_IS_CAFE
 
-void InvalidateTextures(rio::Texture2D** ppTextures, u32 count)
+void InvalidateTextures(FFLTexture** ppTextures, u32 count)
 {
 #if RIO_IS_CAFE
     for (u32 i = 0; i < count; i++)

@@ -139,7 +139,9 @@ void FFLiDeleteShape(void** ppShapeData, FFLDrawParam* pDrawParam)
 #ifdef FFL_USE_ADJUST_MTX
     if (pDrawParam->primitiveParam.pAdjustMatrix != NULL)
     {
-        //RIO_LOG("free pAdjustMatrix: %p\n", pDrawParam->primitiveParam.pAdjustMatrix);
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("free pAdjustMatrix: %p\n", pDrawParam->primitiveParam.pAdjustMatrix);
+#endif
         delete pDrawParam->primitiveParam.pAdjustMatrix;
     }
 #endif
@@ -174,7 +176,9 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
     { // otherwise it will be left null and will be ok
         // Allocate the new model matrix
         rio::Matrix34f* modelMtx = new rio::Matrix34f(rio::Matrix34f::ident);
-        //RIO_LOG("malloc pAdjustMatrix: %p\n", modelMtx);
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("malloc pAdjustMatrix: %p\n", modelMtx);
+#endif
 
         // Apply translation
         if (pTranslate != NULL)

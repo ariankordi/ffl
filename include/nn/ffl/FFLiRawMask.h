@@ -24,15 +24,15 @@ NN_STATIC_ASSERT32(sizeof(FFLiRawMaskDrawParam) == 0x3A8);
 #ifdef __cplusplus
 }
 
-#include <gpu/rio_Texture.h>
+#include <nn/ffl/FFLTexture.h>
 
 struct FFLiRawMaskTextureDesc
 {
-    rio::Texture2D* pTexturesEye[2];
-    rio::Texture2D* pTexturesEyebrow[2];
-    rio::Texture2D* pTextureMouth;
-    rio::Texture2D* pTexturesMustache[2];
-    rio::Texture2D* pTextureMole;
+    FFLTexture* pTexturesEye[2];
+    FFLTexture* pTexturesEyebrow[2];
+    FFLTexture* pTextureMouth;
+    FFLTexture* pTexturesMustache[2];
+    FFLTexture* pTextureMole;
 };
 NN_STATIC_ASSERT32(sizeof(FFLiRawMaskTextureDesc) == 0x20);
 

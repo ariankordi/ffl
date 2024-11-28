@@ -82,7 +82,7 @@ typedef struct FFLModulateParam
     const FFLColor*         pColorR;
     const FFLColor*         pColorG;
     const FFLColor*         pColorB;
-    const FFLRIOTexture2D*  pTexture2D; // rio::Texture2D
+    const FFLTexture*       pTexture2D;
 }
 FFLModulateParam;
 NN_STATIC_ASSERT32(sizeof(FFLModulateParam) == 0x18);

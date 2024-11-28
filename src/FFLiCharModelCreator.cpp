@@ -123,7 +123,14 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         pModel->charInfo.parts.faceMakeup != 0 ||
         pModel->charInfo.parts.beardType >= 4; // FFLiInitTempObjectFacelineTexture
     if (enableFacelineTexture)
+#ifndef FFL_NO_RENDER_TEXTURE
         FFLiInitFacelineTexture(&pModel->facelineRenderTexture, resolution, isEnabledMipMap);
+#else
+        pModel->facelineRenderTexture.pTexture2D = FFL_TEXTURE_PLACEHOLDER;
+        // HACK to use the pointer as indication
+        // to go ahead and make the faceline texture
+        // (check if the pTexture2D is not NULL)
+#endif
     else
         // if faceline texture is not needed
         pModel->facelineRenderTexture.pTexture2D = NULL;
@@ -188,6 +195,11 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 
 void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback)
 {
+#ifdef FFL_NO_RENDER_TEXTURE
+    RIO_ASSERT(false && "When FFL_NO_RENDER_TEXTURE is enabled, you need to make your own faceline and mask textures. FFLInitCharModelGPUStep will effectively be a no-op.");
+    RIO_LOG("ignoring your FFLiInitCharModelGPUStep call (you have to make your own faceline and mask textures)");
+    return;
+#else
     u32 resolution = FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution);
 
     FFLiShaderCallback shaderCallback;
@@ -226,32 +238,72 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
 
     FFLiDeleteTextureTempObject(pModel);
+#endif // FFL_NO_RENDER_TEXTURE
 }
 
 void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
 {
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+    RIO_LOG("in FFLiCharModelCreator::Delete(%p)\n", pModel);
+#endif
+
+#ifndef FFL_NO_RENDER_TEXTURE
+
 #if RIO_IS_CAFE
     GX2DrawDone();
 #elif RIO_IS_WIN
     RIO_GL_CALL(glFinish());
 #endif
 
+#endif // FFL_NO_RENDER_TEXTURE
+
     DeleteTextures(pModel);
     DeleteShapes(pModel);
     if (pModel->facelineRenderTexture.pTexture2D != NULL)
+    {
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("faceline render texture2D != NULL (%p), calling FFLiDeleteFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->facelineRenderTexture);
+#endif
         FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
+    }
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+    else
+        RIO_LOG("faceline render texture2D == NULL\n");
+#endif
 
     if (pModel->pTextureTempObject != NULL)
     {
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("pTextureTempObject != NULL (%p)\n", pModel->pTextureTempObject);
+#endif
         if (pModel->facelineRenderTexture.pTexture2D != NULL)
+        {
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+            RIO_LOG("faceline render texture2D != NULL (%p), calling FFLiDeleteTempObjectFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->pTextureTempObject->facelineTexture);
+#endif
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
+        }
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("FFLiDeleteTempObjectMaskTextures(%p)\n", &pModel->pTextureTempObject->maskTextures);
+#endif
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
+
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("FFLiDeleteTextureTempObject(%p)\n", &pModel->pTextureTempObject);
+#endif
 
         FFLiDeleteTextureTempObject(pModel);
     }
 
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+    RIO_LOG("FFLiDeleteMaskTextures(%p)\n", &pModel->maskTextures);
+#endif
+
     FFLiDeleteMaskTextures(&pModel->maskTextures);
 
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+    RIO_LOG("exiting FFLiCharModelCreator::Delete()\n");
+#endif
 }
 
 // this method is needed in case you don't have "delete" in C
@@ -705,6 +757,7 @@ void SetupDrawParam(FFLiCharModel* pModel)
     FFLCullMode hairCullMode = FFL_CULL_MODE_BACK;
 
     pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE].cullMode = FFL_CULL_MODE_BACK;
+
     FFLiInitModulateShapeFaceline(&pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE].modulateParam, pModel->charInfo.parts.facelineColor, pModel->facelineRenderTexture.pTexture2D);
 
     pModel->drawParam[FFLI_SHAPE_TYPE_OPA_BEARD].cullMode = FFL_CULL_MODE_BACK;
@@ -730,12 +783,12 @@ void SetupDrawParam(FFLiCharModel* pModel)
             drawParamHair.cullMode = hairCullMode;
             FFLiInitModulateShapeHair(&drawParamHair.modulateParam, pModel->charInfo.parts.hairColor);
 
-            const rio::Texture2D* pCapTexture = pModel->pCapTexture;
+            const FFLTexture* pCapTexture = pModel->pCapTexture;
             if (pCapTexture != NULL)
             {
                 FFLDrawParam& drawParamCap = pModel->drawParam[shapeTypeInfo.capIndex];
                 drawParamCap.cullMode = hairCullMode;
-                FFLiInitModulateShapeCap(&drawParamCap.modulateParam, pModel->charInfo.favoriteColor, *pCapTexture);
+                FFLiInitModulateShapeCap(&drawParamCap.modulateParam, pModel->charInfo.favoriteColor, pCapTexture);
             }
         }
     }
@@ -744,21 +797,27 @@ void SetupDrawParam(FFLiCharModel* pModel)
     if (pMaskRenderTexture != NULL)
     {
         pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].cullMode = FFL_CULL_MODE_BACK;
-        FFLiInitModulateShapeMask(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].modulateParam, *pMaskRenderTexture->pTexture2D);
+        FFLiInitModulateShapeMask(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].modulateParam,
+#ifndef FFL_NO_RENDER_TEXTURE
+                                  pMaskRenderTexture->pTexture2D);
+#else
+                          // do not dereference pMaskRenderTexture
+                                  NULL);
+#endif
     }
 
-    const rio::Texture2D* pNoselineTexture = pModel->pNoselineTexture;
+    const FFLTexture* pNoselineTexture = pModel->pNoselineTexture;
     if (pNoselineTexture != NULL)
     {
         pModel->drawParam[FFLI_SHAPE_TYPE_XLU_NOSELINE].cullMode = FFL_CULL_MODE_BACK;
-        FFLiInitModulateShapeNoseline(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_NOSELINE].modulateParam, *pNoselineTexture);
+        FFLiInitModulateShapeNoseline(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_NOSELINE].modulateParam, pNoselineTexture);
     }
 
-    const rio::Texture2D* pGlassTexture = pModel->pGlassTexture;
+    const FFLTexture* pGlassTexture = pModel->pGlassTexture;
     if (pGlassTexture != NULL)
     {
         pModel->drawParam[FFLI_SHAPE_TYPE_XLU_GLASS].cullMode = FFL_CULL_MODE_NONE;
-        FFLiInitModulateShapeGlass(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_GLASS].modulateParam, pModel->charInfo.parts.glassColor, *pGlassTexture);
+        FFLiInitModulateShapeGlass(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_GLASS].modulateParam, pModel->charInfo.parts.glassColor, pGlassTexture);
     }
 }
 

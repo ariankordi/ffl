@@ -20,10 +20,15 @@
 
 namespace {
 
+#ifndef FFL_NO_RENDER_TEXTURE
+
 rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch);
 
 FFLiRenderTexture* FFLiRenderTextureAllocate();
+
 void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture);
+
+#endif // FFL_NO_RENDER_TEXTURE
 
 bool CanUseExpression(FFLExpressionFlag expressionFlag, FFLExpression expression);
 
@@ -33,6 +38,7 @@ void DeleteRawMask(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expres
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo* pCharInfo, FFLExpression expression);
 
 }
+
 
 FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap)
 {
@@ -66,13 +72,22 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressio
         if (expression == FFL_EXPRESSION_LIMIT)
             expression = FFLExpression(i);
 
+#ifndef FFL_NO_RENDER_TEXTURE
+
         pMaskTextures->pRenderTextures[i] = FFLiRenderTextureAllocate();
         rio::TextureFormat format = GetTextureFormat(FFLiUseOffScreenSrgbFetch());
         FFLiInitRenderTexture(pMaskTextures->pRenderTextures[i], resolution, resolution, format, numMips);
+
+#else
+        // HACK used for faceline texture but also here to indicate
+        // just that this mask is active, used by FFLIsAvailableExpression
+        pMaskTextures->pRenderTextures[i] = FFLI_RENDER_TEXTURE_PLACEHOLDER;
+#endif // FFL_NO_RENDER_TEXTURE
     }
 
     return expression;
 }
+
 
 void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures)
 {
@@ -80,12 +95,15 @@ void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures)
     {
         if (pMaskTextures->pRenderTextures[j - 1] != NULL)
         {
+#ifndef FFL_NO_RENDER_TEXTURE // which does NOT allocate it
             FFLiDeleteRenderTexture(pMaskTextures->pRenderTextures[j - 1]);
             FFLiRenderTextureDelete(pMaskTextures->pRenderTextures[j - 1]);
+#endif
             pMaskTextures->pRenderTextures[j - 1] = NULL;
         }
     }
 }
+
 
 FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader)
 {
@@ -160,6 +178,8 @@ void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLEx
     FFLiDeletePartsTextures(&pObject->partsTextures, expressionFlag, resourceType);
 }
 
+#ifndef FFL_NO_RENDER_TEXTURE
+
 void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTempObject* pObject, const FFLiShaderCallback* pCallback
 #if RIO_IS_CAFE
 , FFLiCopySurface* pCopySurface
@@ -222,7 +242,16 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
     }
 }
 
+#endif // FFL_NO_RENDER_TEXTURE
+
 namespace {
+
+#ifndef FFL_NO_RENDER_TEXTURE
+
+void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture)
+{
+    delete pRenderTexture;
+}
 
 rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch)
 {
@@ -233,15 +262,13 @@ rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch)
         return rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM;
 }
 
+
 FFLiRenderTexture* FFLiRenderTextureAllocate()
 {
     return new FFLiRenderTexture;
 }
 
-void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture)
-{
-    delete pRenderTexture;
-}
+#endif // FFL_NO_RENDER_TEXTURE
 
 bool CanUseExpression(FFLExpressionFlag expressionFlag, FFLExpression expression)
 {

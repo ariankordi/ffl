@@ -60,14 +60,14 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     }
 
     if (pDesc->pTexturesMustache[0] != NULL) {
-        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[0]));
+        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, pDesc->pTexturesMustache[0]);
         FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), &(rawMasks.rawMaskPartsDescMustache[0]), &projMatrix);
     } else {
         pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam.pTexture2D = NULL;
     }
 
     if (pDesc->pTexturesMustache[1] != NULL) {
-        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[1]));
+        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam, pCharInfo->parts.beardColor, pDesc->pTexturesMustache[1]);
         FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), &(rawMasks.rawMaskPartsDescMustache[1]), &projMatrix);
     } else {
         pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam.pTexture2D = NULL;
@@ -76,18 +76,18 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     // for all new AFL/miitomo mouth types starting from 37/type 12...
     // ... they actually do not need colors
     if (mouthIndex > excludeColorFromMouthTypeThreshold)
-        FFLiInitModulateMouthEx(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, *pDesc->pTextureMouth);
+        FFLiInitModulateMouthEx(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, pDesc->pTextureMouth);
     else
-        FFLiInitModulateMouth(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, *pDesc->pTextureMouth);
+        FFLiInitModulateMouth(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, pDesc->pTextureMouth);
     FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, &rawMasks.rawMaskPartsDescMouth, &projMatrix);
 
     if (pDesc->pTexturesEyebrow[0] != NULL) {
 #ifdef FFL_USE_MODULATE_EYEBROW_EX
         if (eyebrowIndex > excludeColorFromEyebrowTypeThreshold)
-            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[0]));
+            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[0]);
         else
 #endif
-            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[0]));
+            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[0]);
         FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), &(rawMasks.rawMaskPartsDescEyebrow[0]), &projMatrix);
     } else {
         pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam.pTexture2D = NULL;
@@ -96,10 +96,10 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     if (pDesc->pTexturesEyebrow[1] != NULL) {
 #ifdef FFL_USE_MODULATE_EYEBROW_EX
         if (eyebrowIndex > excludeColorFromEyebrowTypeThreshold)
-            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[1]));
+            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[1]);
         else
 #endif
-            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, *(pDesc->pTexturesEyebrow[1]));
+            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[1]);
         FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), &(rawMasks.rawMaskPartsDescEyebrow[1]), &projMatrix);
     } else {
         pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam.pTexture2D = NULL;
@@ -117,20 +117,20 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     }
 
     if (isLeftEyeUsingTextureDirect)
-        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[0]));
+        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[0]);
     else
-        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[0]));
+        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[0]);
 
     if (isRightEyeUsingTextureDirect)
-        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[1]));
+        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[1]);
     else
-        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, *(pDesc->pTexturesEye[1]));
+        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[1]);
 
     FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), &(rawMasks.rawMaskPartsDescEye[0]), &projMatrix);
     FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), &(rawMasks.rawMaskPartsDescEye[1]), &projMatrix);
 
     if (pDesc->pTextureMole != NULL) {
-        FFLiInitModulateMole(&pDrawParam->drawParamRawMaskPartsMole.modulateParam, *pDesc->pTextureMole);
+        FFLiInitModulateMole(&pDrawParam->drawParamRawMaskPartsMole.modulateParam, pDesc->pTextureMole);
         FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, &rawMasks.rawMaskPartsDescMole, &projMatrix);
     } else {
         pDrawParam->drawParamRawMaskPartsMole.modulateParam.pTexture2D = NULL;

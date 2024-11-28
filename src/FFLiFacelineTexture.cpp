@@ -28,11 +28,15 @@
 
 namespace {
 
+#ifndef FFL_NO_RENDER_TEXTURE
+
 u32 GetWidth(u32 resolution);
 u32 GetHeight(u32 resolution);
 u32 GetNumMips(u32 width, u32 height, bool enableMipMap);
 
 rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch);
+
+#endif // FFL_NO_RENDER_TEXTURE
 
 void DeleteTexture_FaceLine(FFLiFacelineTextureTempObject* pObject, bool isExpand);
 void DeleteTexture_FaceMake(FFLiFacelineTextureTempObject* pObject, bool isExpand);
@@ -61,6 +65,8 @@ void InvalidateTexture(const GX2Texture& texture);
 
 }
 
+#ifndef FFL_NO_RENDER_TEXTURE
+
 void FFLiInitFacelineTexture(FFLiRenderTexture* pRenderTexture, u32 resolution, bool enableMipMap)
 {
     u32 width = GetWidth(resolution);
@@ -69,6 +75,8 @@ void FFLiInitFacelineTexture(FFLiRenderTexture* pRenderTexture, u32 resolution, 
     rio::TextureFormat format = GetTextureFormat(FFLiUseOffScreenSrgbFetch());
     FFLiInitRenderTexture(pRenderTexture, width, height, format, numMips);
 }
+
+#endif // FFL_NO_RENDER_TEXTURE
 
 void FFLiDeleteFacelineTexture(FFLiRenderTexture* pRenderTexture)
 {
@@ -118,11 +126,11 @@ FFLResult FFLiInitTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObje
     InitDrawParamWithoutModulate(&pObject->drawParamFaceBeard, resolution);
 
     if (pCharInfo->parts.faceLine != 0)
-        FFLiInitModulateFaceLine(&pObject->drawParamFaceLine.modulateParam, *pObject->pTextureFaceLine);
+        FFLiInitModulateFaceLine(&pObject->drawParamFaceLine.modulateParam, pObject->pTextureFaceLine);
     if (pCharInfo->parts.faceMakeup != 0)
-        FFLiInitModulateFaceMake(&pObject->drawParamFaceMake.modulateParam, *pObject->pTextureFaceMake);
+        FFLiInitModulateFaceMake(&pObject->drawParamFaceMake.modulateParam, pObject->pTextureFaceMake);
     if (enableBeardTexture)
-        FFLiInitModulateFaceBeard(&pObject->drawParamFaceBeard.modulateParam, pCharInfo->parts.beardColor, *pObject->pTextureFaceBeard);
+        FFLiInitModulateFaceBeard(&pObject->drawParamFaceBeard.modulateParam, pCharInfo->parts.beardColor, pObject->pTextureFaceBeard);
 
     return FFL_RESULT_OK;
 }
@@ -166,6 +174,8 @@ void FFLiDrawFacelineTexture(FFLiFacelineTextureTempObject* pObject, const FFLiS
     if (pObject->pTextureFaceBeard != NULL)
         pCallback->CallDraw(&pObject->drawParamFaceBeard);
 }
+
+#ifndef FFL_NO_RENDER_TEXTURE
 
 void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiCharInfo* pCharInfo, u32 resolution, FFLiFacelineTextureTempObject* pObject, const FFLiShaderCallback* pCallback
 #if RIO_IS_CAFE
@@ -227,7 +237,11 @@ void FFLiRenderFacelineTexture(FFLiRenderTexture* pRenderTexture, const FFLiChar
     FFLiFlushRenderTexture(&renderTexture);
 }
 
+#endif // FFL_NO_RENDER_TEXTURE
+
 namespace {
+
+#ifndef FFL_NO_RENDER_TEXTURE
 
 u32 GetWidth(u32 resolution)
 {
@@ -260,6 +274,8 @@ rio::TextureFormat GetTextureFormat(bool useOffScreenSrgbFetch)
     else
         return rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM;
 }
+
+#endif // FFL_NO_RENDER_TEXTURE
 
 void DeleteTexture_FaceLine(FFLiFacelineTextureTempObject* pObject, bool isExpand)
 {

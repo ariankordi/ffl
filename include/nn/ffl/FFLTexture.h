@@ -11,5 +11,8 @@
 	typedef FFLRIOTexture2D FFLTexture;
 #endif
 
+// Marks that a faceline texture is supposed
+// to be bound but render textures are not supported.
+#define FFL_TEXTURE_PLACEHOLDER (FFLTexture*)0x01
 
 #endif // FFL_TEXTURE_H_

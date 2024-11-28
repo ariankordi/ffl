@@ -11,14 +11,14 @@ extern "C" {
 
 typedef struct FFLiFacelineTextureTempObject
 {
-    FFLRIOTexture2D* pTextureFaceLine;
-    FFLDrawParam     drawParamFaceLine;
-    FFLRIOTexture2D* pTextureFaceMake;
-    FFLDrawParam     drawParamFaceMake;
-    FFLRIOTexture2D* pTextureFaceBeard;
-    FFLDrawParam     drawParamFaceBeard;
-    void*            _144;   // Deleted
-    void*            _148;   // Deleted
+    FFLTexture*   pTextureFaceLine;
+    FFLDrawParam  drawParamFaceLine;
+    FFLTexture*   pTextureFaceMake;
+    FFLDrawParam  drawParamFaceMake;
+    FFLTexture*   pTextureFaceBeard;
+    FFLDrawParam  drawParamFaceBeard;
+    void*         _144;   // Deleted
+    void*         _148;   // Deleted
 }
 FFLiFacelineTextureTempObject;
 NN_STATIC_ASSERT32(sizeof(FFLiFacelineTextureTempObject) == 0x14C);

@@ -18,7 +18,7 @@ typedef struct FFLiMaskTextures
 #ifdef __cplusplus
     FFLiRenderTexture*
 #else
-    FFLRIOTexture2D**
+    FFLTexture**
 #endif
     pRenderTextures[FFL_EXPRESSION_MAX];
 }

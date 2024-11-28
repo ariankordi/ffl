@@ -86,11 +86,11 @@ enum FFLiEyebrowTextureType {
 
 typedef struct FFLiPartsTextures
 {
-    FFLRIOTexture2D* pTexturesEye[FFLI_EYE_TEXTURE_TYPE_MAX];
-    FFLRIOTexture2D* pTexturesMouth[FFLI_MOUTH_TEXTURE_TYPE_MAX];
-    FFLRIOTexture2D* pTexturesEyebrow[FFLI_EYEBROW_TEXTURE_TYPE_MAX];
-    FFLRIOTexture2D* pTextureMustache;
-    FFLRIOTexture2D* pTextureMole;
+    FFLTexture* pTexturesEye[FFLI_EYE_TEXTURE_TYPE_MAX];
+    FFLTexture* pTexturesMouth[FFLI_MOUTH_TEXTURE_TYPE_MAX];
+    FFLTexture* pTexturesEyebrow[FFLI_EYEBROW_TEXTURE_TYPE_MAX];
+    FFLTexture* pTextureMustache;
+    FFLTexture* pTextureMole;
 }
 FFLiPartsTextures;
 NN_STATIC_ASSERT32(sizeof(FFLiPartsTextures) == 0x154);
