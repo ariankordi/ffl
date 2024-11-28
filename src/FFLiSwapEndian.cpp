@@ -42,5 +42,11 @@ u32 FFLiSwapEndianGroup(void* ptr, const FFLiSwapEndianDesc* pDesc, u32 num)
         pPtr = static_cast<u8*>(pPtr) + TypeToSize(desc.type) * desc.size;
     }
 
+#ifdef RIO_DEBUG
+    // Check for overflow
+    size_t diff = static_cast<u8*>(pPtr) - static_cast<u8*>(ptr);
+    RIO_ASSERT(diff <= UINT32_MAX && "Pointer difference exceeds u32 range.");
+#endif // RIO_DEBUG
+
     return static_cast<u8*>(pPtr) - static_cast<u8*>(ptr);
 }

@@ -32,9 +32,7 @@ public:
     bool AfterConstruct();
 
 private:
-#ifndef FFL_NO_DATABASE_RANDOM
     FFLiRandomContext   m_RandomContext;
-#endif
     FFLiAuthorID        m_AuthorID;
     FFLiCreateIDBase    m_CreateIDBase;
     u64                 m_TitleID;

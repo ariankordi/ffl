@@ -53,6 +53,6 @@ private:
 #endif
     FFLResourceType             m_ResourceType;
 };
-//NN_STATIC_ASSERT(sizeof(FFLiResourceLoader) == 0x18);
+//NN_STATIC_ASSERT(sizeof(FFLiResourceLoader) == 0x18); // NOTE: does not match with FFL_NO_FS on/off
 
 #endif // FFLI_RESOURCE_LOADER_H_

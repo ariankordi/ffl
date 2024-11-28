@@ -8,7 +8,8 @@ u32 FFLiRoundUp(u32 value, u32 alignment)
 void* FFLiRoundUpPtr(void* ptr, u32 alignment)
 {
     uintptr_t uintptr = reinterpret_cast<uintptr_t>(ptr);
-    uintptr_t rounded = (uintptr + alignment - 1) & ~(alignment - 1);
+    uintptr_t rounded = (uintptr + static_cast<uintptr_t>(alignment) - 1)
+        & ~static_cast<uintptr_t>(alignment - 1);
     return reinterpret_cast<void*>(rounded);
 }
 

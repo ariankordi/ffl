@@ -48,6 +48,8 @@ public:
 
 private:
     FFLiSystemContext*          m_pSystemContext;
+    // These are excluded from here because their initializers
+    // will be missing, the whole file would be excluded.
 #ifndef FFL_NO_DATABASE_FILE
     FFLiDatabaseFileAccessor    m_DatabaseFileAccessor;
 #endif
@@ -57,11 +59,13 @@ private:
 #ifndef FFL_NO_DATABASE_RANDOM
     FFLiDatabaseRandom          m_DatabaseRandom;
 #endif
+    // Only thing that may be somewhat worth pulling from here
+    // anyway is this, which is borderline useless and can probably be seen by other means
     bool                        m_IsEnabledSpecialMii;
     void*                       _fd4;   // Deleted
 };
 #if !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
-NN_STATIC_ASSERT32(sizeof(FFLiDatabaseManager) == 0xFD8);
+NN_STATIC_ASSERT32(sizeof(FFLiDatabaseManager) == 0xFD8); // NOTE: will not be consistent if you disable features
 #endif
 
 #endif // FFLI_DATABASE_MANAGER_H_

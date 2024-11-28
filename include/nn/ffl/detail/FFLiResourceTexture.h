@@ -4,6 +4,7 @@
 #include <nn/ffl/FFLiTexturePartsType.h>
 
 #include <nn/ffl/detail/FFLiResourcePartsInfo.h>
+#include <nn/ffl/FFLiTextureFormat.h>
 
 #if RIO_IS_WIN
     #ifdef FFL_NO_NINTEXUTILS
@@ -17,15 +18,6 @@
     #include <gx2/enum.h>
     typedef GX2SurfaceFormat FFLiSurfaceFormat;
 #endif
-
-
-
-enum FFLiTextureFormat
-{
-    FFLI_TEXTURE_FORMAT_R8      = 0,
-    FFLI_TEXTURE_FORMAT_RG8     = 1,
-    FFLI_TEXTURE_FORMAT_RGBA8   = 2
-};
 
 FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLiTextureFormat textureFormat);
 
@@ -124,6 +116,11 @@ public:
     u8 NumMips() const
     {
         return m_NumMips;
+    }
+
+    FFLiTextureFormat TextureFormat() const
+    {
+        return static_cast<FFLiTextureFormat>(m_TextureFormat);
     }
 
     FFLiSurfaceFormat SurfaceFormat() const;
