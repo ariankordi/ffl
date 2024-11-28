@@ -115,8 +115,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     if (result != FFL_RESULT_OK)
     {
         FFLiDeleteMaskTextures(&pModel->maskTextures);
-        delete pModel->pTextureTempObject;
-        pModel->pTextureTempObject = NULL;
+        FFLiDeleteTextureTempObject(pModel);
         return result;
     }
 
@@ -136,8 +135,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
             FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
             FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
             FFLiDeleteMaskTextures(&pModel->maskTextures);
-            delete pModel->pTextureTempObject;
-            pModel->pTextureTempObject = NULL;
+            FFLiDeleteTextureTempObject(pModel);
             return result;
         }
     }
@@ -154,8 +152,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
             }
             FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
             FFLiDeleteMaskTextures(&pModel->maskTextures);
-            delete pModel->pTextureTempObject;
-            pModel->pTextureTempObject = NULL;
+            FFLiDeleteTextureTempObject(pModel);
             return result;
         }
 #ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
@@ -172,8 +169,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         }
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
         FFLiDeleteMaskTextures(&pModel->maskTextures);
-        delete pModel->pTextureTempObject;
-        pModel->pTextureTempObject = NULL;
+        FFLiDeleteTextureTempObject(pModel);
         return result;
     }
 
@@ -201,9 +197,13 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
 
     // Flip Y in the view matrix when the
     // default GL clip control is being used
+
+    // (NOTE: Now being done to the primitives directly based on g_TextureFlipY)
+/*
 #ifdef RIO_NO_CLIP_CONTROL
     mvpMatrix.m[1][1] *= -1.f;
 #endif
+*/
 
     shaderCallback.CallSetMatrix(&mvpMatrix);
 
@@ -225,8 +225,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
         FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
     FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
 
-    delete pModel->pTextureTempObject;
-    pModel->pTextureTempObject = NULL;
+    FFLiDeleteTextureTempObject(pModel);
 }
 
 void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
@@ -248,11 +247,18 @@ void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
 
-        delete pModel->pTextureTempObject;
-        pModel->pTextureTempObject = NULL;
+        FFLiDeleteTextureTempObject(pModel);
     }
 
     FFLiDeleteMaskTextures(&pModel->maskTextures);
+
+}
+
+// this method is needed in case you don't have "delete" in C
+void FFLiDeleteTextureTempObject(FFLiCharModel* pModel)
+{
+    delete pModel->pTextureTempObject;
+    pModel->pTextureTempObject = NULL;
 }
 
 namespace {

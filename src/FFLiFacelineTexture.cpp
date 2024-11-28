@@ -317,12 +317,24 @@ void InitAttributes(FFLAttributeBufferParam* pAttributes, u32 resolution)
     const u32 POSITION_BUFFER_SIZE = sizeof(FFLVec4) * 4;
     const u32 TEXCOORD_BUFFER_SIZE = sizeof(FFLVec2) * 4;
 
-    const FFLVec4 POSITION_BUFFER[4] = {
-        { -1.0f,  1.0f,  0.0f,  0.0f },
-        {  1.0f,  1.0f,  0.0f,  0.0f },
-        { -1.0f, -1.0f,  0.0f,  0.0f },
-        {  1.0f, -1.0f,  0.0f,  0.0f }
-    };
+    FFLVec4 POSITION_BUFFER[4];
+    if (g_TextureFlipY)
+    {
+        // Flipped Y-coordinates
+        POSITION_BUFFER[0] = { -1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-left
+        POSITION_BUFFER[1] = {  1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-right
+        POSITION_BUFFER[2] = { -1.0f,   1.0f,  0.0f,  0.0f }; // Top-left
+        POSITION_BUFFER[3] = {  1.0f,   1.0f,  0.0f,  0.0f }; // Top-right
+    }
+    else
+    {
+        // Default Y-coordinates
+        POSITION_BUFFER[0] = { -1.0f,   1.0f,  0.0f,  0.0f }; // Top-left
+        POSITION_BUFFER[1] = {  1.0f,   1.0f,  0.0f,  0.0f }; // Top-right
+        POSITION_BUFFER[2] = { -1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-left
+        POSITION_BUFFER[3] = {  1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-right
+    }
+
     NN_STATIC_ASSERT(sizeof(POSITION_BUFFER) == POSITION_BUFFER_SIZE);
 
     static const FFLVec2 TEXCOORD_BUFFER[4] = {

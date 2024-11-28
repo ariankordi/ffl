@@ -58,6 +58,7 @@ void FFLiDeleteCharModel(FFLiCharModel* pModel);
 
 #ifdef __cplusplus
 
+// names collide (even though this isnt extern C???)
 void FFLiGetCharInfoFromCharModel(FFLiCharInfo* pCharInfo, const FFLiCharModel* pModel);
 bool FFLiIsAvailableExpression(const FFLiCharModel* pModel, FFLExpression expression);
 //FFLiGetDrawParamFromCharModel(FFLiCharModel const *, FFLDrawType)

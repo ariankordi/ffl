@@ -19,7 +19,8 @@ FFLResult FFLFlushQuota(void);
 FFLResult FFLExit(void);
 bool FFLIsAvailable(void);
 FFLColor FFLGetFavoriteColor(s32 index);
-FFLColor FFLGetFacelineColor(s32 index); // NOTE: not in FFL
+FFLColor FFLGetFacelineColor(s32 index); // NOTE: this and below are not in FFL
+void FFLSetTextureFlipY(bool textureFlipY);
 
 #ifdef __cplusplus
 }

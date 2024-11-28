@@ -17,8 +17,8 @@
         #define GLAD_GL_IMPLEMENTATION
 
         #include <glad/gl.h>
-    #endif
-#endif
+    #endif // RIO_GLES
+#endif // FFL_ADD_GLAD_GL_IMPLEMENTATION
 
 // FFLiInitResEx(void *, FFLInitDesc const *, FFLResourceDesc const *)
 FFLResult FFLInitResEx(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pResDesc)
@@ -66,4 +66,9 @@ FFLColor FFLGetFavoriteColor(s32 index)
 FFLColor FFLGetFacelineColor(s32 index)
 {
     return FFLiGetFacelineColor(index);
+}
+
+void FFLSetTextureFlipY(bool textureFlipY) // not in FFL obviously
+{
+    FFLiSetTextureFlipY(textureFlipY);
 }

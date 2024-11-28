@@ -2,6 +2,8 @@
 #include <nn/ffl/FFLiShaderCallback.h>
 #include <nn/ffl/FFLiUtil.h>
 
+#include <nn/ffl/FFLiManager.h> // for g_TextureFlipY
+
 #include <nn/ffl/detail/FFLiBug.h>
 
 #include <math/rio_Matrix.h>
@@ -244,12 +246,35 @@ void InitAttributesForFill(FFLAttributeBufferParam* pAttributes)
 {
     const u32 POSITION_BUFFER_SIZE = sizeof(FFLVec4) * 4;
 
+    /*
     static const FFLVec4 POSITION_BUFFER[4] = {
         {  1.0f, -1.0f,  0.0f,  0.0f },
         {  1.0f,  1.0f,  0.0f,  0.0f },
         { -1.0f,  1.0f,  0.0f,  0.0f },
         { -1.0f, -1.0f,  0.0f,  0.0f }
     };
+    */
+    FFLVec4 POSITION_BUFFER[4];
+    // no texture, orientation does not matter, no Y flip needed.. I think
+
+
+    if (g_TextureFlipY)
+    {
+        // Flipped Y-coordinates
+        POSITION_BUFFER[0] = {  1.0f,   1.0f,  0.0f,  0.0f };  // Top-left
+        POSITION_BUFFER[1] = {  1.0f,  -1.0f,  0.0f,  0.0f };  // Top-right
+        POSITION_BUFFER[2] = { -1.0f,  -1.0f,  0.0f,  0.0f };  // Bottom-left
+        POSITION_BUFFER[3] = { -1.0f,   1.0f,  0.0f,  0.0f };  // Bottom-right
+    }
+    else
+    {
+        // Default Y-coordinates
+        POSITION_BUFFER[0] = {  1.0f,  -1.0f,  0.0f,  0.0f };  // Top-left
+        POSITION_BUFFER[1] = {  1.0f,   1.0f,  0.0f,  0.0f };  // Top-right
+        POSITION_BUFFER[2] = { -1.0f,   1.0f,  0.0f,  0.0f };  // Bottom-left
+        POSITION_BUFFER[3] = { -1.0f,  -1.0f,  0.0f,  0.0f };  // Bottom-right
+    }
+
     NN_STATIC_ASSERT(sizeof(POSITION_BUFFER) == POSITION_BUFFER_SIZE);
 
     static const FFLAttributeBufferParam ATTRIBUTES = { {

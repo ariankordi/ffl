@@ -38,8 +38,7 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressio
 {
     FFLExpression expression = static_cast<FFLExpression>(FFL_EXPRESSION_LIMIT);
 
-    u32 numMips = enableMipMap ? FFLiGetMipMapNum(resolution, resolution) : 1;
-
+    [[maybe_unused]] u32 numMips = enableMipMap ? FFLiGetMipMapNum(resolution, resolution) : 1;
 
     for (u32 i = 0; expressionFlag != 0; i++, expressionFlag >>= 1)
     {

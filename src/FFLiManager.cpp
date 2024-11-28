@@ -21,6 +21,16 @@ static void SetResultIfError(FFLResult* pDst, FFLResult src)
 
 // --------------------------------------------------------------------------
 
+
+// Controls whether position attributes in faceline and mask
+// part primitives have Y flipped (for OpenGL default Y):
+bool g_TextureFlipY =
+#ifdef RIO_NO_CLIP_CONTROL
+                       true;
+#else
+                       false;
+#endif
+
 namespace {
 
 FFLiManager* g_FFLManager = NULL;
@@ -56,6 +66,11 @@ FFLResult FFLiExit()
 bool FFLiIsAvailable()
 {
     return FFLiManager::IsConstruct();
+}
+
+void FFLiSetTextureFlipY(bool textureFlipY)
+{
+    g_TextureFlipY = textureFlipY;
 }
 
 FFLResult FFLiManager::Create(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pResDesc)

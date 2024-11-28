@@ -4,6 +4,8 @@
 #include <nn/ffl/FFLiShaderCallback.h>
 #include <nn/ffl/FFLiPartsTextures.h>
 
+#include <nn/ffl/FFLiManager.h> // for g_TextureFlipY
+
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
 #include <gfx/rio_Projection.h>
@@ -47,7 +49,15 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     CalcRawMask(&rawMasks, pCharInfo, resolution, leftEyeIndex, rightEyeIndex);
 
     const rio::OrthoProjection proj = rio::OrthoProjection(-200.0f, 200.0f, 0.0f, static_cast<f32>(resolution), 0.0f, static_cast<f32>(resolution));
-    const rio::BaseMtx44f& projMatrix = proj.getMatrix();
+
+    rio::BaseMtx44f& projMatrix = const_cast<rio::BaseMtx44f&>(proj.getMatrix());
+
+    // Effectively flip the Y coordinates of all mask part shapes
+    if (g_TextureFlipY)
+    {
+        projMatrix.m[1][0] *= -1.f; projMatrix.m[1][2] *= -1.f;
+        projMatrix.m[1][1] *= -1.f; projMatrix.m[1][3] *= -1.f;
+    }
 
     if (pDesc->pTexturesMustache[0] != NULL) {
         FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, *(pDesc->pTexturesMustache[0]));

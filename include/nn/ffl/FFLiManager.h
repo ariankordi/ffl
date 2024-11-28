@@ -26,6 +26,10 @@ void FFLiInitResGPUStep();
 
 extern "C" FFLResult FFLiFlushQuota(bool force);    // No idea why this in particular is extern "C"
 
+extern bool g_TextureFlipY; // FFLiFacelineTexture.cpp
+                            // FFLiRawMaskParts.cpp
+void FFLiSetTextureFlipY(bool textureFlipY);
+
 FFLResult FFLiExit();
 
 bool FFLiIsAvailable();
