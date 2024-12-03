@@ -552,6 +552,9 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
         && pModel->expression != FFL_EXPRESSION_50
         && pModel->expression != FFL_EXPRESSION_51
         && pModel->expression != FFL_EXPRESSION_52
+        // probably blank?
+        && pModel->expression != FFL_EXPRESSION_61
+        && pModel->expression != FFL_EXPRESSION_62
     )
     {
         f32 noseScale = pModel->charInfo.parts.noseScale * 0.175f + 0.4f;
@@ -581,15 +584,21 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
         }
     }
 
-    result = InitShape(pModel, FFLI_SHAPE_PARTS_TYPE_MASK, pModel->charInfo.parts.faceType, 1.0f, 1.0f, NULL, false, pResLoader, pCoordinate);
-    if (result != FFL_RESULT_OK)
+    // skip drawing mask as well if expression is blank face
+    if (pModel->expression != FFL_EXPRESSION_61
+        && pModel->expression != FFL_EXPRESSION_62
+    )
     {
-        DeleteShape_Noseline(pModel);
-        DeleteShape_Nose(pModel);
-        DeleteShape_Beard(pModel);
-        DeleteShape_Hair(pModel);
-        DeleteShape_Faceline(pModel);
-        return result;
+        result = InitShape(pModel, FFLI_SHAPE_PARTS_TYPE_MASK, pModel->charInfo.parts.faceType, 1.0f, 1.0f, NULL, false, pResLoader, pCoordinate);
+        if (result != FFL_RESULT_OK)
+        {
+            DeleteShape_Noseline(pModel);
+            DeleteShape_Nose(pModel);
+            DeleteShape_Beard(pModel);
+            DeleteShape_Hair(pModel);
+            DeleteShape_Faceline(pModel);
+            return result;
+        }
     }
 
     if (pModel->charInfo.parts.glassType > 0)
