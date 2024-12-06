@@ -18,6 +18,12 @@
 
         #include <glad/gl.h>
     #endif // RIO_GLES
+#else
+    void FFLGladLoadGL(void)
+    {
+        // no-op just so that this resolves
+        RIO_LOG("FFLGladLoadGL called but FFL_ADD_GLAD_GL_IMPLEMENTATION not defined, ignoring");
+    }
 #endif // FFL_ADD_GLAD_GL_IMPLEMENTATION
 
 // FFLiInitResEx(void *, FFLInitDesc const *, FFLResourceDesc const *)

@@ -226,7 +226,10 @@ s32 FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits windowBits)
 
 FFLResult FFLiResourceHeader::GetResult() const
 {
-    if (!FFLiCheckAlignPtr(GetHeaderRaw(), 4))
+    bool alignResult = FFLiCheckAlignPtr(GetHeaderRaw(), 4);
+    RIO_ASSERT(alignResult);
+
+    if (!alignResult)
         return FFL_RESULT_ERROR;
 
     if (GetMagic() != 0x46465241)  // FFRA

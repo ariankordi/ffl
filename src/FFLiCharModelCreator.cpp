@@ -559,10 +559,11 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
     {
         f32 noseScale = pModel->charInfo.parts.noseScale * 0.175f + 0.4f;
 
-        FFLVec3 nosePos;
-        nosePos.x = pModel->faceCenterPos.x;
-        nosePos.y = pModel->faceCenterPos.y + (pModel->charInfo.parts.nosePositionY - 8) * -1.5f;
-        nosePos.z = pModel->faceCenterPos.z;
+        FFLVec3 nosePos = {
+            .x = pModel->faceCenterPos.x,
+            .y = pModel->faceCenterPos.y + (pModel->charInfo.parts.nosePositionY - 8) * -1.5f,
+            .z = pModel->faceCenterPos.z
+        };
 
         result = InitShape(pModel, FFLI_SHAPE_PARTS_TYPE_NOSE, pModel->charInfo.parts.noseType, noseScale, noseScale, &nosePos, false, pResLoader, pCoordinate);
         if (result != FFL_RESULT_OK)
@@ -605,10 +606,11 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
     {
         f32 glassScale = pModel->charInfo.parts.glassScale * 0.15f + 0.4f;
 
-        FFLVec3 glassPos;
-        glassPos.x = pModel->faceCenterPos.x;
-        glassPos.y = pModel->faceCenterPos.y + (pModel->charInfo.parts.glassPositionY - 11) * -1.5f + 5.0f;
-        glassPos.z = pModel->faceCenterPos.z + 2.0f;
+        FFLVec3 glassPos = {
+            .x = pModel->faceCenterPos.x,
+            .y = pModel->faceCenterPos.y + (pModel->charInfo.parts.glassPositionY - 11) * -1.5f + 5.0f,
+            .z = pModel->faceCenterPos.z + 2.0f,
+        };
 
         result = InitShape(pModel, FFLI_SHAPE_PARTS_TYPE_GLASS, 0, glassScale, glassScale, &glassPos, false, pResLoader, pCoordinate);
         if (result != FFL_RESULT_OK)
@@ -882,9 +884,11 @@ void FFLiCharModelCreator::AfterExecuteGPUStep(FFLiCharModel* pModel)
     rio::Graphics::setViewport(0, 0, width, height);
     rio::Graphics::setScissor(0, 0, width, height);
 #endif // RIO_NO_GLFW_CALLS
-#if RIO_IS_CAFE
-    GX2DrawDone();
-#elif RIO_IS_WIN
-    RIO_GL_CALL(glFinish());
-#endif
+#ifndef FFL_NO_RENDER_TEXTURE
+    #if RIO_IS_CAFE
+        GX2DrawDone();
+    #elif RIO_IS_WIN
+        RIO_GL_CALL(glFinish());
+    #endif
+#endif // FFL_NO_RENDER_TEXTURE
 }

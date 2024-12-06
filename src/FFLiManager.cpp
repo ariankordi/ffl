@@ -78,6 +78,7 @@ FFLResult FFLiManager::Create(const FFLInitDesc* pInitDesc, const FFLResourceDes
     if (IsConstruct())
         return FFL_RESULT_OK;
 
+    RIO_ASSERT(pInitDesc != NULL);
     if (pInitDesc == NULL)
         return FFL_RESULT_ERROR;
 

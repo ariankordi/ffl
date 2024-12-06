@@ -11,9 +11,8 @@
 extern "C" {
 #endif
 
-#define FFL_CHAR_MODEL_SIZE sizeof(FFLiCharModel)
-
-
+#define FFL_CHAR_MODEL_SIZE (int)sizeof(FFLiCharModel)
+// ^^ Cast is because ClangSharp says Cannot implicitly convert type int to ulong
 
 /*
 #if INTPTR_MAX == INT64_MAX

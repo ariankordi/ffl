@@ -196,6 +196,7 @@ FFLResult FFLiDatabaseManager::PickupCharInfo(FFLiCharInfo* pCharInfo, FFLDataSo
 
 FFLResult FFLiDatabaseManager::GetStoreData(FFLiStoreDataCFL* pStoreDataCFL, FFLDataSource dataSource, u16 index)
 {
+    RIO_ASSERT(dataSource == FFL_DATA_SOURCE_OFFICIAL || dataSource == FFL_DATA_SOURCE_DEFAULT);
     if (dataSource != FFL_DATA_SOURCE_OFFICIAL && dataSource != FFL_DATA_SOURCE_DEFAULT)
         return FFL_RESULT_ERROR;
 

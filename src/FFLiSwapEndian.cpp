@@ -48,5 +48,6 @@ u32 FFLiSwapEndianGroup(void* ptr, const FFLiSwapEndianDesc* pDesc, u32 num)
     RIO_ASSERT(diff <= UINT32_MAX && "Pointer difference exceeds u32 range.");
 #endif // RIO_DEBUG
 
-    return static_cast<u8*>(pPtr) - static_cast<u8*>(ptr);
+    return static_cast<u8*>(pPtr) - static_cast<u8*>(ptr); // NOTE: warning below
+    // warning C4244: 'return': conversion from '__int64' to 'u32', possible loss of data
 }

@@ -185,7 +185,10 @@ FFLResult FFLiResourceLoader::GetPointerTextureByExpandCache(void** ppPtr, u32* 
     u32 num;
     FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header(), partsType);
     if (pPartsInfo == NULL || index >= num)
+    {
+        RIO_LOG("FFLiResourceLoader::GetPointerTextureByExpandCache: pPartsInfo == NULL || index (= %d) >= %d", index, num);
         return FFL_RESULT_ERROR;
+    }
 
     *pSize = pPartsInfo[index].dataSize;
     return GetPointerFromCache(ppPtr, pPartsInfo[index]);

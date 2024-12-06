@@ -13,6 +13,7 @@ FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSour
         return FFL_RESULT_MANAGER_NOT_CONSTRUCT;
 
     FFLiManager* pManager = FFLiManager::GetInstance();
+    RIO_ASSERT(pManager->CanInitCharModel());
     if (!pManager->CanInitCharModel())
         return FFL_RESULT_ERROR;
 

@@ -43,8 +43,9 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
 FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap)
 {
     FFLExpression expression = static_cast<FFLExpression>(FFL_EXPRESSION_LIMIT);
-
-    [[maybe_unused]] u32 numMips = enableMipMap ? FFLiGetMipMapNum(resolution, resolution) : 1;
+#ifndef FFL_NO_RENDER_TEXTURE
+    u32 numMips = enableMipMap ? FFLiGetMipMapNum(resolution, resolution) : 1;
+#endif
 
     for (u32 i = 0; expressionFlag != 0; i++, expressionFlag >>= 1)
     {
@@ -384,35 +385,49 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     // courtesy of miitomo
     switch(expression) {
     case FFL_EXPRESSION_19:
+        [[fallthrough]];
     case FFL_EXPRESSION_20:
         pExpressionCharInfo->parts.eyeScale = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
+        [[fallthrough]];
     case FFL_EXPRESSION_45:
+        [[fallthrough]];
     case FFL_EXPRESSION_46:
+        [[fallthrough]];
     case FFL_EXPRESSION_53:
+        [[fallthrough]];
     case FFL_EXPRESSION_54:
         pExpressionCharInfo->parts.mouthScaleY = 3;
         pExpressionCharInfo->parts.mouthScale = 4;
         break;
     case FFL_EXPRESSION_25:
+        [[fallthrough]];
     case FFL_EXPRESSION_26:
+        [[fallthrough]];
     case FFL_EXPRESSION_37:
+        [[fallthrough]];
     case FFL_EXPRESSION_38:
+        [[fallthrough]];
     case FFL_EXPRESSION_55:
+        [[fallthrough]];
     case FFL_EXPRESSION_56:
+        [[fallthrough]];
     case FFL_EXPRESSION_57:
+        [[fallthrough]];
     case FFL_EXPRESSION_58:
         pExpressionCharInfo->parts.eyeScale = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
         pExpressionCharInfo->parts.eyeRotate = 4;
         break;
     case FFL_EXPRESSION_33:
+        [[fallthrough]];
     case FFL_EXPRESSION_34:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.mouthScaleY = 3;
         pExpressionCharInfo->parts.mouthScale = 4;
         break;
     case FFL_EXPRESSION_35:
+        [[fallthrough]];
     case FFL_EXPRESSION_36:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
@@ -421,6 +436,7 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.mouthScaleY = 3;
         break;
     case FFL_EXPRESSION_39:
+        [[fallthrough]];
     case FFL_EXPRESSION_40:
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
@@ -428,14 +444,20 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.eyebrowRotate = 6;
         break;
     case FFL_EXPRESSION_43:
+        [[fallthrough]];
     case FFL_EXPRESSION_44:
+        [[fallthrough]];
     case FFL_EXPRESSION_47:
+        [[fallthrough]];
     case FFL_EXPRESSION_48:
         pExpressionCharInfo->parts.eyeRotate = 4;
         break;
     case FFL_EXPRESSION_49: // Cat
+        [[fallthrough]];
     case FFL_EXPRESSION_50: // Cat duplicate
+        [[fallthrough]];
     case FFL_EXPRESSION_51: // Dog
+        [[fallthrough]];
     case FFL_EXPRESSION_52: // Dog duplicate
         pExpressionCharInfo->parts.eyeRotate = 4;
         pExpressionCharInfo->parts.eyeScaleY = 3;
@@ -454,6 +476,7 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.mustacheType = 0;
         break;
     case FFL_EXPRESSION_67:
+        [[fallthrough]];
     case FFL_EXPRESSION_68:
         pExpressionCharInfo->parts.mouthScaleY = 3;
         break;

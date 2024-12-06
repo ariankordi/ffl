@@ -4,6 +4,7 @@
 
 void FFLSetShaderCallback(const FFLShaderCallback* pCallback)
 {
+    RIO_ASSERT(pCallback != NULL);
 #ifdef FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
     // initialize this to false in case the shader class does not initialize it
     const_cast<FFLShaderCallback*>(pCallback)->facelineColorIsTransparent = false;
