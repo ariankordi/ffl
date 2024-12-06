@@ -172,7 +172,12 @@ void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLEx
 {
     for (u32 j = FFL_EXPRESSION_LIMIT; j > 0; j--)
         if (CanUseExpression(expressionFlag, FFLExpression(j - 1)))
+        {
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+            RIO_LOG("FFLiDeleteTempObjectMaskTextures(%p): Deleting mask %d (%p)\n", pObject, (j - 1), pObject->pRawMaskDrawParam[j - 1]);
+#endif
             FFLiDeleteDrawParamRawMask(pObject->pRawMaskDrawParam[j - 1]);
+        }
 
     DeleteRawMask(pObject, expressionFlag);
 

@@ -35,7 +35,13 @@ void DeleteAttributesForFill(FFLAttributeBufferParam* pAttributes);
 void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const FFLiRawMaskPartsDesc* pDesc, const rio::BaseMtx44f* pProjMatrix)
 {
     rio::Matrix44f mvpMatrix;
-    rio::Matrix34f mvMatrix;
+    rio::Matrix34f mvMatrix = { // rio::Matrix34f::ident;
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0
+        // why is this inlined? just in case you
+        // want to build without any rio sources
+    };
 
     CalcMVMatrix(&mvMatrix, pDesc);
     mvpMatrix.fromMatrix34(mvMatrix);
@@ -84,11 +90,28 @@ namespace {
 
 void CalcMVMatrix(rio::Matrix34f* pMVMatrix, const FFLiRawMaskPartsDesc* pDesc)
 {
-    pMVMatrix->makeSRT(
-        { pDesc->scale.x * 0.88961464f, pDesc->scale.y * 0.9276675f, 1.0f },
-        { 0.0f, 0.0f, rio::Mathf::deg2rad(pDesc->rot) },
-        { pDesc->pos.x, pDesc->pos.y, 0.0f }
-    );
+    static const f32 scaleAdjustX = 0.88961464f;
+    static const f32 scaleAdjustY = 0.9276675f;
+
+    //const rio::Vector3f scale =     { pDesc->scale.x * scaleAdjustX, pDesc->scale.y * scaleAdjustY, 1.0f };
+    const rio::Vector3f rotate =    { 0.0f, 0.0f, rio::Mathf::deg2rad(pDesc->rot) };
+    const rio::Vector3f translate = { pDesc->pos.x, pDesc->pos.y, 0.0f };
+
+    //pMVMatrix->makeSRT(scale, rotate, translate);
+
+    rio::Matrix34f scaleMatrix, rotateMatrix, scaleAdjustMatrix, translateMatrix;
+    scaleMatrix.makeS({ pDesc->scale.x, pDesc->scale.y, 1.0f });
+    pMVMatrix->setMul(scaleMatrix, *pMVMatrix);
+
+    rotateMatrix.makeR(rotate);
+    pMVMatrix->setMul(rotateMatrix, *pMVMatrix);
+
+    scaleAdjustMatrix.makeS({ scaleAdjustX, scaleAdjustY, 1.0f });
+    pMVMatrix->setMul(scaleAdjustMatrix, *pMVMatrix);
+
+    translateMatrix.makeT(translate);
+    pMVMatrix->setMul(translateMatrix, *pMVMatrix);
+
 }
 
 void* Allocate(u32 size, u32 alignment)
