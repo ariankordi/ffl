@@ -11,7 +11,20 @@
 extern "C" {
 #endif
 
-typedef struct FFLMiddleDB FFLMiddleDB;
+#include <nn/ffl/FFLiMiddleDB.h>
+
+#define FFL_MIDDLE_DB_SIZE (int)sizeof(FFLiMiddleDB)
+
+typedef struct FFLMiddleDB
+{
+    union
+    {
+        u8 data[FFL_MIDDLE_DB_SIZE];
+        u32 data32[FFL_MIDDLE_DB_SIZE / sizeof(u32)];
+    };
+}
+FFLMiddleDB;
+NN_STATIC_ASSERT(sizeof(FFLMiddleDB) == FFL_MIDDLE_DB_SIZE);
 
 u32 FFLGetMiddleDBBufferSize(u16 miiDataNum);
 

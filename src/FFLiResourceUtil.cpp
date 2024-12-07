@@ -7,11 +7,11 @@ FFLResult FFLiIsVaildResourceHeader(const FFLiResourceHeader* pHeader)
 }
 
 
-
-enum ResHeaderHint {
-    RES_HINT_DEFAULT = 1,
-    RES_HINT_AFL     = 2,
-    RES_HINT_AFL_2_3 = 3
+// Completely custom type not in FFL:
+enum FFLiResourceTypeHint {
+    FFL_RESOURCE_TYPE_HINT_FFL     = 0,
+    FFL_RESOURCE_TYPE_HINT_AFL     = 2,
+    FFL_RESOURCE_TYPE_HINT_AFL_2_3 = 3
     // todo remove 2 type shapes and add a new resource header for that
     //RES_HINT_AFL_2_3_NO_2_SHAPES = 4,
     /* future optimization ideas?:
@@ -45,7 +45,7 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
     u32 totalUncompressSizeNoVersion = pHeaderDefault->m_TotalUncompressSize & 0x1FFFFFFF; // only last 29 bits
 
     // take first 30 bits, use last 3 as ResourceHeaderTypeHint enum
-    ResHeaderHint hint = static_cast<ResHeaderHint>(pHeaderDefault->m_TotalUncompressSize >> 29); // first 3 bits
+    FFLiResourceTypeHint hint = static_cast<FFLiResourceTypeHint>(pHeaderDefault->m_TotalUncompressSize >> 29); // first 3 bits
 
     //RIO_LOG("header m_TotalUncompressSize: 0x%04X\n", totalUncompressSizeNoVersion);
     //RIO_LOG("header resource hint: %i (raw: 0x%04X)\n", hint, pHeaderDefault->m_TotalUncompressSize);
@@ -55,10 +55,10 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
 
     switch (hint)
     {
-        case RES_HINT_AFL:
+        case FFL_RESOURCE_TYPE_HINT_AFL:
             return new FFLiResourceHeaderAFL();
             break;
-        case RES_HINT_AFL_2_3:
+        case FFL_RESOURCE_TYPE_HINT_AFL_2_3:
             return new FFLiResourceHeaderAFL_2_3();
             break;
         default:

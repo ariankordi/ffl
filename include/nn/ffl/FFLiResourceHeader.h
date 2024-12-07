@@ -91,6 +91,7 @@ public:
     u32                         m_Magic;
     u32                         m_Version;                  // I think? Always 0x00070000
     u32                         m_UncompressBufferSize;
+    // Used by FFLResource.py and in FFLiResourceUtil.cpp to store "resource hint":
     u32                         m_TotalUncompressSize;      // _c, unused
     int                         m_IsExpand;                 // Must be 1 specifically to be true, not just non-zero
     FFLiResourceTextureHeader   m_TextureHeader;
