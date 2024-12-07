@@ -5,6 +5,10 @@
 
 #include <nn/ffl/FFLiShapePartsType.h>
 
+extern bool g_FrontCullForFlipX;
+
+void FFLiSetFrontCullForFlipX(bool enable);
+
 struct FFLBoundingBox;
 struct FFLDrawParam;
 struct FFLVec3;

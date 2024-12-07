@@ -39,6 +39,17 @@ static bool IsNaN(f32 value)
     return (x.u << 1) > 0xff000000;
 }
 
+// Controls whether to set front face culling
+// when flipping X on shapes (flipped hair).
+// If this is false, the index buffer will be
+// adjusted to reverse triangle winding.
+bool g_FrontCullForFlipX = true; // True by default in FFL.
+
+void FFLiSetFrontCullForFlipX(bool enable)
+{
+    g_FrontCullForFlipX = enable;
+}
+
 namespace {
 
 FFLiResourceShapeElementType GetElementType(FFLAttributeBufferType type);
@@ -52,6 +63,8 @@ void AdjustAttribute(T* pVec, u32 num, f32 scaleX, f32 scaleY, f32 scaleZ, const
 
 template <typename T>
 void AdjustAttributeWithoutScale(T* pVec, u32 num, bool flipX, const FFLiCoordinate* pCoordinate);
+
+void AdjustIndexBuffer(void* pIndexPtr, u32 indexCount);
 
 }
 
@@ -156,12 +169,6 @@ void FFLiDeleteShape(void** ppShapeData, FFLDrawParam* pDrawParam)
     }
 }
 
-#ifdef FFL_NORMAL_ATTRIBUTE_IS_SNORM_8_8_8_8
-    #define FFLI_NORMAL_ATTRIBUTE_TYPE FFLiSnorm8_8_8_8
-#else
-    #define FFLI_NORMAL_ATTRIBUTE_TYPE FFLiSnorm10_10_10_2
-#endif
-
 void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32 scaleX, f32 scaleY, const FFLVec3* pTranslate, bool flipX, const FFLiCoordinate* pCoordinate, FFLiShapePartsType partsType, bool limitNoseScaleZ)
 {
     f32 scaleZ = (scaleX + scaleY) * 0.5f;
@@ -202,12 +209,26 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
         pCoordinate
     );
 
-    AdjustAttributeWithoutScale<FFLI_NORMAL_ATTRIBUTE_TYPE>(
-        static_cast<FFLI_NORMAL_ATTRIBUTE_TYPE*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].ptr),
-        pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].size / sizeof(FFLI_NORMAL_ATTRIBUTE_TYPE),
-        flipX,
-        pCoordinate
-    );
+
+    if (g_NormalIsSnorm8_8_8_8)
+    {
+        AdjustAttributeWithoutScale<FFLiSnorm8_8_8_8>(
+            static_cast<FFLiSnorm8_8_8_8*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].ptr),
+            pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].size / sizeof(FFLiSnorm8_8_8_8),
+            flipX,
+            pCoordinate
+        );
+    }
+    else
+    {
+        AdjustAttributeWithoutScale<FFLiSnorm10_10_10_2>(
+            static_cast<FFLiSnorm10_10_10_2*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].ptr),
+            pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL].size / sizeof(FFLiSnorm10_10_10_2),
+            flipX,
+            pCoordinate
+        );
+    }
+
 
     AdjustAttributeWithoutScale<FFLiSnorm8_8_8_8>(
         static_cast<FFLiSnorm8_8_8_8*>(pDrawParam->attributeBufferParam.attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_TANGENT].ptr),
@@ -224,6 +245,12 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
             pTranslate,
             flipX,
             pCoordinate
+        );
+
+    if (flipX && !g_FrontCullForFlipX)
+        AdjustIndexBuffer(
+            pDrawParam->primitiveParam.pIndexBuffer,
+            pDrawParam->primitiveParam.indexCount
         );
 
 /*
@@ -318,7 +345,11 @@ u32 GetStride(FFLAttributeBufferType type, u32 size)
         stride = FormatToStride(rio::VertexStream::FORMAT_32_32_FLOAT);
         break;
     case FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL:
-        stride = FormatToStride(rio::VertexStream::FORMAT_10_10_10_2_SNORM);
+        // Note that this is literally useless since they are both 32 bits.
+        if (g_NormalIsSnorm8_8_8_8)
+            stride = FormatToStride(rio::VertexStream::FORMAT_8_8_8_8_SNORM);
+        else
+            stride = FormatToStride(rio::VertexStream::FORMAT_10_10_10_2_SNORM);
         break;
     case FFL_ATTRIBUTE_BUFFER_TYPE_TANGENT:
         stride = FormatToStride(rio::VertexStream::FORMAT_8_8_8_8_SNORM);
@@ -392,6 +423,31 @@ void AdjustAttributeWithoutScale(T* pVec, u32 num, bool flipX, const FFLiCoordin
 
         if (!isDefault)
             pCoordinate->TransformWithoutScale(&vec);
+    }
+}
+
+// Reverses winding, should be called when flipping X
+// as an alternative to using front face culling.
+void AdjustIndexBuffer(void* pIndexPtr, u32 indexCount)
+{
+    /*
+    u16* pIndex = pIndexBuffer + (indexCount + -1);
+    u16 curIdx;
+    for (u32 i = 0; i < indexCount / 2; i = i + 1) {
+        curIdx = *pIndexBuffer;
+        *pIndexBuffer = *pIndex;
+        *pIndex = curIdx;
+        pIndexBuffer = pIndexBuffer + 1;
+        pIndex = pIndex + -1;
+    }
+    */
+    u16* pIndexBuffer = static_cast<u16*>(pIndexPtr);
+    u32 halfCount = indexCount / 2;
+
+    for (u32 i = 0; i < halfCount; ++i) {
+        u16 curIdx = pIndexBuffer[i];
+        pIndexBuffer[i] = pIndexBuffer[indexCount - 1 - i];
+        pIndexBuffer[indexCount - 1 - i] = curIdx;
     }
 }
 

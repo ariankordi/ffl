@@ -3,6 +3,9 @@
 #include <nn/ffl/FFLiColor.h>
 #include <nn/ffl/FFLiManager.h>
 
+#include <nn/ffl/detail/FFLiResourceShape.h> // FFLiSetNormalIsSnorm8_8_8_8
+#include <nn/ffl/FFLiShape.h> // FFLiSetFrontCullForFlipX
+
 #ifdef FFL_ADD_GLAD_GL_IMPLEMENTATION
     #ifdef RIO_GLES
         #define gladLoadGLES2 FFLGladLoadGL
@@ -69,12 +72,22 @@ FFLColor FFLGetFavoriteColor(s32 index)
     return FFLiGetFavoriteColor(index);
 }
 
+// All functions below are not originally in FFL:
+
 FFLColor FFLGetFacelineColor(s32 index)
 {
     return FFLiGetFacelineColor(index);
 }
 
-void FFLSetTextureFlipY(bool textureFlipY) // not in FFL obviously
+void FFLSetTextureFlipY(bool textureFlipY)
 {
     FFLiSetTextureFlipY(textureFlipY);
+}
+void FFLSetNormalIsSnorm8_8_8_8(bool enable)
+{
+    FFLiSetNormalIsSnorm8_8_8_8(enable);
+}
+void FFLSetFrontCullForFlipX(bool enable)
+{
+    FFLiSetFrontCullForFlipX(enable);
 }

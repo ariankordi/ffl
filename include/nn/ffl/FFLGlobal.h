@@ -21,6 +21,8 @@ bool FFLIsAvailable(void);
 FFLColor FFLGetFavoriteColor(s32 index);
 FFLColor FFLGetFacelineColor(s32 index); // NOTE: this and below are not in FFL
 void FFLSetTextureFlipY(bool textureFlipY);
+void FFLSetNormalIsSnorm8_8_8_8(bool enable);
+void FFLSetFrontCullForFlipX(bool enable);
 
 #ifdef __cplusplus
 }

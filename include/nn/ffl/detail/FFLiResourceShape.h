@@ -8,11 +8,9 @@
 #include <nn/ffl/detail/FFLiResourcePartsInfo.h>
 
 
-#if defined(RIO_GLES) && !defined(GL_ES_VERSION_3_0)
-    // NOTE: 10_10_10_2 primitive format is not supported in GL(ES) 2.0
-    // it is converted in-place in FFLiGetResourceShapeElement
-    #define FFL_NORMAL_ATTRIBUTE_IS_SNORM_8_8_8_8
-#endif
+extern bool g_NormalIsSnorm8_8_8_8;
+
+void FFLiSetNormalIsSnorm8_8_8_8(bool enable);
 
 enum FFLiResourceShapeElementType
 {

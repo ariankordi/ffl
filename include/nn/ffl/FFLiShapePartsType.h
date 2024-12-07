@@ -3,7 +3,11 @@
 
 #include <nn/ffl/types.h>
 
-enum FFLiShapePartsType
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum FFLiShapePartsType
 {
     FFLI_SHAPE_PARTS_TYPE_BEARD         =  0,
     FFLI_SHAPE_PARTS_TYPE_CAP_1         =  1,
@@ -18,6 +22,11 @@ enum FFLiShapePartsType
     FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1    = 10,
     FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2    = 11,
     FFLI_SHAPE_PARTS_TYPE_MAX           = 12
-};
+}
+FFLiShapePartsType;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FFLI_SHAPE_PARTS_TYPE_H_
