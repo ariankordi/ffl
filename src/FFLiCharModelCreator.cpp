@@ -777,7 +777,7 @@ void SetupDrawParam(FFLiCharModel* pModel)
     pModel->drawParam[FFLI_SHAPE_TYPE_OPA_NOSE].cullMode = FFL_CULL_MODE_BACK;
     FFLiInitModulateShapeNose(&pModel->drawParam[FFLI_SHAPE_TYPE_OPA_NOSE].modulateParam, pModel->charInfo.parts.facelineColor);
 
-    if (pModel->charInfo.parts.hairDir > 0)
+    if (pModel->charInfo.parts.hairDir > 0 && g_FrontCullForFlipX)
         hairCullMode = FFL_CULL_MODE_FRONT;
 
     for (u32 i = 0; i < 2; i++)
