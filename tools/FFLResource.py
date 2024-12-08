@@ -1590,15 +1590,34 @@ class FFLiResourceShapeDataHeader:
 
         colorBufferIndex = primitive.attributes.COLOR_0
         colorBufferAccessor = accessors[colorBufferIndex]
-        assert colorBufferAccessor.byteOffset == 0
-        assert colorBufferAccessor.componentType == pygltflib.FLOAT
-        assert colorBufferAccessor.type == pygltflib.VEC4
-        assert colorBufferAccessor.count == vertexNum
-        colorBufferView = bufferViews[colorBufferAccessor.bufferView]
-        assert colorBufferView.buffer == 0
-        assert colorBufferView.byteLength == 4 * 4 * vertexNum
-        assert colorBufferView.target == pygltflib.ARRAY_BUFFER
-        shape.color = [struct.unpack_from("<4f", buffer, colorBufferView.byteOffset + i * 4 * 4) for i in range(vertexNum)]
+
+        # Check the component type
+        if colorBufferAccessor.componentType == pygltflib.FLOAT:
+            assert colorBufferAccessor.type == pygltflib.VEC4
+            assert colorBufferAccessor.count == vertexNum
+            colorBufferView = bufferViews[colorBufferAccessor.bufferView]
+            assert colorBufferView.buffer == 0
+            assert colorBufferView.target == pygltflib.ARRAY_BUFFER
+            shape.color = [
+                struct.unpack_from("<4f", buffer, colorBufferView.byteOffset + i * 4 * 4)
+                for i in range(vertexNum)
+            ]
+        elif colorBufferAccessor.componentType == pygltflib.UNSIGNED_SHORT:
+            assert colorBufferAccessor.type == pygltflib.VEC4
+            assert colorBufferAccessor.count == vertexNum
+            colorBufferView = bufferViews[colorBufferAccessor.bufferView]
+            assert colorBufferView.buffer == 0
+            assert colorBufferView.target == pygltflib.ARRAY_BUFFER
+            # Convert UNSIGNED_SHORT to FLOAT (divide by 65535.0 for normalization)
+            shape.color = [
+                tuple(
+                    c / 65535.0
+                    for c in struct.unpack_from("<4H", buffer, colorBufferView.byteOffset + i * 4 * 2)
+                )
+                for i in range(vertexNum)
+            ]
+        else:
+            raise ValueError(f"Unsupported component type for color attribute :( {colorBufferAccessor.componentType}")
 
         g = itertools.groupby(shape.color)
         shape.uniformColor = next(g, True) and not next(g, False)
@@ -2119,7 +2138,7 @@ class FFLiResourceHeader:
         self._format = endianness_character + '5I%ds%ds48x' % (FFLiResourceTextureHeader().size, FFLiResourceShapeHeader.size)
         self.size = struct.calcsize(self._format)
         #assert size == 0x4A00
-        if self.size != FFLIRESOURCEHEADER_DEFAULT_SIZE:
+        if self.size != FFLIRESOURCEHEADER_DEFAULT_SIZE and resource_header_hint != RES_HINT_AFL and resource_header_hint != RES_HINT_AFL_2_3:
             print(f"\033[91mFFLiResourceHeader size != 0x{FFLIRESOURCEHEADER_DEFAULT_SIZE:X}, actual size: 0x{self.size:X} (will not work in FFL unmodified)\033[0m")
 
     def load(self, data, pos=0):

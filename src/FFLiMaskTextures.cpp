@@ -214,7 +214,14 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
                 rio::Graphics::BLEND_MODE_ONE, rio::Graphics::BLEND_MODE_ONE
 #endif
             );
+#ifndef FFL_NO_DRAW_MASK_ALPHA_VALUES
+            renderState.setBlendEquationSeparate(
+                rio::Graphics::BLEND_FUNC_ADD,
+                rio::Graphics::BLEND_FUNC_MAX
+            );
+#else
             renderState.setBlendEquation(rio::Graphics::BLEND_FUNC_ADD);
+#endif
 
             renderState.apply();
 
@@ -224,7 +231,11 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
             RIO_ASSERT(renderTexture.pTexture2D->getTextureFormat() == rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM);
             FFLiSetupRenderTexture(&renderTexture, &BLACK, NULL, 0, pCallback);
 
+            pCallback->CallApplyAlphaTestEnable();
+
             FFLiDrawRawMask(pObject->pRawMaskDrawParam[i], pCallback);
+
+            pCallback->CallApplyAlphaTestDisable();
 
             if (renderTexture.pTexture2D->getNumMips() > 1)
             {

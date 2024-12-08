@@ -243,10 +243,6 @@ void FFLiInvalidateRawMask(FFLiRawMaskDrawParam* pDrawParam)
 
 void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCallback* pCallback)
 {
-    pCallback->CallApplyAlphaTestEnable();
-// does not make a huge difference but mask is
-// a bit inaccurate, has outlines without this
-#ifndef FFL_NO_DRAW_MASK_ALPHA_VALUES
     if (pDrawParam->drawParamRawMaskPartsMustache[0].primitiveParam.indexCount != 0)
         FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
     if (pDrawParam->drawParamRawMaskPartsMustache[1].primitiveParam.indexCount != 0)
@@ -261,7 +257,20 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     if (pDrawParam->drawParamRawMaskPartsMole.primitiveParam.indexCount != 0)
         FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
 
+#ifndef FFL_NO_DRAW_MASK_ALPHA_VALUES
     rio::RenderState renderState;
+    renderState.setBlendEnable(true);
+    renderState.setDepthEnable(false, false);
+    renderState.setCullingMode(rio::Graphics::CULLING_MODE_NONE);
+    renderState.setBlendFactorSeparate(
+        rio::Graphics::BLEND_MODE_ONE_MINUS_DST_ALPHA, rio::Graphics::BLEND_MODE_DST_ALPHA,
+        rio::Graphics::BLEND_MODE_ONE, rio::Graphics::BLEND_MODE_ONE
+    );
+    renderState.setBlendEquationSeparate(
+        rio::Graphics::BLEND_FUNC_ADD,
+        rio::Graphics::BLEND_FUNC_MAX
+    );
+
     renderState.setColorMask(false, false, false, true);
     renderState.applyColorMask();
     renderState.setBlendFactor(rio::Graphics::BLEND_MODE_ZERO, rio::Graphics::BLEND_MODE_ZERO);
@@ -272,10 +281,8 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsFill, pCallback);
 
     renderState.setBlendFactor(rio::Graphics::BLEND_MODE_SRC_ALPHA, rio::Graphics::BLEND_MODE_ONE);
-    renderState.setBlendFactorSrcAlpha(rio::Graphics::BLEND_MODE_ONE);
     renderState.applyBlendAndFastZ();
     pCallback->CallApplyAlphaTestEnable();
-#endif
 
     if (pDrawParam->drawParamRawMaskPartsMustache[0].primitiveParam.indexCount != 0)
         FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), pCallback);
@@ -290,11 +297,13 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam, const FFLiShaderCal
     FFLiDrawRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), pCallback);
     if (pDrawParam->drawParamRawMaskPartsMole.primitiveParam.indexCount != 0)
         FFLiDrawRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, pCallback);
-#ifndef FFL_NO_DRAW_MASK_ALPHA_VALUES
+
     renderState.setColorMask(true, true, true, true);
     renderState.applyColorMask();
-#endif
     pCallback->CallApplyAlphaTestDisable();
+
+#endif // FFL_NO_DRAW_MASK_ALPHA_VALUES
+
 }
 
 namespace {
