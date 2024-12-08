@@ -7,14 +7,14 @@ This is my fork of [AboodXD's FFL decompilation](), which was originally decompi
 TL;DR, FFL is the library that renders Miis and manages Mii data on Wii U and is only accessible to approved developers.</summary>
 
 # FFL
-Decompilation of Wii U Face Library v1.3.10, used in New Super Mario Bros. U v1.3.0.  
+Decompilation of Wii U Face Library v1.3.10, used in New Super Mario Bros. U v1.3.0.
 
-FFL is a library that is part of nn (**N**intendo SDK C++ API **N**amespace?), used for dealing with Mii data.  
-While most of nn is already open to developers as part of the Cafe SDK by Nintendo, FFL is a closed-source library that is sent to developers on demand.  
+FFL is a library that is part of nn (**N**intendo SDK C++ API **N**amespace?), used for dealing with Mii data.
+While most of nn is already open to developers as part of the Cafe SDK by Nintendo, FFL is a closed-source library that is sent to developers on demand.
 
-This decompilation aims to provide more information on Mii data, as well as to further push the progress on the [New Super Mario Bros. U decompilation project](https://github.com/aboood40091/red-pro2).  
+This decompilation aims to provide more information on Mii data, as well as to further push the progress on the [New Super Mario Bros. U decompilation project](https://github.com/aboood40091/red-pro2).
 
-See [Sead](https://github.com/aboood40091/sead) for matching policy.  
+See [Sead](https://github.com/aboood40091/sead) for matching policy.
 </details>
 
 Specifically, this is Abood's port to RIO (OpenGL 3.3) which works on PC alongside Wii U.
@@ -32,10 +32,40 @@ Over time, I've added new features that are not included in Abood's original dec
 * Allow using the [Miitomo AFL resource files](https://github.com/ariankordi/ffl/commit/d740192adb655a1a3d6e2bcae0feda5ea8fd25fc) alongside FFL resources from Wii U.
   - This means that, if you need a resource file, you can [just use the Miitomo one downloadable from web.archive.org.](http://web.archive.org/web/20180502054513/http://download-cdn.miitomo.com/native/20180125111639/android/v2/asset_model_character_mii_AFLResHigh_2_3_dat.zip)
   - Additionally added [Miitomo exclusive expressions](https://github.com/ariankordi/ffl/commit/2bdfc351f16af84e279956d57e2be5cb42c946e8).
-* Flags to remove unneeded functionality such as [FFL_NO_DATABASE_FILE](https://github.com/ariankordi/ffl/commit/3d499fc66f686ce5ed181a8459f3fd288df32f70), [FFL_NO_NINTEXUTILS](https://github.com/ariankordi/ffl/commit/5174db9dda7f330e96ed278844e11c76642b1e50), [FFL_NO_FS](https://github.com/ariankordi/ffl/commit/7ffa02c1ff4eae2d731b5aa4de453547f0f27f35), 
+* Flags to remove unneeded functionality such as [FFL_NO_DATABASE_FILE](https://github.com/ariankordi/ffl/commit/3d499fc66f686ce5ed181a8459f3fd288df32f70), [FFL_NO_NINTEXUTILS](https://github.com/ariankordi/ffl/commit/5174db9dda7f330e96ed278844e11c76642b1e50), [FFL_NO_FS](https://github.com/ariankordi/ffl/commit/7ffa02c1ff4eae2d731b5aa4de453547f0f27f35),
   - Applying FFL_NO_DATABASE_FILE is probably essential if you're on a PC - FFL will try to load the database file when it is initialized.
   - Note that with FFL_NO_NINTEXUTILS, you can't load Wii U resources - just ones from Miitomo.
 * Fixes for [calling FFL from C](https://github.com/ariankordi/ffl/commit/bd25dafc2029067368b28f6c96a8732d2157a712) (broken in the RIO port) and [OpenGL ES 2.0](https://github.com/ariankordi/ffl/commit/c5286b4822ca884dc2b5eb58c61ce54acac55bb6).
 * Various [functions](https://github.com/ariankordi/ffl/commit/7840fb118f64a85838d31805491e33d8665ebfa6) such as FFLSetScale, and [enum definitions](https://github.com/ariankordi/ffl/commit/1b46640a60e6ba8f4a0ac0fcbb11195c43912a72) missing from the decomp.
-* Minor [adjustments](https://github.com/ariankordi/ffl/commit/948780c0713f4366d9e4da30f3d616b03f83d652) [and](https://github.com/ariankordi/ffl/commit/5e843d33891878a64fbef820a76483be30305d4e) [optimizations](https://github.com/ariankordi/ffl/commit/d7eb341aa484decc9d532445c46d47a32c346ad8) and an accuracy tweak (todo detail mask matrix thing when it is pushed)
+* Minor [adjustments](https://github.com/ariankordi/ffl/commit/948780c0713f4366d9e4da30f3d616b03f83d652) [and](https://github.com/ariankordi/ffl/commit/5e843d33891878a64fbef820a76483be30305d4e) [optimizations](https://github.com/ariankordi/ffl/commit/d7eb341aa484decc9d532445c46d47a32c346ad8) and accuracy tweaks for the mask texture.
 * WIP: Exports and a texture callback system to assist using FFL without RIO or OpenGL (todo, detail this?)
+
+## Definitions
+This documents all of the definitions that this supports to add/remove functionality, as of December 2024.
+
+* FFL_ADD_GLAD_GL_IMPLEMENTATION - Adds GLAD implementation, enabling FFLGladLoadGL (dynamic linking)
+* FFL_ENABLE_NEW_MASK_ONLY_FLAG  - Enables new mask only flag which does not initialize shapes.
+* FFL_NO_DATABASE_DEFAULT    - disables default guest Miis
+* FFL_NO_DATABASE_FILE       - Disables opening and use of hidden/official databases.
+* FFL_NO_DATABASE_RANDOM     - Disables use of random database and FFLiGetRandomCharInfo.
+* FFL_NO_MIDDLE_DB           - Disables FFLMiddleDB functionality (^^)
+* FFL_NO_RENDER_TEXTURE      - Do not use FFLiRenderTexture (breaks FFLInitCharModelGPUStep)
+* FFL_NO_FS                  - Disables FFL's use of RIO filesystem.
+  - This is used for databases and non-cached resource loading.
+* FFL_NO_NINTEXUTILS         - Disables ninTexUtils, which is needed for Wii U/FFLRes resource file support.
+  - Specifically, this library deswizzles Wii U format textures. You can still use AFL resources with this.
+* FFL_NO_DRAW_MASK_ALPHA_VALUES - Skip drawing alpha values on mask (FFL default behavior)...
+  - This makes zero difference to the mask's appearance for me.
+* FFL_MLC_PATH - Takes a quoted string. Defines the MLC path if FS is not disabled.
+* FFL_PART_INDEX_WRAP - When out of bounds part indexes are passed in (invalid CharInfo)...
+  - ... This option will choose to wrap that part index.
+
+#### Not documented (slash useless):
+* FFL_USE_ADJUST_MTX
+* FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
+* FFL_USE_MINIZ
+* FFL_USE_MODULATE_EYEBROW_EX
+* FFL_LOG_CHARMODEL_CLEANUP
+
+## License Note
+All of the changes that I have made to FFL in this repo are hereby licensed under [the Unlicense](https://choosealicense.com/licenses/unlicense/). However, this does not account for changes made by Abood when porting the decompilation, or the library to begin with.

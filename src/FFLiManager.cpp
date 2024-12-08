@@ -215,22 +215,29 @@ FFLResult FFLiManager::AfterConstruct(const FFLInitDesc* pInitDesc, const FFLRes
     }
     else
     {
-        bool noResourceEverLoaded = true;
+        s32 resourceCount = 0;
+
+        RIO_LOG("FFLiManager::AfterConstruct: Attached resource types: ");
         for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
         {
             // skip resources with size of zero
-            if (pResDesc->size[i] == 0) {
-                RIO_LOG("FFL resource %i has size of zero, skipping\n", i);
+            if (pResDesc->size[i] == 0)
                 continue;
-            }
-            noResourceEverLoaded = false;
+
             result = m_ResourceManager.AttachCache(pResDesc->pData[i], pResDesc->size[i], FFLResourceType(i));
             if (result != FFL_RESULT_OK)
                 return result;
+
+            resourceCount++;
+            RIO_LOG("%i ", i);
         }
         // if no resource was loaded then do not go further
-        if (noResourceEverLoaded)
+        if (resourceCount < 1)
+        {
+            RIO_LOG("(none, returning error)\n");
             return FFL_RESULT_ERROR;
+        }
+        RIO_LOG("(%i/%i, success)\n", resourceCount, FFL_RESOURCE_TYPE_MAX);
     }
 
     result = m_DatabaseManager.AfterConstruct();
