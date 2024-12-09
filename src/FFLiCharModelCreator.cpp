@@ -2,6 +2,7 @@
 #include <nn/ffl/FFLCharModelDesc.h>
 #include <nn/ffl/FFLCharModelSource.h>
 #include <nn/ffl/FFLModelType.h>
+#include <nn/ffl/FFLModelFlag.h>
 
 #include <nn/ffl/FFLiCharModel.h>
 #include <nn/ffl/FFLiCharModelCreateParam.h>
@@ -83,6 +84,16 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     rio::MemUtil::set(pModel, 0, sizeof(FFLiCharModel));
 
     pModel->charModelDesc = *pDesc;
+
+    // Initialize FFLAllExpressionFlag mid and high u32s
+    // to zeroes if the model flag does not indicate they
+    // are used - because they are not always initialized.
+    if (!(pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_NEW_EXPRESSIONS))
+    {
+        pModel->charModelDesc.allExpressionFlag.flag.mid = 0;
+        pModel->charModelDesc.allExpressionFlag.flag.high = 0;
+    }
+
     pModel->modelType = ModelFlagToModelType(pModel->charModelDesc.modelFlag);
 
     FFLResult result;
@@ -109,9 +120,9 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 
     pModel->pTextureTempObject = new FFLiTextureTempObject;
 
-    pModel->expression = FFLiInitMaskTextures(&pModel->maskTextures, pDesc->expressionFlag, resolution, isEnabledMipMap);
+    pModel->expression = FFLiInitMaskTextures(&pModel->maskTextures, pDesc->allExpressionFlag, resolution, isEnabledMipMap);
 
-    result = FFLiInitTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, &pModel->maskTextures, &pModel->charInfo, pDesc->expressionFlag, resolution, isEnabledMipMap, &resLoader);
+    result = FFLiInitTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, &pModel->maskTextures, &pModel->charInfo, pDesc->allExpressionFlag, resolution, isEnabledMipMap, &resLoader);
     if (result != FFL_RESULT_OK)
     {
         FFLiDeleteMaskTextures(&pModel->maskTextures);
@@ -140,7 +151,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         if (result != FFL_RESULT_OK)
         {
             FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
-            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
+            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->allExpressionFlag, pDesc->resourceType);
             FFLiDeleteMaskTextures(&pModel->maskTextures);
             FFLiDeleteTextureTempObject(pModel);
             return result;
@@ -157,7 +168,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
                 FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
                 FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
             }
-            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
+            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->allExpressionFlag, pDesc->resourceType);
             FFLiDeleteMaskTextures(&pModel->maskTextures);
             FFLiDeleteTextureTempObject(pModel);
             return result;
@@ -174,7 +185,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
             FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
         }
-        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->expressionFlag, pDesc->resourceType);
+        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->allExpressionFlag, pDesc->resourceType);
         FFLiDeleteMaskTextures(&pModel->maskTextures);
         FFLiDeleteTextureTempObject(pModel);
         return result;
@@ -196,10 +207,11 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback)
 {
 #ifdef FFL_NO_RENDER_TEXTURE
-    RIO_ASSERT(false && "When FFL_NO_RENDER_TEXTURE is enabled, you need to make your own faceline and mask textures. FFLInitCharModelGPUStep will effectively be a no-op.");
-    RIO_LOG("ignoring your FFLiInitCharModelGPUStep call (you have to make your own faceline and mask textures)");
-    return;
+    RIO_LOG("WARNING: FFLInitCharModelGPUStep was called. When FFL_NO_RENDER_TEXTURE is enabled, you need " \
+    "to make your own faceline and mask textures. This function will try to make RIO_GL_CALL()s, which may or " \
+    "may not crash you right now by jumping to undefined GL function pointers. Proceed with caution.\n");
 #else
+//#endif // FFL_NO_RENDER_TEXTURE
     u32 resolution = FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution);
 
     FFLiShaderCallback shaderCallback;
@@ -235,7 +247,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
 
     if (pModel->facelineRenderTexture.pTexture2D != NULL)
         FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
-    FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
+    FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pModel->charModelDesc.resourceType);
 
     FFLiDeleteTextureTempObject(pModel);
 #endif // FFL_NO_RENDER_TEXTURE
@@ -286,7 +298,7 @@ void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
 #ifdef FFL_LOG_CHARMODEL_CLEANUP
         RIO_LOG("FFLiDeleteTempObjectMaskTextures(%p)\n", &pModel->pTextureTempObject->maskTextures);
 #endif
-        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.expressionFlag, pModel->charModelDesc.resourceType);
+        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pModel->charModelDesc.resourceType);
 
 #ifdef FFL_LOG_CHARMODEL_CLEANUP
         RIO_LOG("FFLiDeleteTextureTempObject(%p)\n", &pModel->pTextureTempObject);
@@ -547,7 +559,13 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
         }
     }
 
-    // HACK: skip drawing nose if expression is AFL dog or cat
+    /* HACK: Skip initializing certain shapes based on expressions.
+     * Ideally this would be implemented in FFLiSetExpression...
+     * ... however, there would need to be a new property in
+     * DrawParam that can "disable" a shape, and then re-enable it.
+     * Nose: Dog/cat (49, 50, 51, 52), Blank (61, 62)
+     * Mask: Blank (61, 62)
+     */
     if (pModel->expression != FFL_EXPRESSION_49
         && pModel->expression != FFL_EXPRESSION_50
         && pModel->expression != FFL_EXPRESSION_51
@@ -585,7 +603,8 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
         }
     }
 
-    // skip drawing mask as well if expression is blank face
+    // Skip mask shape for blank expression.
+
     if (pModel->expression != FFL_EXPRESSION_61
         && pModel->expression != FFL_EXPRESSION_62
     )
@@ -804,17 +823,23 @@ void SetupDrawParam(FFLiCharModel* pModel)
         }
     }
 
-    const FFLiRenderTexture* pMaskRenderTexture = pModel->maskTextures.pRenderTextures[pModel->expression];
-    if (pMaskRenderTexture != NULL)
+    RIO_ASSERT(pModel->expression < FFL_EXPRESSION_LIMIT); // set by FFLiInitMaskTextures's return value
+    // not sure what to do if this fails
+    if (pModel->expression < FFL_EXPRESSION_LIMIT)
     {
-        pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].cullMode = FFL_CULL_MODE_BACK;
-        FFLiInitModulateShapeMask(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].modulateParam,
+        const FFLiRenderTexture* pMaskRenderTexture = pModel->maskTextures.pRenderTextures[pModel->expression];
+        if (pMaskRenderTexture != NULL)
+        {
+            pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].cullMode = FFL_CULL_MODE_BACK;
+            FFLiInitModulateShapeMask(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].modulateParam,
 #ifndef FFL_NO_RENDER_TEXTURE
-                                  pMaskRenderTexture->pTexture2D);
+                pMaskRenderTexture->pTexture2D);
 #else
-                          // do not dereference pMaskRenderTexture
-                                  NULL);
+                // do not dereference pMaskRenderTexture
+                // but still indicate this slot is active
+                FFLI_RENDER_TEXTURE_PLACEHOLDER);
 #endif
+        }
     }
 
     const FFLTexture* pNoselineTexture = pModel->pNoselineTexture;

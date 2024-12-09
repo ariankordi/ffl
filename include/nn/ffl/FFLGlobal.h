@@ -5,6 +5,8 @@
 #include <nn/ffl/FFLFontRegion.h>
 #include <nn/ffl/FFLResult.h>
 
+#include <nn/ffl/FFLExpressionFlag.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,6 +25,9 @@ FFLColor FFLGetFacelineColor(s32 index); // NOTE: this and below are not in FFL
 void FFLSetTextureFlipY(bool textureFlipY);
 void FFLSetNormalIsSnorm8_8_8_8(bool enable);
 void FFLSetFrontCullForFlipX(bool enable);
+
+// Helper method to set a specific index within an expression flag.
+void FFLSetExpressionFlagIndex(FFLAllExpressionFlag* ef, u32 index, bool set);
 
 #ifdef __cplusplus
 }

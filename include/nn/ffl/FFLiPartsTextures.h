@@ -5,7 +5,9 @@
 #include <nn/ffl/FFLResourceType.h>
 #include <nn/ffl/FFLResult.h>
 
+#include <nn/ffl/FFLExpressionFlag.h>
 #include <nn/ffl/FFLTexture.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,14 +118,14 @@ s32 FFLiCharInfoAndTypeToEyeIndex(const FFLiCharInfo* pCharInfo, FFLiEyeTextureT
 s32 FFLiCharInfoAndTypeToMouthIndex(const FFLiCharInfo* pCharInfo, FFLiMouthTextureType type);
 s32 FFLiCharInfoAndTypeToEyebrowIndex(const FFLiCharInfo* pCharInfo, FFLiEyebrowTextureType type);
 
-FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, FFLiResourceLoader* pResLoader);
-void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
+FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCharInfo* pCharInfo, FFLAllExpressionFlag expressionFlag, FFLiResourceLoader* pResLoader);
+void FFLiDeletePartsTextures(FFLiPartsTextures* pPartsTextures, FFLAllExpressionFlag expressionFlag, FFLResourceType resourceType);
 
 const FFLiEyeMouthTypeElement& FFLiGetEyeMouthTypeElement(FFLExpression expression);
 
-u32 FFLiGetMaxMouthNum(FFLExpressionFlag expressionFlagCount);
-u32 FFLiGetMaxEyeNum(FFLExpressionFlag expressionFlagCount);
-u32 FFLiGetMaxEyebrowNum(FFLExpressionFlag expressionFlagCount);
+u32 FFLiGetMaxMouthNum(u32 expressionFlagCount);
+u32 FFLiGetMaxEyeNum(u32 expressionFlagCount);
+u32 FFLiGetMaxEyebrowNum(u32 expressionFlagCount);
 
 #endif // __cplusplus
 

@@ -44,7 +44,7 @@ typedef struct FFLiCharModel
 }
 FFLiCharModel;
 #ifndef __EMSCRIPTEN__
-NN_STATIC_ASSERT32(sizeof(FFLiCharModel) == 0x844);
+NN_STATIC_ASSERT32(sizeof(FFLiCharModel) == 0x848);
 #endif
 
 struct FFLCharModelSource;

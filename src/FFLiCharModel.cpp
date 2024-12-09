@@ -38,7 +38,8 @@ void FFLiDeleteCharModel(FFLiCharModel* pModel)
 
 void FFLiSetExpression(FFLiCharModel* pModel, FFLExpression expression)
 {
-    if (1 << expression & pModel->charModelDesc.expressionFlag)
+    if (FFLiIsAvailableExpression(pModel, expression))
+    //if (1 << expression & pModel->charModelDesc.expressionFlag)
     {
         pModel->expression = expression;
 #ifndef FFL_NO_RENDER_TEXTURE

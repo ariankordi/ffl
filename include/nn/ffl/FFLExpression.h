@@ -1,8 +1,6 @@
 #ifndef FFL_EXPRESSION_H_
 #define FFL_EXPRESSION_H_
 
-#include <nn/ffl/types.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -96,9 +94,14 @@ typedef enum FFLExpression
     FFL_EXPRESSION_68  = 68,  // Singing
     FFL_EXPRESSION_69  = 69,  // Stunned
 
-    FFL_EXPRESSION_MAX = 70
+    FFL_EXPRESSION_MAX = 70,
 }
 FFLExpression;
+
+#define FFL_EXPRESSION_LIMIT 70
+// ^^ set this to 19 if you do not want
+// miitomo expressions to be usable
+
 
 /* TODO: FIX THESE FLAWS
 
@@ -106,6 +109,7 @@ FFLExpression;
    Unknown what these are supposed to be, have seen it dark and light.
 FFL_EXPRESSION_39 (Resolve)
 FFL_EXPRESSION_40 (Resolve mouth open)
+
 FFL_EXPRESSION_49 (Cat)
 FFL_EXPRESSION_50 (Cat duplicate)
 FFL_EXPRESSION_51 (Dog)

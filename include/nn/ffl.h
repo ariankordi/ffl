@@ -21,6 +21,7 @@
 #include <nn/ffl/FFLMiddleDB.h>
 #include <nn/ffl/FFLMiddleDBType.h>
 #include <nn/ffl/FFLModelType.h>
+#include <nn/ffl/FFLModelFlag.h>
 #include <nn/ffl/FFLModulateParam.h>
 #include <nn/ffl/FFLPartsTransform.h>
 #include <nn/ffl/FFLRace.h>

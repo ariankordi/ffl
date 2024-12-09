@@ -13,6 +13,8 @@
     #include <nn/ffl/FFLiMaskTexturesTempObject.h>
 #endif
 
+#include <nn/ffl/FFLExpressionFlag.h>
+
 typedef struct FFLiMaskTextures
 {
 #ifdef __cplusplus
@@ -36,10 +38,10 @@ class   FFLiResourceLoader;
 class   FFLiResourceManager;
 class   FFLiShaderCallback;
 
-FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap);
+FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLAllExpressionFlag expressionFlag, u32 resolution, bool enableMipMap);
 void FFLiDeleteMaskTextures(FFLiMaskTextures* pMaskTextures);
 
-FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, FFLExpressionFlag expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader);
+FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, const FFLiMaskTextures* pMaskTextures, const FFLiCharInfo* pCharInfo, FFLAllExpressionFlag expressionFlag, u32 resolution, bool enableMipMap, FFLiResourceLoader* pResLoader);
 
 void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTempObject* pObject, const FFLiShaderCallback* pCallback
 #if RIO_IS_CAFE
@@ -50,7 +52,7 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
 extern "C" {
 #endif
 
-void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLExpressionFlag expressionFlag, FFLResourceType resourceType);
+void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLAllExpressionFlag expressionFlag, FFLResourceType resourceType);
 
 #ifdef __cplusplus
 }

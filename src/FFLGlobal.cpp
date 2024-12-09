@@ -6,6 +6,8 @@
 #include <nn/ffl/detail/FFLiResourceShape.h> // FFLiSetNormalIsSnorm8_8_8_8
 #include <nn/ffl/FFLiShape.h> // FFLiSetFrontCullForFlipX
 
+#include <nn/ffl/FFLExpression.h> // FFL_EXPRESSION_LIMIT
+
 #ifdef FFL_ADD_GLAD_GL_IMPLEMENTATION
     #ifdef RIO_GLES
         #define gladLoadGLES2 FFLGladLoadGL
@@ -77,6 +79,22 @@ FFLColor FFLGetFavoriteColor(s32 index)
 FFLColor FFLGetFacelineColor(s32 index)
 {
     return FFLiGetFacelineColor(index);
+}
+
+void FFLSetExpressionFlagIndex(FFLAllExpressionFlag* ef, u32 index, bool set)
+{
+    if (index < 0 || index >= FFL_EXPRESSION_LIMIT) {
+        RIO_LOG("FFLSetExpressionFlagIndex: input out of range: %d\n", index);
+        return; // Do not set anything.
+    }
+
+    s32 part = index / 32;       // Determine which 32-bit block
+    s32 bitIndex = index % 32;   // Determine which bit within the block
+
+    if (set)
+        ef->flags[part] |= (1 << bitIndex);  // Set the bit
+    else
+        ef->flags[part] &= ~(1 << bitIndex); // Clear the bit
 }
 
 void FFLSetTextureFlipY(bool textureFlipY)
