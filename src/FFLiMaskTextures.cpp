@@ -204,7 +204,7 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
             desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
-            if (expressionCharInfo.parts.mustacheType != 0) {
+            if (expressionCharInfo.parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY) {
                 desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
                 desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
             } else {

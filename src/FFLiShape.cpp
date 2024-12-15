@@ -119,9 +119,9 @@ FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundin
             primitive.primitiveType = rio::Drawer::TRIANGLES;
         }
 
-        if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_1)
+        if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL)
         {
-            const FFLiResourceShapeHairTransform* pTransform = static_cast<const FFLiResourceShapeHairTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR_1));
+            const FFLiResourceShapeHairTransform* pTransform = static_cast<const FFLiResourceShapeHairTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR));
 
             pModel->partsTransform.headFrontTranslate = pTransform->Get(0);
             pModel->partsTransform.headFrontRotate  = pTransform->Get(1);

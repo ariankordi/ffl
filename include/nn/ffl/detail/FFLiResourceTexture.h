@@ -43,14 +43,14 @@ public:
     u32                     partsMaxSize[FFLI_TEXTURE_PARTS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoBeard[3];
     FFLiResourcePartsInfo   partsInfoCap[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoEye[62]; // FFL_EYE_TYPE_TRUE_MAX
+    FFLiResourcePartsInfo   partsInfoEye[62]; // FFL_EYE_TYPE_RESOURCE_MAX
     FFLiResourcePartsInfo   partsInfoEyebrow[24]; // FFL_EYEBROW_TYPE_MAX
     FFLiResourcePartsInfo   partsInfoFaceline[FFL_FACE_LINE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceMakeup[FFL_FACE_MAKE_MAX];
     // leave this as FFL_GLASS_TYPE_MAX for AFLResHigh.dat NOT 2_3
     FFLiResourcePartsInfo   partsInfoGlass[FFL_GLASS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoMole[FFL_MOLE_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoMouth[37]; // FFL_MOUTH_TYPE_TRUE_MAX
+    FFLiResourcePartsInfo   partsInfoMouth[37]; // FFL_MOUTH_TYPE_RESOURCE_MAX
     FFLiResourcePartsInfo   partsInfoMustache[FFL_MUSTACHE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoNoseline[FFL_NOSE_TYPE_MAX];
 };
@@ -65,13 +65,13 @@ public:
     u32                     partsMaxSize[FFLI_TEXTURE_PARTS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoBeard[3];
     FFLiResourcePartsInfo   partsInfoCap[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoEye[FFL_EYE_TYPE_TRUE_MAX];
+    FFLiResourcePartsInfo   partsInfoEye[FFL_EYE_TYPE_RESOURCE_MAX];
     FFLiResourcePartsInfo   partsInfoEyebrow[FFL_EYEBROW_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceline[FFL_FACE_LINE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceMakeup[FFL_FACE_MAKE_MAX];
     FFLiResourcePartsInfo   partsInfoGlass[20];
     FFLiResourcePartsInfo   partsInfoMole[FFL_MOLE_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoMouth[FFL_MOUTH_TYPE_TRUE_MAX];
+    FFLiResourcePartsInfo   partsInfoMouth[FFL_MOUTH_TYPE_RESOURCE_MAX];
     FFLiResourcePartsInfo   partsInfoMustache[FFL_MUSTACHE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoNoseline[FFL_NOSE_TYPE_MAX];
 };
@@ -87,13 +87,13 @@ public:
     u32                     partsMaxSize[FFLI_TEXTURE_PARTS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoBeard[3];
     FFLiResourcePartsInfo   partsInfoCap[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoEye[FFL_EYE_TYPE_TRUE_MAX];
+    FFLiResourcePartsInfo   partsInfoEye[FFL_EYE_TYPE_RESOURCE_MAX];
     FFLiResourcePartsInfo   partsInfoEyebrow[FFL_EYEBROW_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceline[FFL_FACE_LINE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceMakeup[FFL_FACE_MAKE_MAX];
     FFLiResourcePartsInfo   partsInfoGlass[FFL_GLASS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoMole[FFL_MOLE_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoMouth[FFL_MOUTH_TYPE_TRUE_MAX];
+    FFLiResourcePartsInfo   partsInfoMouth[FFL_MOUTH_TYPE_RESOURCE_MAX];
     FFLiResourcePartsInfo   partsInfoMustache[FFL_MUSTACHE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoNoseline[FFL_NOSE_TYPE_MAX];
 };

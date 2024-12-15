@@ -73,8 +73,8 @@ const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLi
         return GetElement(pSize, pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_COLOR), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_COLOR));
     case FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX:
         return GetElement(pSize, pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX));
-    case FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR_1:
-        if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_1)
+    case FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR:
+        if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL)
         {
             *pSize = sizeof(FFLiResourceShapeHairTransform);
             return pShape->GetTransform();
@@ -116,7 +116,7 @@ void FFLiSwapEndianResourceShapeElement(void* pShapeData, FFLiShapePartsType par
     SwapEndianVec3(&(pShape->GetBoundingBox().min));
     SwapEndianVec3(&(pShape->GetBoundingBox().max));
 
-    if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_1)
+    if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL)
         SwapEndianHairTransform(pShape->GetTransform());
 
     else if (partsType == FFLI_SHAPE_PARTS_TYPE_FACELINE)

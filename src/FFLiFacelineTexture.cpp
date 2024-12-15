@@ -108,7 +108,7 @@ FFLResult FFLiInitTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObje
     }
 
     s32 beardType = pCharInfo->parts.beardType;
-    bool enableBeardTexture = beardType >= 4;
+    bool enableBeardTexture = beardType >= FFL_BEARD_SHAPE_MAX;
 
     if (enableBeardTexture)
     {
@@ -290,7 +290,7 @@ void DeleteTexture_FaceMake(FFLiFacelineTextureTempObject* pObject, bool isExpan
 void DeleteTexture_FaceBeard(FFLiFacelineTextureTempObject* pObject, const FFLiCharInfo* pCharInfo, bool isExpand)
 {
     s32 beardType = pCharInfo->parts.beardType;
-    bool enableBeardTexture = beardType >= 4;
+    bool enableBeardTexture = beardType >= FFL_BEARD_SHAPE_MAX;
 
     if (enableBeardTexture)
         FFLiDeleteTexture(&pObject->pTextureFaceBeard, isExpand);

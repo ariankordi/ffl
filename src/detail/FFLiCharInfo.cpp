@@ -245,7 +245,7 @@ bool FFLiiVerifyCharInfo(const FFLiCharInfo* pCharInfo, bool verifyName)
 
 s32 FFLiiGetEyeRotateOffset(s32 type)
 {
-    static const u8 ROTATE[FFL_EYE_TYPE_TRUE_MAX] = {
+    static const u8 ROTATE[FFL_EYE_TYPE_RESOURCE_MAX] = {
         3, 4, 4, 4,
         3, 4, 4, 4,
         3, 4, 4, 4,

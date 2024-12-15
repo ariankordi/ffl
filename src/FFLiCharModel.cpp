@@ -91,16 +91,16 @@ struct FFLiShapeTypeInfo
     FFLiShapeType   capIndex;
 };
 
-static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_0 = {
-    FFLI_SHAPE_TYPE_OPA_HAIR_1,
-    FFLI_SHAPE_TYPE_OPA_FOREHEAD_1,
-    FFLI_SHAPE_TYPE_OPA_CAP_1
+static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_NORMAL = {
+    FFLI_SHAPE_TYPE_OPA_HAIR_NORMAL,
+    FFLI_SHAPE_TYPE_OPA_FOREHEAD_NORMAL,
+    FFLI_SHAPE_TYPE_OPA_HAT_NORMAL
 };
 
-static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_1 = {
-    FFLI_SHAPE_TYPE_OPA_HAIR_2,
-    FFLI_SHAPE_TYPE_OPA_FOREHEAD_2,
-    FFLI_SHAPE_TYPE_OPA_CAP_2
+static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_HAT = {
+    FFLI_SHAPE_TYPE_OPA_HAIR_CAP,
+    FFLI_SHAPE_TYPE_OPA_FOREHEAD_CAP,
+    FFLI_SHAPE_TYPE_OPA_HAT_CAP
 };
 
 const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
@@ -108,11 +108,11 @@ const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
     switch (type)
     {
     case FFL_MODEL_TYPE_NORMAL:
-        return SHAPE_TYPE_INFO_0;
+        return SHAPE_TYPE_INFO_NORMAL;
     case FFL_MODEL_TYPE_HAT:
-        return SHAPE_TYPE_INFO_1;
+        return SHAPE_TYPE_INFO_HAT;
     default:
-        return SHAPE_TYPE_INFO_0;
+        return SHAPE_TYPE_INFO_NORMAL;
     }
 }
 

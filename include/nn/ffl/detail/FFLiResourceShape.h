@@ -21,7 +21,7 @@ enum FFLiResourceShapeElementType
     FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_COLOR      = 4,
     FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX      = 5,
 
-    FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR_1   = 6,
+    FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR     = 6,
     FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_FACELINE = 7,
 
     FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BOUNDING_BOX   = 8,
@@ -39,17 +39,17 @@ struct FFLiResourceShapeHeader
 {
     u32                     partsMaxSize[FFLI_SHAPE_PARTS_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoBeard[4];
-    FFLiResourcePartsInfo   partsInfoCap1[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoCap2[FFL_HAIR_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoHatNormal[FFL_HAIR_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoHatCap[FFL_HAIR_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoFaceline[FFL_FACE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoGlass[1];
     FFLiResourcePartsInfo   partsInfoMask[FFL_FACE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoNoseline[FFL_NOSE_TYPE_MAX];
     FFLiResourcePartsInfo   partsInfoNose[FFL_NOSE_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoHair1[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoHair2[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoForehead1[FFL_HAIR_TYPE_MAX];
-    FFLiResourcePartsInfo   partsInfoForehead2[FFL_HAIR_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoHairNormal[FFL_HAIR_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoHairCap[FFL_HAIR_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoForeheadNormal[FFL_HAIR_TYPE_MAX];
+    FFLiResourcePartsInfo   partsInfoForeheadCap[FFL_HAIR_TYPE_MAX];
 };
 NN_STATIC_ASSERT(sizeof(FFLiResourceShapeHeader) == 0x35C0);
 

@@ -66,10 +66,10 @@ u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
     {
     case FFLI_SHAPE_PARTS_TYPE_BEARD:
         return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoBeard) / sizeof(FFLiResourcePartsInfo);
-    case FFLI_SHAPE_PARTS_TYPE_CAP_1:
-        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoCap1) / sizeof(FFLiResourcePartsInfo);
-    case FFLI_SHAPE_PARTS_TYPE_CAP_2:
-        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoCap2) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL:
+        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoHatNormal) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_SHAPE_PARTS_TYPE_HAT_CAP:
+        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoHatCap) / sizeof(FFLiResourcePartsInfo);
     case FFLI_SHAPE_PARTS_TYPE_FACELINE:
         return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoFaceline) / sizeof(FFLiResourcePartsInfo);
     case FFLI_SHAPE_PARTS_TYPE_GLASS:
@@ -80,14 +80,14 @@ u32 FFLiGetShapeResourceNum(FFLiShapePartsType partsType)
         return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoNoseline) / sizeof(FFLiResourcePartsInfo);
     case FFLI_SHAPE_PARTS_TYPE_NOSE:
         return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoNose) / sizeof(FFLiResourcePartsInfo);
-    case FFLI_SHAPE_PARTS_TYPE_HAIR_1:
-        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoHair1) / sizeof(FFLiResourcePartsInfo);
-    case FFLI_SHAPE_PARTS_TYPE_HAIR_2:
-        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoHair2) / sizeof(FFLiResourcePartsInfo);
-    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1:
-        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoForehead1) / sizeof(FFLiResourcePartsInfo);
-    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2:
-        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoForehead2) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL:
+        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoHairNormal) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_SHAPE_PARTS_TYPE_HAIR_CAP:
+        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoHairCap) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_NORMAL:
+        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoForeheadNormal) / sizeof(FFLiResourcePartsInfo);
+    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP:
+        return SIZE_OF_MEMBER(FFLiResourceShapeHeader, partsInfoForeheadCap) / sizeof(FFLiResourcePartsInfo);
     default:
         return 0;
     }
@@ -154,10 +154,10 @@ FFLiResourcePartsInfo* FFLiGetShapeResoucePartsInfos(u32* pNum, FFLiResourceShap
     {
     case FFLI_SHAPE_PARTS_TYPE_BEARD:
         return pHeader->partsInfoBeard;
-    case FFLI_SHAPE_PARTS_TYPE_CAP_1:
-        return pHeader->partsInfoCap1;
-    case FFLI_SHAPE_PARTS_TYPE_CAP_2:
-        return pHeader->partsInfoCap2;
+    case FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL:
+        return pHeader->partsInfoHatNormal;
+    case FFLI_SHAPE_PARTS_TYPE_HAT_CAP:
+        return pHeader->partsInfoHatCap;
     case FFLI_SHAPE_PARTS_TYPE_FACELINE:
         return pHeader->partsInfoFaceline;
     case FFLI_SHAPE_PARTS_TYPE_GLASS:
@@ -168,14 +168,14 @@ FFLiResourcePartsInfo* FFLiGetShapeResoucePartsInfos(u32* pNum, FFLiResourceShap
         return pHeader->partsInfoNoseline;
     case FFLI_SHAPE_PARTS_TYPE_NOSE:
         return pHeader->partsInfoNose;
-    case FFLI_SHAPE_PARTS_TYPE_HAIR_1:
-        return pHeader->partsInfoHair1;
-    case FFLI_SHAPE_PARTS_TYPE_HAIR_2:
-        return pHeader->partsInfoHair2;
-    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1:
-        return pHeader->partsInfoForehead1;
-    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2:
-        return pHeader->partsInfoForehead2;
+    case FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL:
+        return pHeader->partsInfoHairNormal;
+    case FFLI_SHAPE_PARTS_TYPE_HAIR_CAP:
+        return pHeader->partsInfoHairCap;
+    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_NORMAL:
+        return pHeader->partsInfoForeheadNormal;
+    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP:
+        return pHeader->partsInfoForeheadCap;
     default:
         return NULL;
     }

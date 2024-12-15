@@ -1685,19 +1685,19 @@ FFL_ATTRIBUTE_BUFFER_TYPE_COLOR     = 4
 
 
 # FFLiShapePartsType
-FFLI_SHAPE_PARTS_TYPE_BEARD         =  0
-FFLI_SHAPE_PARTS_TYPE_CAP_1         =  1
-FFLI_SHAPE_PARTS_TYPE_CAP_2         =  2
-FFLI_SHAPE_PARTS_TYPE_FACELINE      =  3
-FFLI_SHAPE_PARTS_TYPE_GLASS         =  4
-FFLI_SHAPE_PARTS_TYPE_MASK          =  5
-FFLI_SHAPE_PARTS_TYPE_NOSELINE      =  6
-FFLI_SHAPE_PARTS_TYPE_NOSE          =  7
-FFLI_SHAPE_PARTS_TYPE_HAIR_1        =  8
-FFLI_SHAPE_PARTS_TYPE_HAIR_2        =  9
-FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1    = 10
-FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2    = 11
-FFLI_SHAPE_PARTS_TYPE_MAX           = 12
+FFLI_SHAPE_PARTS_TYPE_BEARD           =  0
+FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL      =  1
+FFLI_SHAPE_PARTS_TYPE_HAT_CAP         =  2
+FFLI_SHAPE_PARTS_TYPE_FACELINE        =  3
+FFLI_SHAPE_PARTS_TYPE_GLASS           =  4
+FFLI_SHAPE_PARTS_TYPE_MASK            =  5
+FFLI_SHAPE_PARTS_TYPE_NOSELINE        =  6
+FFLI_SHAPE_PARTS_TYPE_NOSE            =  7
+FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL     =  8
+FFLI_SHAPE_PARTS_TYPE_HAIR_CAP        =  9
+FFLI_SHAPE_PARTS_TYPE_FOREHEAD_NORMAL = 10
+FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP    = 11
+FFLI_SHAPE_PARTS_TYPE_MAX             = 12
 
 
 class FFLiResourceShapeHeader:
@@ -1721,29 +1721,29 @@ class FFLiResourceShapeHeader:
 
     def load(self, headerData, data, pos=0, isExpand=False):
         (partsMaxSizeBeard,
-         partsMaxSizeCap1,
-         partsMaxSizeCap2,
+         partsMaxSizeHatNormal,
+         partsMaxSizeHatCap,
          partsMaxSizeFaceline,
          partsMaxSizeGlass,
          partsMaxSizeMask,
          partsMaxSizeNoseline,
          partsMaxSizeNose,
-         partsMaxSizeHair1,
-         partsMaxSizeHair2,
-         partsMaxSizeForehead1,
-         partsMaxSizeForehead2,
+         partsMaxSizeHairNormal,
+         partsMaxSizeHairCap,
+         partsMaxSizeForeheadNormal,
+         partsMaxSizeForeheadCap,
          partsInfoBeardData,
-         partsInfoCap1Data,
-         partsInfoCap2Data,
+         partsInfoHatNormalData,
+         partsInfoHatCapData,
          partsInfoFacelineData,
          partsInfoGlassData,
          partsInfoMaskData,
          partsInfoNoselineData,
          partsInfoNoseData,
-         partsInfoHair1Data,
-         partsInfoHair2Data,
-         partsInfoForehead1Data,
-         partsInfoForehead2Data) = struct.unpack(self._format, headerData)
+         partsInfoHairNormalData,
+         partsInfoHairCapData,
+         partsInfoForeheadNormalData,
+         partsInfoForeheadCapData) = struct.unpack(self._format, headerData)
 
         expandAlignment = max(ATTRIBUTE_DATA_ALIGNMENT, INDEX_DATA_ALIGNMENT)
 
@@ -1754,19 +1754,19 @@ class FFLiResourceShapeHeader:
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
             self.partsInfoBeard.append([partsInfo, shape])
 
-        self.partsInfoCap1 = []
+        self.partsInfoHatNormal = []
         for i in range(132):
             partsInfo = FFLiResourcePartsInfo()
-            partsData = partsInfo.load(partsInfoCap1Data[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
+            partsData = partsInfo.load(partsInfoHatNormalData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
-            self.partsInfoCap1.append([partsInfo, shape])
+            self.partsInfoHatNormal.append([partsInfo, shape])
 
-        self.partsInfoCap2 = []
+        self.partsInfoHatCap = []
         for i in range(132):
             partsInfo = FFLiResourcePartsInfo()
-            partsData = partsInfo.load(partsInfoCap2Data[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
+            partsData = partsInfo.load(partsInfoHatCapData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
-            self.partsInfoCap2.append([partsInfo, shape])
+            self.partsInfoHatCap.append([partsInfo, shape])
 
         self.partsInfoFaceline = []
         for i in range(12):
@@ -1803,33 +1803,33 @@ class FFLiResourceShapeHeader:
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
             self.partsInfoNose.append([partsInfo, shape])
 
-        self.partsInfoHair1 = []
+        self.partsInfoHairNormal = []
         for i in range(132):
             partsInfo = FFLiResourcePartsInfo()
-            partsData = partsInfo.load(partsInfoHair1Data[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
+            partsData = partsInfo.load(partsInfoHairNormalData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
-            self.partsInfoHair1.append([partsInfo, shape])
+            self.partsInfoHairNormal.append([partsInfo, shape])
 
-        self.partsInfoHair2 = []
+        self.partsInfoHairCap = []
         for i in range(132):
             partsInfo = FFLiResourcePartsInfo()
-            partsData = partsInfo.load(partsInfoHair2Data[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
+            partsData = partsInfo.load(partsInfoHairCapData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
-            self.partsInfoHair2.append([partsInfo, shape])
+            self.partsInfoHairCap.append([partsInfo, shape])
 
-        self.partsInfoForehead1 = []
+        self.partsInfoForeheadNormal = []
         for i in range(132):
             partsInfo = FFLiResourcePartsInfo()
-            partsData = partsInfo.load(partsInfoForehead1Data[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
+            partsData = partsInfo.load(partsInfoForeheadNormalData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
-            self.partsInfoForehead1.append([partsInfo, shape])
+            self.partsInfoForeheadNormal.append([partsInfo, shape])
 
-        self.partsInfoForehead2 = []
+        self.partsInfoForeheadCap = []
         for i in range(132):
             partsInfo = FFLiResourcePartsInfo()
-            partsData = partsInfo.load(partsInfoForehead2Data[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
+            partsData = partsInfo.load(partsInfoForeheadCapData[i * FFLiResourcePartsInfo.size:(i + 1) * FFLiResourcePartsInfo.size], data, pos, isExpand, expandAlignment)
             shape = FFLiResourceShapeDataHeader.load(partsData, isExpand)
-            self.partsInfoForehead2.append([partsInfo, shape])
+            self.partsInfoForeheadCap.append([partsInfo, shape])
 
     def save(self, currentFileSize, isExpand):
         global total_uncompressed_size
@@ -1846,22 +1846,22 @@ class FFLiResourceShapeHeader:
             partsInfoBeardData += partsInfoData
             data += partsData
 
-        partsMaxSizeCap1 = 0
-        partsInfoCap1Data = bytearray()
-        for partsInfo, shape in self.partsInfoCap1:
+        partsMaxSizeHatNormal = 0
+        partsInfoHatNormalData = bytearray()
+        for partsInfo, shape in self.partsInfoHatNormal:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
-            partsMaxSizeCap1 = max(len(partsData), partsMaxSizeCap1)
+            partsMaxSizeHatNormal = max(len(partsData), partsMaxSizeHatNormal)
             partsInfoData, partsData = partsInfo.save(partsData, currentFileSize, isExpand, expandAlignment); currentFileSize += len(partsData)
-            partsInfoCap1Data += partsInfoData
+            partsInfoHatNormalData += partsInfoData
             data += partsData
 
-        partsMaxSizeCap2 = 0
-        partsInfoCap2Data = bytearray()
-        for partsInfo, shape in self.partsInfoCap2:
+        partsMaxSizeHatCap = 0
+        partsInfoHatCapData = bytearray()
+        for partsInfo, shape in self.partsInfoHatCap:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
-            partsMaxSizeCap2 = max(len(partsData), partsMaxSizeCap2)
+            partsMaxSizeHatCap = max(len(partsData), partsMaxSizeHatCap)
             partsInfoData, partsData = partsInfo.save(partsData, currentFileSize, isExpand, expandAlignment); currentFileSize += len(partsData)
-            partsInfoCap2Data += partsInfoData
+            partsInfoHatCapData += partsInfoData
             data += partsData
 
         partsMaxSizeFaceline = 0
@@ -1909,68 +1909,68 @@ class FFLiResourceShapeHeader:
             partsInfoNoseData += partsInfoData
             data += partsData
 
-        partsMaxSizeHair1 = 0
-        partsInfoHair1Data = bytearray()
-        for partsInfo, shape in self.partsInfoHair1:
+        partsMaxSizeHairNormal = 0
+        partsInfoHairNormalData = bytearray()
+        for partsInfo, shape in self.partsInfoHairNormal:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
-            partsMaxSizeHair1 = max(len(partsData), partsMaxSizeHair1)
+            partsMaxSizeHairNormal = max(len(partsData), partsMaxSizeHairNormal)
             partsInfoData, partsData = partsInfo.save(partsData, currentFileSize, isExpand, expandAlignment); currentFileSize += len(partsData)
-            partsInfoHair1Data += partsInfoData
+            partsInfoHairNormalData += partsInfoData
             data += partsData
 
-        partsMaxSizeHair2 = 0
-        partsInfoHair2Data = bytearray()
-        for partsInfo, shape in self.partsInfoHair2:
+        partsMaxSizeHairCap = 0
+        partsInfoHairCapData = bytearray()
+        for partsInfo, shape in self.partsInfoHairCap:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
-            partsMaxSizeHair2 = max(len(partsData), partsMaxSizeHair2)
+            partsMaxSizeHairCap = max(len(partsData), partsMaxSizeHairCap)
             partsInfoData, partsData = partsInfo.save(partsData, currentFileSize, isExpand, expandAlignment); currentFileSize += len(partsData)
-            partsInfoHair2Data += partsInfoData
+            partsInfoHairCapData += partsInfoData
             data += partsData
 
-        partsMaxSizeForehead1 = 0
-        partsInfoForehead1Data = bytearray()
-        for partsInfo, shape in self.partsInfoForehead1:
+        partsMaxSizeForeheadNormal = 0
+        partsInfoForeheadNormalData = bytearray()
+        for partsInfo, shape in self.partsInfoForeheadNormal:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
-            partsMaxSizeForehead1 = max(len(partsData), partsMaxSizeForehead1)
+            partsMaxSizeForeheadNormal = max(len(partsData), partsMaxSizeForeheadNormal)
             partsInfoData, partsData = partsInfo.save(partsData, currentFileSize, isExpand, expandAlignment); currentFileSize += len(partsData)
-            partsInfoForehead1Data += partsInfoData
+            partsInfoForeheadNormalData += partsInfoData
             data += partsData
 
-        partsMaxSizeForehead2 = 0
-        partsInfoForehead2Data = bytearray()
-        for partsInfo, shape in self.partsInfoForehead2:
+        partsMaxSizeForeheadCap = 0
+        partsInfoForeheadCapData = bytearray()
+        for partsInfo, shape in self.partsInfoForeheadCap:
             partsData = FFLiResourceShapeDataHeader.save(shape, isExpand)
-            partsMaxSizeForehead2 = max(len(partsData), partsMaxSizeForehead2)
+            partsMaxSizeForeheadCap = max(len(partsData), partsMaxSizeForeheadCap)
             partsInfoData, partsData = partsInfo.save(partsData, currentFileSize, isExpand, expandAlignment); currentFileSize += len(partsData)
-            partsInfoForehead2Data += partsInfoData
+            partsInfoForeheadCapData += partsInfoData
             data += partsData
 
         headerData = struct.pack(
             self._format,
             partsMaxSizeBeard,
-            partsMaxSizeCap1,
-            partsMaxSizeCap2,
+            partsMaxSizeHatNormal,
+            partsMaxSizeHatCap,
             partsMaxSizeFaceline,
             partsMaxSizeGlass,
             partsMaxSizeMask,
             partsMaxSizeNoseline,
             partsMaxSizeNose,
-            partsMaxSizeHair1,
-            partsMaxSizeHair2,
-            partsMaxSizeForehead1,
-            partsMaxSizeForehead2,
+            partsMaxSizeHairNormal,
+            partsMaxSizeHairCap,
+            partsMaxSizeForeheadNormal,
+            partsMaxSizeForeheadCap,
             partsInfoBeardData,
-            partsInfoCap1Data,
-            partsInfoCap2Data,
+            partsInfoHatNormalData,
+            partsInfoHatCapData,
             partsInfoFacelineData,
             partsInfoGlassData,
             partsInfoMaskData,
             partsInfoNoselineData,
             partsInfoNoseData,
-            partsInfoHair1Data,
-            partsInfoHair2Data,
-            partsInfoForehead1Data,
-            partsInfoForehead2Data
+            partsInfoHairNormalData,
+            partsInfoHairCapData,
+            partsInfoForeheadNormalData,
+            partsInfoForeheadCapData
         )
 
         #total_uncompressed_size += len(headerData)
@@ -1987,17 +1987,17 @@ class FFLiResourceShapeHeader:
 
         for partsInfoArray, name in (
             (self.partsInfoBeard, "Beard"),
-            (self.partsInfoCap1, "Cap1"),
-            (self.partsInfoCap2, "Cap2"),
+            (self.partsInfoHatNormal, "HatNormal"),
+            (self.partsInfoHatCap, "HatCap"),
             (self.partsInfoFaceline, "Faceline"),
             (self.partsInfoGlass, "Glass"),
             (self.partsInfoMask, "Mask"),
             (self.partsInfoNoseline, "Noseline"),
             (self.partsInfoNose, "Nose"),
-            (self.partsInfoHair1, "Hair1"),
-            (self.partsInfoHair2, "Hair2"),
-            (self.partsInfoForehead1, "Forehead1"),
-            (self.partsInfoForehead2, "Forehead2")
+            (self.partsInfoHairNormal, "HairNormal"),
+            (self.partsInfoHairCap, "HairCap"),
+            (self.partsInfoForeheadNormal, "ForeheadNormal"),
+            (self.partsInfoForeheadCap, "ForeheadCap")
         ):
             for i, (partsInfo, shape) in enumerate(partsInfoArray):
                 if shape is None:
@@ -2039,17 +2039,17 @@ class FFLiResourceShapeHeader:
 
         for count, name in (
             (  4, "Beard"),
-            (132, "Cap1"),
-            (132, "Cap2"),
+            (132, "HatNormal"),
+            (132, "HatCap"),
             ( 12, "Faceline"),
             (  1, "Glass"),
             ( 12, "Mask"),
             ( 18, "Noseline"),
             ( 18, "Nose"),
-            (132, "Hair1"),
-            (132, "Hair2"),
-            (132, "Forehead1"),
-            (132, "Forehead2")
+            (132, "HairNormal"),
+            (132, "HairCap"),
+            (132, "ForeheadNormal"),
+            (132, "ForeheadCap")
         ):
             partsInfoArray = []
 
@@ -2099,17 +2099,17 @@ class FFLiResourceShapeHeader:
     def compare(self, other):
         for partsInfoArrayA, partsInfoArrayB, name in (
             (self.partsInfoBeard, other.partsInfoBeard, "Beard"),
-            (self.partsInfoCap1, other.partsInfoCap1, "Cap1"),
-            (self.partsInfoCap2, other.partsInfoCap2, "Cap2"),
+            (self.partsInfoHatNormal, other.partsInfoHatNormal, "HatNormal"),
+            (self.partsInfoHatCap, other.partsInfoHatCap, "HatCap"),
             (self.partsInfoFaceline, other.partsInfoFaceline, "Faceline"),
             (self.partsInfoGlass, other.partsInfoGlass, "Glass"),
             (self.partsInfoMask, other.partsInfoMask, "Mask"),
             (self.partsInfoNoseline, other.partsInfoNoseline, "Noseline"),
             (self.partsInfoNose, other.partsInfoNose, "Nose"),
-            (self.partsInfoHair1, other.partsInfoHair1, "Hair1"),
-            (self.partsInfoHair2, other.partsInfoHair2, "Hair2"),
-            (self.partsInfoForehead1, other.partsInfoForehead1, "Forehead1"),
-            (self.partsInfoForehead2, other.partsInfoForehead2, "Forehead2")
+            (self.partsInfoHairNormal, other.partsInfoHairNormal, "HairNormal"),
+            (self.partsInfoHairCap, other.partsInfoHairCap, "HairCap"),
+            (self.partsInfoForeheadNormal, other.partsInfoForeheadNormal, "ForeheadNormal"),
+            (self.partsInfoForeheadCap, other.partsInfoForeheadCap, "ForeheadCap")
         ):
             for i, ((partsInfoA, shapeA), (partsInfoB, shapeB)) in enumerate(zip(partsInfoArrayA, partsInfoArrayB)):
                 label = "FFLiResourceShapeHeader.%s.%d" % (name, i)

@@ -296,9 +296,10 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
             if (useFlag[i])
             {
                 u32 eyebrowIndex = FFLiCharInfoAndTypeToEyebrowIndex(pCharInfo, FFLiEyebrowTextureType(i));
-                // skip eyebrow type 23 specifically bc it is blank
-                if (eyebrowIndex == 23)
+
+                if (eyebrowIndex == FFL_EYEBROW_TYPE_EMPTY)
                     continue;
+
                 FFLResult result = FFLiLoadTextureWithAllocate(&(pPartsTextures->pTexturesEyebrow[i]), FFLI_TEXTURE_PARTS_TYPE_EYEBROW, eyebrowIndex, pResLoader);
                 // here eyebrow type corresponds directly to the resource type
                 if (result != FFL_RESULT_OK)
@@ -315,7 +316,7 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
         }
     }
 
-    if (pCharInfo->parts.mustacheType != 0) {
+    if (pCharInfo->parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY) {
         result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMustache, FFLI_TEXTURE_PARTS_TYPE_MUSTACHE, pCharInfo->parts.mustacheType, pResLoader);
         if (result != FFL_RESULT_OK)
         {
@@ -328,7 +329,7 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
         pPartsTextures->pTextureMustache = NULL;
     }
 
-    if (pCharInfo->parts.moleType != 0) {
+    if (pCharInfo->parts.moleType != FFL_MOLE_TYPE_EMPTY) {
         result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMole, FFLI_TEXTURE_PARTS_TYPE_MOLE, pCharInfo->parts.moleType, pResLoader);
         if (result != FFL_RESULT_OK)
         {

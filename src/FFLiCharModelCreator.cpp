@@ -135,7 +135,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 
     bool enableFacelineTexture = pModel->charInfo.parts.faceLine != 0 ||
         pModel->charInfo.parts.faceMakeup != 0 ||
-        pModel->charInfo.parts.beardType >= 4; // FFLiInitTempObjectFacelineTexture
+        pModel->charInfo.parts.beardType >= FFL_BEARD_SHAPE_MAX; // FFLiInitTempObjectFacelineTexture
     if (enableFacelineTexture)
 #ifndef FFL_NO_RENDER_TEXTURE
         FFLiInitFacelineTexture(&pModel->facelineRenderTexture, resolution, isEnabledMipMap);
@@ -345,10 +345,10 @@ FFLiShapeType ConvertShapePartsTypeToShapeType(FFLiShapePartsType partsType)
     {
     case FFLI_SHAPE_PARTS_TYPE_BEARD:
         return FFLI_SHAPE_TYPE_OPA_BEARD;
-    case FFLI_SHAPE_PARTS_TYPE_CAP_1:
-        return FFLI_SHAPE_TYPE_OPA_CAP_1;
-    case FFLI_SHAPE_PARTS_TYPE_CAP_2:
-        return FFLI_SHAPE_TYPE_OPA_CAP_2;
+    case FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL:
+        return FFLI_SHAPE_TYPE_OPA_HAT_NORMAL;
+    case FFLI_SHAPE_PARTS_TYPE_HAT_CAP:
+        return FFLI_SHAPE_TYPE_OPA_HAT_CAP;
     case FFLI_SHAPE_PARTS_TYPE_FACELINE:
         return FFLI_SHAPE_TYPE_OPA_FACELINE;
     case FFLI_SHAPE_PARTS_TYPE_GLASS:
@@ -359,14 +359,14 @@ FFLiShapeType ConvertShapePartsTypeToShapeType(FFLiShapePartsType partsType)
         return FFLI_SHAPE_TYPE_XLU_NOSELINE;
     case FFLI_SHAPE_PARTS_TYPE_NOSE:
         return FFLI_SHAPE_TYPE_OPA_NOSE;
-    case FFLI_SHAPE_PARTS_TYPE_HAIR_1:
-        return FFLI_SHAPE_TYPE_OPA_HAIR_1;
-    case FFLI_SHAPE_PARTS_TYPE_HAIR_2:
-        return FFLI_SHAPE_TYPE_OPA_HAIR_2;
-    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1:
-        return FFLI_SHAPE_TYPE_OPA_FOREHEAD_1;
-    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2:
-        return FFLI_SHAPE_TYPE_OPA_FOREHEAD_2;
+    case FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL:
+        return FFLI_SHAPE_TYPE_OPA_HAIR_NORMAL;
+    case FFLI_SHAPE_PARTS_TYPE_HAIR_CAP:
+        return FFLI_SHAPE_TYPE_OPA_HAIR_CAP;
+    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_NORMAL:
+        return FFLI_SHAPE_TYPE_OPA_FOREHEAD_NORMAL;
+    case FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP:
+        return FFLI_SHAPE_TYPE_OPA_FOREHEAD_CAP;
     default:
         return FFLI_SHAPE_TYPE_MAX;
     }
@@ -457,13 +457,13 @@ const ModelTypeShapePartsInfo* GetModelTypeShapePartsInfo(u32 modelFlag)
 {
     static ModelTypeShapePartsInfo modelTypeShapePartsInfo[2 * 3] = {
         // FFL_MODEL_TYPE_NORMAL
-        { false, FFLI_SHAPE_PARTS_TYPE_HAIR_1 },
-        { false, FFLI_SHAPE_PARTS_TYPE_CAP_1 },
-        { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_1 },
+        { false, FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL },
+        { false, FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL },
+        { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_NORMAL },
         // FFL_MODEL_TYPE_HAT
-        { false, FFLI_SHAPE_PARTS_TYPE_HAIR_2 },
-        { false, FFLI_SHAPE_PARTS_TYPE_CAP_2 },
-        { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_2 }
+        { false, FFLI_SHAPE_PARTS_TYPE_HAIR_CAP },
+        { false, FFLI_SHAPE_PARTS_TYPE_HAT_CAP },
+        { false, FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP }
     };
 
     bool modelType0Enable = modelFlag & FFL_MODEL_FLAG_NORMAL;
@@ -495,7 +495,7 @@ void DeleteShape_Hair(FFLiCharModel* pModel, u32 count = 2 * 3)
 
 void DeleteShape_Beard(FFLiCharModel* pModel)
 {
-    if (pModel->charInfo.parts.beardType < 4)
+    if (pModel->charInfo.parts.beardType < FFL_BEARD_SHAPE_MAX)
         DeleteShape(pModel, FFLI_SHAPE_PARTS_TYPE_BEARD);
 }
 
@@ -551,7 +551,7 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
 
     }
 
-    if (pModel->charInfo.parts.beardType < 4)
+    if (pModel->charInfo.parts.beardType < FFL_BEARD_SHAPE_MAX)
     {
         result = InitShape(pModel, FFLI_SHAPE_PARTS_TYPE_BEARD, pModel->charInfo.parts.beardType, 1.0f, 1.0f, &pModel->beardPos, false, pResLoader, pCoordinate);
         if (result != FFL_RESULT_OK)
@@ -663,8 +663,8 @@ void DeleteShapes(FFLiCharModel* pModel)
 
 void DeleteTexture_Cap(FFLiCharModel* pModel, bool isExpand)
 {
-    if (FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_CAP_1])) ||
-        FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_CAP_2])))
+    if (FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_HAT_NORMAL])) ||
+        FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_HAT_CAP])))
     {
         FFLiDeleteTexture(&pModel->pCapTexture, isExpand);
     }
@@ -684,8 +684,8 @@ void DeleteTexture_Glass(FFLiCharModel* pModel, bool isExpand)
 
 FFLResult InitTextures(FFLiCharModel* pModel, FFLiResourceLoader* pResLoader)
 {
-    if (FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_CAP_1])) ||
-        FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_CAP_2])))
+    if (FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_HAT_NORMAL])) ||
+        FFLiCanDrawShape(&(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_HAT_CAP])))
     {
         FFLResult result = FFLiLoadTextureWithAllocate(&pModel->pCapTexture, FFLI_TEXTURE_PARTS_TYPE_CAP, pModel->charInfo.parts.hairType, pResLoader);
         if (result != FFL_RESULT_OK)
@@ -755,16 +755,16 @@ struct FFLiShapeTypeInfo
     FFLiShapeType   capIndex;
 };
 
-static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_0 = {
-    FFLI_SHAPE_TYPE_OPA_HAIR_1,
-    FFLI_SHAPE_TYPE_OPA_FOREHEAD_1,
-    FFLI_SHAPE_TYPE_OPA_CAP_1
+static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_NORMAL = {
+    FFLI_SHAPE_TYPE_OPA_HAIR_NORMAL,
+    FFLI_SHAPE_TYPE_OPA_FOREHEAD_NORMAL,
+    FFLI_SHAPE_TYPE_OPA_HAT_NORMAL
 };
 
-static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_1 = {
-    FFLI_SHAPE_TYPE_OPA_HAIR_2,
-    FFLI_SHAPE_TYPE_OPA_FOREHEAD_2,
-    FFLI_SHAPE_TYPE_OPA_CAP_2
+static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_HAT = {
+    FFLI_SHAPE_TYPE_OPA_HAIR_CAP,
+    FFLI_SHAPE_TYPE_OPA_FOREHEAD_CAP,
+    FFLI_SHAPE_TYPE_OPA_HAT_CAP
 };
 
 const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
@@ -772,11 +772,11 @@ const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
     switch (type)
     {
     case FFL_MODEL_TYPE_NORMAL:
-        return SHAPE_TYPE_INFO_0;
+        return SHAPE_TYPE_INFO_NORMAL;
     case FFL_MODEL_TYPE_HAT:
-        return SHAPE_TYPE_INFO_1;
+        return SHAPE_TYPE_INFO_HAT;
     default:
-        return SHAPE_TYPE_INFO_0;
+        return SHAPE_TYPE_INFO_NORMAL;
     }
 }
 
