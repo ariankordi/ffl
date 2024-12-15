@@ -127,10 +127,6 @@ FFLExpression FFLiInitMaskTextures(FFLiMaskTextures* pMaskTextures, FFLAllExpres
             pMaskTextures->pRenderTextures[i] = FFLiRenderTextureAllocate();
             rio::TextureFormat format = GetTextureFormat(FFLiUseOffScreenSrgbFetch());
             FFLiInitRenderTexture(pMaskTextures->pRenderTextures[i], resolution, resolution, format, numMips);
-    #if RIO_IS_WIN
-            RIO_GL_CALL(glBindTexture(GL_TEXTURE_2D, FFL_GET_RIO_NATIVE_TEXTURE_HANDLE(pMaskTextures->pRenderTextures[i]->pTexture2D)));
-            RIO_GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-    #endif // RIO_IS_WIN
 #else // FFL_NO_RENDER_TEXTURE
             // HACK used for faceline texture but also here to indicate
             // just that this mask is active, used by FFLIsAvailableExpression
@@ -336,7 +332,7 @@ void FFLiRenderMaskTextures(FFLiMaskTextures* pMaskTextures, FFLiMaskTexturesTem
                     pCopySurface->Execute(pSurface, i, pSurface, i - 1);
 
                 pCopySurface->End();
-#endif
+#endif // RIO_IS_WIN
             }
 
             FFLiFlushRenderTexture(&renderTexture);
