@@ -22,10 +22,11 @@ typedef struct FFLDrawParam FFLDrawParam;
 typedef struct FFLShaderCallback
 {
     void*               pObj;
-#ifdef FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
-    // allow shader to specify that faceline color should have A set to 0, needed for switch shader when drawType is set to faceline
+    // allow shader to specify that faceline color should
+    // have A set to 0, needed for switch shader when
+    // drawType is set to faceline (only when letting FFL make render textures)
     bool                facelineColorIsTransparent;
-#endif // FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
+    u8                  _padding[3];
     void (*pApplyAlphaTestFunc)(void* pObj, bool enable, FFLRIOCompareFunc func, f32 ref);
     void (*pDrawFunc)(void* pObj, const FFLDrawParam* drawParam);
     void (*pSetMatrixFunc)(void* pObj, const FFLRIOBaseMtx44f* matrix);

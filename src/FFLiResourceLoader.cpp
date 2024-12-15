@@ -83,7 +83,10 @@ FFLResult FFLiResourceLoader::LoadTexture(void* pData, u32* pSize, FFLiTexturePa
 #else
     )
 #endif
+    {
+        RIO_LOG("FFLiResourceLoader::LoadTexture: Tried to load invalid parts type %d index %d (max: %d)\n", partsType, index, num);
         return FFL_RESULT_ERROR;
+    }
 
     const u32 partIndex =
 #ifdef FFL_PART_INDEX_WRAP
@@ -136,7 +139,10 @@ FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsT
 #else
     )
 #endif
+    {
+        RIO_LOG("FFLiResourceLoader::LoadShape: Tried to load invalid parts type %d index %d (max: %d)\n", partsType, index, num);
         return FFL_RESULT_ERROR;
+    }
 
     const u32 partIndex =
 #ifdef FFL_PART_INDEX_WRAP

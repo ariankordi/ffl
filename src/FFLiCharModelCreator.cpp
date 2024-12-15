@@ -90,6 +90,9 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     // are used - because they are not always initialized.
     if (!(pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_NEW_EXPRESSIONS))
     {
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+        RIO_LOG("model flag does not have FFL_MODEL_FLAG_NEW_EXPRESSIONS, truncating pModel->charModelDesc.allExpressionFlag\n");
+#endif
         pModel->charModelDesc.allExpressionFlag.flag.mid = 0;
         pModel->charModelDesc.allExpressionFlag.flag.high = 0;
     }
@@ -120,9 +123,9 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 
     pModel->pTextureTempObject = new FFLiTextureTempObject;
 
-    pModel->expression = FFLiInitMaskTextures(&pModel->maskTextures, pDesc->allExpressionFlag, resolution, isEnabledMipMap);
+    pModel->expression = FFLiInitMaskTextures(&pModel->maskTextures, pModel->charModelDesc.allExpressionFlag, resolution, isEnabledMipMap);
 
-    result = FFLiInitTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, &pModel->maskTextures, &pModel->charInfo, pDesc->allExpressionFlag, resolution, isEnabledMipMap, &resLoader);
+    result = FFLiInitTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, &pModel->maskTextures, &pModel->charInfo, pModel->charModelDesc.allExpressionFlag, resolution, isEnabledMipMap, &resLoader);
     if (result != FFL_RESULT_OK)
     {
         FFLiDeleteMaskTextures(&pModel->maskTextures);
@@ -151,7 +154,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         if (result != FFL_RESULT_OK)
         {
             FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
-            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->allExpressionFlag, pDesc->resourceType);
+            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pDesc->resourceType);
             FFLiDeleteMaskTextures(&pModel->maskTextures);
             FFLiDeleteTextureTempObject(pModel);
             return result;
@@ -168,7 +171,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
                 FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
                 FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
             }
-            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->allExpressionFlag, pDesc->resourceType);
+            FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pDesc->resourceType);
             FFLiDeleteMaskTextures(&pModel->maskTextures);
             FFLiDeleteTextureTempObject(pModel);
             return result;
@@ -185,7 +188,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
             FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
         }
-        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pDesc->allExpressionFlag, pDesc->resourceType);
+        FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pDesc->resourceType);
         FFLiDeleteMaskTextures(&pModel->maskTextures);
         FFLiDeleteTextureTempObject(pModel);
         return result;

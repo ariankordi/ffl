@@ -233,10 +233,16 @@ FFLResult FFLiResourceHeader::GetResult() const
         return FFL_RESULT_ERROR;
 
     if (GetMagic() != 0x46465241)  // FFRA
+    {
+        RIO_LOG("FFLiResourceHeader::GetResult: Invalid magic. Found: 0x%08X, Expected: 0x46465241\n", GetMagic());
         return FFL_RESULT_FILE_INVALID;
+    }
 
     if (GetVersion() != FFLI_RESOURCE_HEADER_VERSION)
+    {
+        RIO_LOG("FFLiResourceHeader::GetResult: Invalid version. Found: 0x%08X, Expected: 0x%08X\n", GetVersion(), FFLI_RESOURCE_HEADER_VERSION);
         return FFL_RESULT_FILE_INVALID;
+    }
 
     return FFL_RESULT_OK;
 }

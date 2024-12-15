@@ -3,7 +3,7 @@
 
 #include <nn/ffl/types.h>
 
-#define FFLI_AUTHOR_ID_SIZE  (sizeof(u64))
+#define FFLI_AUTHOR_ID_SIZE  (int)sizeof(u64)
 
 typedef struct FFLiAuthorID
 {
