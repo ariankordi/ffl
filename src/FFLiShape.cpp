@@ -430,21 +430,11 @@ void AdjustAttributeWithoutScale(T* pVec, u32 num, bool flipX, const FFLiCoordin
 // as an alternative to using front face culling.
 void AdjustIndexBuffer(void* pIndexPtr, u32 indexCount)
 {
-    /*
-    u16* pIndex = pIndexBuffer + (indexCount + -1);
-    u16 curIdx;
-    for (u32 i = 0; i < indexCount / 2; i = i + 1) {
-        curIdx = *pIndexBuffer;
-        *pIndexBuffer = *pIndex;
-        *pIndex = curIdx;
-        pIndexBuffer = pIndexBuffer + 1;
-        pIndex = pIndex + -1;
-    }
-    */
     u16* pIndexBuffer = static_cast<u16*>(pIndexPtr);
     u32 halfCount = indexCount / 2;
 
-    for (u32 i = 0; i < halfCount; ++i) {
+    for (u32 i = 0; i < halfCount; ++i)
+    {
         u16 curIdx = pIndexBuffer[i];
         pIndexBuffer[i] = pIndexBuffer[indexCount - 1 - i];
         pIndexBuffer[indexCount - 1 - i] = curIdx;

@@ -33,7 +33,8 @@ void FFLiRenderTextureDelete(FFLiRenderTexture* pRenderTexture);
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo* pCharInfo, FFLExpression expression);
 
 // Inline function to find the index of the least significant set bit
-inline s32 FindNextSetBit(u32* v) {
+inline s32 FindNextSetBit(u32* v)
+{
     if (*v == 0) return -1; // No set bits
 #if defined(__GNUC__) || defined(__clang__)
         s32 bitIndex = __builtin_ctz(*v);
@@ -204,10 +205,13 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
             desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
-            if (expressionCharInfo.parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY) {
+            if (expressionCharInfo.parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY)
+            {
                 desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
                 desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
-            } else {
+            }
+            else
+            {
                 desc.pTexturesMustache[0] = NULL;
                 desc.pTexturesMustache[1] = NULL;
             }
@@ -490,7 +494,8 @@ const CorrectParam& GetCorrectParam(FFLExpression expression)
 void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharInfo*, FFLExpression expression)
 {
     // courtesy of miitomo
-    switch(expression) {
+    switch(expression)
+    {
     case FFL_EXPRESSION_19:
         [[fallthrough]];
     case FFL_EXPRESSION_20:
@@ -626,14 +631,15 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
         pExpressionCharInfo->parts.mouthScale = 8;
 
     s32 mouthScaleY;
-    if (expression == 67) {
-        if (pExpressionCharInfo->parts.mouthScaleY < 3) {
+    if (expression == 67)
+    {
+        if (pExpressionCharInfo->parts.mouthScaleY < 3)
             mouthScaleY = 0;
-        } else {
+        else
+        {
             mouthScaleY = pExpressionCharInfo->parts.mouthScaleY + -3;
-            if (mouthScaleY > 6) {
+            if (mouthScaleY > 6)
                 mouthScaleY = 6;
-            }
         }
         pExpressionCharInfo->parts.mouthScaleY = mouthScaleY;
     }

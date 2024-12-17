@@ -121,12 +121,15 @@ void FFLiInitModulateShapeFaceline(FFLModulateParam* pParam, s32 color, const FF
     pParam->type = FFL_MODULATE_TYPE_SHAPE_FACELINE;
     pParam->pColorG = NULL;
     pParam->pColorB = NULL;
-    if (texture2D == NULL) {
+    if (texture2D == NULL)
+    {
         // bind it as a constant color rather than a texture
         pParam->mode = FFL_MODULATE_MODE_CONSTANT;
         pParam->pColorR = &FFLiGetFacelineColor(color);
         pParam->pTexture2D = NULL;
-    } else {
+    }
+    else
+    {
         pParam->mode = FFL_MODULATE_MODE_TEXTURE_DIRECT;
         pParam->pColorR = NULL;
         pParam->pTexture2D = texture2D;

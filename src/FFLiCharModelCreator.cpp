@@ -104,7 +104,9 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     if (pSource->dataSource == FFL_DATA_SOURCE_DIRECT_POINTER)
     {
         pModel->charInfo = *reinterpret_cast<const FFLiCharInfo*>(pSource->pBuffer);
-    } else {
+    }
+    else
+    {
         result = m_pCharModelCreateParam->GetDatabaseManager()->PickupCharInfo(&pModel->charInfo, pSource->dataSource, pSource->pBuffer, pSource->index);
         if (result != FFL_RESULT_OK)
             return result;
@@ -149,7 +151,8 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         // if faceline texture is not needed
         pModel->facelineRenderTexture.pTexture2D = NULL;
 
-    if (enableFacelineTexture) {
+    if (enableFacelineTexture)
+    {
         result = FFLiInitTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->facelineRenderTexture, &pModel->charInfo, resolution, isEnabledMipMap, &resLoader);
         if (result != FFL_RESULT_OK)
         {
@@ -167,7 +170,8 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         result = InitShapes(pModel, &resLoader, &m_pCharModelCreateParam->GetCoordinate());
         if (result != FFL_RESULT_OK)
         {
-            if (enableFacelineTexture) {
+            if (enableFacelineTexture)
+            {
                 FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
                 FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
             }
@@ -184,7 +188,8 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     if (result != FFL_RESULT_OK)
     {
         DeleteShapes(pModel);
-        if (enableFacelineTexture) {
+        if (enableFacelineTexture)
+        {
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
             FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
         }

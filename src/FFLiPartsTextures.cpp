@@ -316,7 +316,8 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
         }
     }
 
-    if (pCharInfo->parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY) {
+    if (pCharInfo->parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY)
+    {
         result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMustache, FFLI_TEXTURE_PARTS_TYPE_MUSTACHE, pCharInfo->parts.mustacheType, pResLoader);
         if (result != FFL_RESULT_OK)
         {
@@ -325,11 +326,14 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
             DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
             return result;
         }
-    } else {
+    }
+    else
+    {
         pPartsTextures->pTextureMustache = NULL;
     }
 
-    if (pCharInfo->parts.moleType != FFL_MOLE_TYPE_EMPTY) {
+    if (pCharInfo->parts.moleType != FFL_MOLE_TYPE_EMPTY)
+    {
         result = FFLiLoadTextureWithAllocate(&pPartsTextures->pTextureMole, FFLI_TEXTURE_PARTS_TYPE_MOLE, pCharInfo->parts.moleType, pResLoader);
         if (result != FFL_RESULT_OK)
         {
@@ -339,7 +343,9 @@ FFLResult FFLiLoadPartsTextures(FFLiPartsTextures* pPartsTextures, const FFLiCha
             DeleteTextures_Eye(pPartsTextures, expressionFlag, pResLoader->IsExpand());
             return result;
         }
-    } else {
+    }
+    else
+    {
         pPartsTextures->pTextureMole = NULL;
     }
 

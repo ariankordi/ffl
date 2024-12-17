@@ -36,7 +36,9 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
         *needsEndianSwap = true;
         // NOTE: Only swaps endian BEFORE texture/shape headers
         pHeaderDefault->SwapEndian();
-    } else {
+    }
+    else
+    {
         *needsEndianSwap = false;
     }
 
@@ -50,7 +52,7 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
     //RIO_LOG("header m_TotalUncompressSize: 0x%04X\n", totalUncompressSizeNoVersion);
     //RIO_LOG("header resource hint: %i (raw: 0x%04X)\n", hint, pHeaderDefault->m_TotalUncompressSize);
 
-    // ig old versions of FFLResource.py set it to this
+    // old versions of FFLResource.py set it to this
     RIO_ASSERT(pHeaderDefault->m_TotalUncompressSize != 0);
 
     switch (hint)

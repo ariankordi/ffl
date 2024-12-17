@@ -83,7 +83,8 @@ FFLColor FFLGetFacelineColor(s32 index)
 
 void FFLSetExpressionFlagIndex(FFLAllExpressionFlag* ef, u32 index, bool set)
 {
-    if (index < 0 || index >= FFL_EXPRESSION_LIMIT) {
+    if (index < 0 || index >= FFL_EXPRESSION_LIMIT)
+    {
         RIO_LOG("FFLSetExpressionFlagIndex: input out of range: %d\n", index);
         return; // Do not set anything.
     }

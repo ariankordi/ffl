@@ -88,22 +88,28 @@ FFLResult FFLiInitTempObjectFacelineTexture(FFLiFacelineTextureTempObject* pObje
     rio::MemUtil::set(pObject, 0, sizeof(FFLiFacelineTextureTempObject));
 
     FFLResult result;
-    if (pCharInfo->parts.faceLine != 0) {
+    if (pCharInfo->parts.faceLine != 0)
+    {
         result = FFLiLoadTextureWithAllocate(&pObject->pTextureFaceLine, FFLI_TEXTURE_PARTS_TYPE_FACELINE, pCharInfo->parts.faceLine, pResLoader);
         if (result != FFL_RESULT_OK)
             return result;
-    } else {
+    }
+    else
+    {
         pObject->pTextureFaceLine = NULL;
     }
 
-    if (pCharInfo->parts.faceMakeup != 0) {
+    if (pCharInfo->parts.faceMakeup != 0)
+    {
         result = FFLiLoadTextureWithAllocate(&pObject->pTextureFaceMake, FFLI_TEXTURE_PARTS_TYPE_FACE_MAKEUP, pCharInfo->parts.faceMakeup, pResLoader);
         if (result != FFL_RESULT_OK)
         {
             DeleteTexture_FaceLine(pObject, pResLoader->IsExpand());
             return result;
         }
-    } else {
+    }
+    else
+    {
         pObject->pTextureFaceMake = NULL;
     }
 

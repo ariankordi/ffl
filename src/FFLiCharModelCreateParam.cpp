@@ -38,7 +38,8 @@ namespace
 {
 
     // Function to verify expression flag: if any bits are set and against the limit
-    bool IsExpressionFlagValid(const FFLAllExpressionFlag* ef) {
+    bool IsExpressionFlagValid(const FFLAllExpressionFlag* ef)
+    {
         s32 anyBitsSet = 0;
 #if FFL_EXPRESSION_LIMIT <= 96 // bit limit
         // Check the third u32
