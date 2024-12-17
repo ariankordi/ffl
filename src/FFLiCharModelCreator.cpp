@@ -903,7 +903,7 @@ void FFLiCharModelCreator::AfterExecuteGPUStep(FFLiCharModel* pModel)
 {
     InvalidateShapes(pModel);
     InvalidateTextures(pModel);
-#ifndef RIO_NO_GLFW_CALLS
+#if !defined(RIO_NO_GLFW_CALLS) && !defined(FFL_NO_RENDER_TEXTURE)
     rio::Window::instance()->makeContextCurrent();
 
     u32 width = rio::Window::instance()->getWidth();
@@ -911,7 +911,7 @@ void FFLiCharModelCreator::AfterExecuteGPUStep(FFLiCharModel* pModel)
 
     rio::Graphics::setViewport(0, 0, width, height);
     rio::Graphics::setScissor(0, 0, width, height);
-#endif // RIO_NO_GLFW_CALLS
+#endif // !defined(RIO_NO_GLFW_CALLS) && !defined(FFL_NO_RENDER_TEXTURE)
 #ifndef FFL_NO_RENDER_TEXTURE
     #if RIO_IS_CAFE
         GX2DrawDone();

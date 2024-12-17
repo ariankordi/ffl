@@ -6,12 +6,11 @@
 #include <nn/ffl/FFLMiddleDBType.h>
 #include <nn/ffl/FFLRace.h>
 #include <nn/ffl/FFLResult.h>
+#include <nn/ffl/FFLiMiddleDB.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <nn/ffl/FFLiMiddleDB.h>
 
 #define FFL_MIDDLE_DB_SIZE (int)sizeof(FFLiMiddleDB)
 

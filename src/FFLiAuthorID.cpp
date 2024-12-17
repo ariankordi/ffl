@@ -3,7 +3,7 @@
 
 bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b)
 {
-    const u32 count = FFLI_AUTHOR_ID_SIZE / sizeof(u16);
+    [[maybe_unused]] const u32 count = FFLI_AUTHOR_ID_SIZE / sizeof(u16);
     NN_STATIC_ASSERT(count == 4);
 
     if (a->value16[0] != b->value16[0])

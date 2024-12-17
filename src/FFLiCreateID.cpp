@@ -16,7 +16,7 @@ bool FFLiIsNullMiiID(const FFLCreateID* pCreateID)
 {
     if (pCreateID != NULL)
     {
-        const u32 count = FFL_CREATE_ID_SIZE / sizeof(u16);
+        [[maybe_unused]] const u32 count = FFL_CREATE_ID_SIZE / sizeof(u16);
         NN_STATIC_ASSERT(count == 5);
 
         if (pCreateID->value16[0] == 0 &&
@@ -99,7 +99,7 @@ bool FFLiIsSameMiiID(const FFLCreateID* a, const FFLCreateID* b)
 {
     if (FFLiIsValidMiiID(a) && FFLiIsValidMiiID(b))
     {
-        const u32 count = FFL_CREATE_ID_SIZE / sizeof(u16);
+        [[maybe_unused]] const u32 count = FFL_CREATE_ID_SIZE / sizeof(u16);
         NN_STATIC_ASSERT(count == 5);
 
         if (a->value16[0] == b->value16[0] &&
