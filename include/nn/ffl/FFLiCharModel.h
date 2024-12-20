@@ -19,7 +19,10 @@
 #ifndef __cplusplus
 typedef struct FFLCharModelSource FFLCharModelSource;
 typedef struct FFLShaderCallback FFLShaderCallback;
-#endif
+#ifdef FFL_USE_TEXTURE_CALLBACK
+typedef struct FFLTextureCallback FFLTextureCallback;
+#endif // FFL_USE_TEXTURE_CALLBACK
+#endif // __cplusplus
 
 
 typedef struct FFLiCharModel
@@ -50,7 +53,17 @@ NN_STATIC_ASSERT32(sizeof(FFLiCharModel) == 0x848);
 struct FFLCharModelSource;
 struct FFLShaderCallback;
 
-FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc);
+#ifdef FFL_USE_TEXTURE_CALLBACK
+struct FFLTextureCallback;
+#endif
+
+FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    // add additional shader callback argument
+    , const FFLTextureCallback* pCallback);
+#else
+    );
+#endif
 
 void FFLiInitCharModelGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback);
 

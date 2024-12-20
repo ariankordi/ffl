@@ -7,7 +7,12 @@
 
 #include <misc/rio_MemUtil.h>
 
-FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc)
+FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    , const FFLTextureCallback* pCallback)
+#else
+    )
+#endif
 {
     if (!FFLiManager::IsConstruct())
         return FFL_RESULT_MANAGER_NOT_CONSTRUCT;
@@ -18,7 +23,12 @@ FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSour
         return FFL_RESULT_ERROR;
 
     FFLiCharModelCreator creator(&pManager->GetCharModelCreateParam(), pManager);
-    return creator.ExecuteCPUStep(pModel, pSource, pDesc);
+    return creator.ExecuteCPUStep(pModel, pSource, pDesc
+#ifdef FFL_USE_TEXTURE_CALLBACK
+        , pCallback);
+#else
+    );
+#endif
 }
 
 void FFLiInitCharModelGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback)

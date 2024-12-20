@@ -7,16 +7,28 @@
 
 #include <filedevice/rio_FileDeviceMgr.h>
 
+#ifdef FFL_USE_TEXTURE_CALLBACK
+struct FFLTextureCallback;
+#endif
+
 namespace {
 
 bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo);
 
 }
 
-FFLiResourceLoader::FFLiResourceLoader(FFLiResourceManager* pResourceManager, FFLiResourceLoaderBuffer* pResLoaderBuffer, FFLResourceType resourceType)
+FFLiResourceLoader::FFLiResourceLoader(FFLiResourceManager* pResourceManager, FFLiResourceLoaderBuffer* pResLoaderBuffer, FFLResourceType resourceType
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    , const FFLTextureCallback* pCallback)
+#else
+    )
+#endif
     : m_pResourceManager(pResourceManager)
     , m_pBuffer(pResLoaderBuffer)
     , m_ResourceType(resourceType)
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    , m_TextureCallback(pCallback)
+#endif
 {
 }
 

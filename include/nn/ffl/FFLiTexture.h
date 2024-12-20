@@ -9,7 +9,6 @@
 #include <nn/ffl/FFLTexture.h>
 
 class FFLiResourceLoader;
-class FFLiResourceManager;
 
 FFLResult FFLiLoadTextureWithAllocate(FFLTexture** ppTexture2D, FFLiTexturePartsType partsType, u32 index, FFLiResourceLoader* pResLoader);
 void FFLiDeleteTexture(FFLTexture** ppTexture2D, bool isExpand);

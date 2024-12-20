@@ -32,6 +32,9 @@
 #include <nn/ffl/FFLResult.h>
 #include <nn/ffl/FFLShaderCallback.h>
 #include <nn/ffl/FFLStandard.h>
+#ifdef FFL_USE_TEXTURE_CALLBACK
+#include <nn/ffl/FFLTextureCallback.h>
+#endif // FFL_USE_TEXTURE_CALLBACK
 #include <nn/ffl/FFLVec.h>
 
 #endif // NN_FFL_H_

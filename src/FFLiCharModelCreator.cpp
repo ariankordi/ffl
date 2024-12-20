@@ -76,7 +76,12 @@ void SetupDrawParam(FFLiCharModel* pModel);
 
 }
 
-FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc)
+FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    , const FFLTextureCallback* pCallback)
+#else
+    )
+#endif
 {
     if (!FFLiCharModelCreateParam::CheckModelDesc(pDesc))
         return FFL_RESULT_ERROR;
@@ -121,7 +126,13 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
         return FFL_RESULT_ERROR;
 
     FFLiResourceLoaderBuffer resLoaderBuffer(m_pCharModelCreateParam->GetResourceManager(), resourceType);
-    FFLiResourceLoader resLoader(m_pCharModelCreateParam->GetResourceManager(), &resLoaderBuffer, resourceType);
+
+    FFLiResourceLoader resLoader(m_pCharModelCreateParam->GetResourceManager(), &resLoaderBuffer, resourceType
+#ifdef FFL_USE_TEXTURE_CALLBACK
+        , pCallback);
+#else
+        );
+#endif
 
     pModel->pTextureTempObject = new FFLiTextureTempObject;
 

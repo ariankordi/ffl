@@ -13,11 +13,19 @@ class   FFLiResourceHeader;
 class   FFLiResourceLoaderBuffer;
 class   FFLiResourceManager;
 struct  FFLiResourcePartsInfo;
+#ifdef FFL_USE_TEXTURE_CALLBACK
+struct FFLTextureCallback;
+#endif
 
 class FFLiResourceLoader
 {
 public:
-    FFLiResourceLoader(FFLiResourceManager* pResourceManager, FFLiResourceLoaderBuffer* pResLoaderBuffer, FFLResourceType resourceType);
+    FFLiResourceLoader(FFLiResourceManager* pResourceManager, FFLiResourceLoaderBuffer* pResLoaderBuffer, FFLResourceType resourceType
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    , const FFLTextureCallback* pCallback);
+#else
+    );
+#endif
     ~FFLiResourceLoader();
 
     bool IsExpand() const;
@@ -26,6 +34,13 @@ public:
 
     u32 GetTextureAlignedMaxSize(FFLiTexturePartsType partsType) const;
     u32 GetShapeAlignedMaxSize(FFLiShapePartsType partsType) const;
+
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    const FFLTextureCallback* GetTextureCallback() const
+    {
+        return m_TextureCallback;
+    }
+#endif
 
     FFLResult LoadTexture(void* pData, u32* pSize, FFLiTexturePartsType partsType, u32 index);
     FFLResult LoadShape(void* pData, u32* pSize, FFLiShapePartsType partsType, u32 index);
@@ -52,6 +67,9 @@ private:
     rio::FileHandle             m_FileHandle;
 #endif
     FFLResourceType             m_ResourceType;
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    const FFLTextureCallback*   m_TextureCallback;
+#endif
 };
 //NN_STATIC_ASSERT(sizeof(FFLiResourceLoader) == 0x18); // NOTE: does not match with FFL_NO_FS on/off
 

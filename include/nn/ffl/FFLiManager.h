@@ -14,6 +14,9 @@
 #include <nn/ffl/detail/FFLiCopySurface.h>
 
 #include <nn/ffl/FFLiDatabaseFile.h>
+#ifdef FFL_USE_TEXTURE_CALLBACK
+#include <nn/ffl/FFLiTextureCallback.h>
+#endif
 
 struct FFLResourceDesc;
 
@@ -78,6 +81,18 @@ public:
         return m_ShaderCallback;
     }
 
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    FFLiTextureCallback& GetTextureCallback()
+    {
+        return m_TextureCallback;
+    }
+
+    const FFLiTextureCallback& GetTextureCallback() const
+    {
+        return m_TextureCallback;
+    }
+#endif
+
     FFLiCharModelCreateParam& GetCharModelCreateParam()
     {
         return m_CharModelCreateParam;
@@ -119,6 +134,9 @@ private:
     FFLiResourceManager         m_ResourceManager;
     FFLiDatabaseManager         m_DatabaseManager;
     FFLiShaderCallback          m_ShaderCallback;
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    FFLiTextureCallback         m_TextureCallback;
+#endif
     FFLiCharModelCreateParam    m_CharModelCreateParam;
     FFLInitDesc                 m_InitDesc;
 #if RIO_IS_CAFE
@@ -126,6 +144,6 @@ private:
 #endif // RIO_IS_CAFE
     bool                        m_IsSetupGPU;
 };
-//NN_STATIC_ASSERT(sizeof(FFLiManager) == 0x29B0);
+//NN_STATIC_ASSERT(sizeof(FFLiManager) == 0x29B0); // needs updating
 
 #endif // FFLI_MANAGER_H_

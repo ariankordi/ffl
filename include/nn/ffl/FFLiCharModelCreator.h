@@ -11,13 +11,23 @@ struct  FFLiCharModel;
 class   FFLiCharModelCreateParam;
 class   FFLiManager;
 
+#ifdef FFL_USE_TEXTURE_CALLBACK
+#include <nn/ffl/FFLTextureCallback.h>
+#endif
+
 class FFLiCharModelCreator
 {
 public:
     FFLiCharModelCreator(FFLiCharModelCreateParam* pParam, FFLiManager* pManager);
     ~FFLiCharModelCreator();
 
-    FFLResult ExecuteCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc);
+    FFLResult ExecuteCPUStep(FFLiCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc
+#ifdef FFL_USE_TEXTURE_CALLBACK
+    , const FFLTextureCallback* pCallback);
+#else
+    );
+#endif
+
     void ExecuteGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback);
     void AfterExecuteGPUStep(FFLiCharModel* pModel);
 

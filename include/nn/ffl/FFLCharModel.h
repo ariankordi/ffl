@@ -44,6 +44,10 @@ typedef struct FFLPartsTransform FFLPartsTransform;
 typedef struct FFLShaderCallback FFLShaderCallback;
 
 FFLResult FFLInitCharModelCPUStep(FFLCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc);
+// not in FFL: lets you explicitly specify a texture callback for uploads
+#ifdef FFL_USE_TEXTURE_CALLBACK
+FFLResult FFLInitCharModelCPUStepWithCallback(FFLCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc, const FFLTextureCallback* pCallback);
+#endif
 
 void FFLInitCharModelGPUStep(FFLCharModel* pModel);
 void FFLInitCharModelGPUStepWithCallback(FFLCharModel* pModel, const FFLShaderCallback* pCallback);

@@ -14,10 +14,28 @@ FFLiCharModel* GetCharModel(FFLCharModel* pModel)
 
 }
 
+#ifdef FFL_USE_TEXTURE_CALLBACK
+
+FFLResult FFLInitCharModelCPUStepWithCallback(FFLCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc, const FFLTextureCallback* pCallback)
+{
+    return FFLiInitCharModelCPUStep(GetCharModel(pModel), pSource, pDesc, pCallback);
+}
+
+FFLResult FFLInitCharModelCPUStep(FFLCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc)
+{
+    const FFLTextureCallback* pCallback = NULL;
+    if (FFLiManager::IsConstruct())
+        pCallback = FFLiManager::GetInstance()->GetTextureCallback().Get();
+
+    return FFLInitCharModelCPUStepWithCallback(pModel, pSource, pDesc, pCallback);
+}
+
+#else
 FFLResult FFLInitCharModelCPUStep(FFLCharModel* pModel, const FFLCharModelSource* pSource, const FFLCharModelDesc* pDesc)
 {
     return FFLiInitCharModelCPUStep(GetCharModel(pModel), pSource, pDesc);
 }
+#endif // FFL_USE_TEXTURE_CALLBACK
 
 void FFLInitCharModelGPUStep(FFLCharModel* pModel)
 {
