@@ -117,6 +117,7 @@ enum
     FFL_FACELINE_COLOR_MAX      = 6,
     FFL_FACE_LINE_MAX           = 12,
     FFL_FACE_MAKE_MAX           = 12,
+    FFL_HAIR_TYPE_EMPTY         = 30,
     FFL_HAIR_TYPE_MAX           = 132,
     FFL_HAIR_COLOR_MAX          = 8,
     FFL_HAIR_DIR_MAX            = 2,

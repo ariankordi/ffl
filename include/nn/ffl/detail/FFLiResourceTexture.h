@@ -4,7 +4,7 @@
 #include <nn/ffl/FFLiTexturePartsType.h>
 
 #include <nn/ffl/detail/FFLiResourcePartsInfo.h>
-#include <nn/ffl/FFLiTextureFormat.h>
+#include <nn/ffl/FFLTextureFormat.h>
 
 #if RIO_IS_WIN
     #ifdef FFL_NO_NINTEXUTILS
@@ -19,7 +19,7 @@
     typedef GX2SurfaceFormat FFLiSurfaceFormat;
 #endif
 
-FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLiTextureFormat textureFormat);
+FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLTextureFormat textureFormat);
 
 class FFLiResourceHeader;
 
@@ -118,9 +118,9 @@ public:
         return m_NumMips;
     }
 
-    FFLiTextureFormat TextureFormat() const
+    FFLTextureFormat TextureFormat() const
     {
-        return static_cast<FFLiTextureFormat>(m_TextureFormat);
+        return static_cast<FFLTextureFormat>(m_TextureFormat);
     }
 
     FFLiSurfaceFormat SurfaceFormat() const;
@@ -137,7 +137,7 @@ private:
     u16 m_Width;
     u16 m_Height;
     u8  m_NumMips;
-    u8  m_TextureFormat;    // Maps to FFLiTextureFormat
+    u8  m_TextureFormat;    // Maps to FFLTextureFormat
 };
 NN_STATIC_ASSERT_IS_POD(FFLiResourceTextureFooter);
 NN_STATIC_ASSERT(sizeof(FFLiResourceTextureFooter) == 0xC);

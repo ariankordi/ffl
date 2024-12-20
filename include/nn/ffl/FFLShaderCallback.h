@@ -26,8 +26,11 @@ typedef struct FFLShaderCallback
     // have A set to 0, needed for switch shader when
     // drawType is set to faceline (only when letting FFL make render textures)
     bool                facelineColorIsTransparent;
+    // ^^ Apparently this is called "facelineLeaveAlpha"
+    // in nn::mii::detail::TextureShaderInfoData/TextureShaderImpl
     u8                  _padding[3];
     void (*pApplyAlphaTestFunc)(void* pObj, bool enable, FFLRIOCompareFunc func, f32 ref);
+    // ^^ Unused when FFL_NO_DRAW_MASK_ALPHA_VALUES is set (FFLiDrawRawMask)
     void (*pDrawFunc)(void* pObj, const FFLDrawParam* drawParam);
     void (*pSetMatrixFunc)(void* pObj, const FFLRIOBaseMtx44f* matrix);
 }

@@ -39,13 +39,11 @@ inline s32 FindNextSetBit(u32* v)
 #if defined(__GNUC__) || defined(__clang__)
         s32 bitIndex = __builtin_ctz(*v);
 //#pragma message("using __builtin__ctz for mask FindNextSetBit")
-/*
 #elif defined(_MSC_VER)
         unsigned long bitIndex;
         _BitScanForward(&bitIndex, *v);
-*/
 #else
-    //#pragma message("using de bruijn for mask FindNextSetBit")
+//#pragma message("using de bruijn for mask FindNextSetBit")
     s32 bitIndex;
 
     static const s32 MultiplyDeBruijnBitPosition[32] =
@@ -62,7 +60,7 @@ inline s32 FindNextSetBit(u32* v)
      * and http://chessprogramming.wikispaces.com/BitScan */
 
     const u32 val = *v;
-    bitIndex = MultiplyDeBruijnBitPosition[((u32)((val & -val) * 0x077CB531UL)) >> 27];
+    bitIndex = MultiplyDeBruijnBitPosition[((u32)((val & (~val + 1)) * 0x077CB531UL)) >> 27];
 #endif
     *v &= *v - 1; // Clear the least significant set bit
     return static_cast<s32>(bitIndex);

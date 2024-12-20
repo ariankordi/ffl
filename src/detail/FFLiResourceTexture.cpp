@@ -12,27 +12,33 @@
 #define GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM    GX2_SURFACE_FORMAT_UNORM_RGBA8
 #endif
 
-FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLiTextureFormat textureFormat)
+FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLTextureFormat textureFormat)
 {
     switch (textureFormat)
     {
 #ifdef FFL_NO_NINTEXUTILS
     // use rio texture formats here
-    case FFLI_TEXTURE_FORMAT_R8:
+    case FFL_TEXTURE_FORMAT_R8_UNORM:
         return rio::TEXTURE_FORMAT_R8_UNORM;
-    case FFLI_TEXTURE_FORMAT_RG8:
+    case FFL_TEXTURE_FORMAT_R8_G8_UNORM:
         return rio::TEXTURE_FORMAT_R8_G8_UNORM;
-    case FFLI_TEXTURE_FORMAT_RGBA8:
+    case FFL_TEXTURE_FORMAT_R8_G8_B8_A8_UNORM:
+        return rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM;
+    default:
+        RIO_ASSERT(false);
         return rio::TEXTURE_FORMAT_R8_G8_B8_A8_UNORM;
     // compressed texture formats can go here later maybe
     }
     return rio::TEXTURE_FORMAT_R8_UNORM;
 #else
-    case FFLI_TEXTURE_FORMAT_R8:
+    case FFL_TEXTURE_FORMAT_R8_UNORM:
         return GX2_SURFACE_FORMAT_TC_R8_UNORM;
-    case FFLI_TEXTURE_FORMAT_RG8:
+    case FFL_TEXTURE_FORMAT_R8_G8_UNORM:
         return GX2_SURFACE_FORMAT_TC_R8_G8_UNORM;
-    case FFLI_TEXTURE_FORMAT_RGBA8:
+    case FFL_TEXTURE_FORMAT_R8_G8_B8_A8_UNORM:
+        return GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM;
+    default:
+        RIO_ASSERT(false);
         return GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM;
     }
     return GX2_SURFACE_FORMAT_TC_R8_UNORM;
@@ -41,7 +47,7 @@ FFLiSurfaceFormat FFLiGetResourceSurfaceFormat(FFLiTextureFormat textureFormat)
 
 FFLiSurfaceFormat FFLiResourceTextureFooter::SurfaceFormat() const
 {
-    return FFLiGetResourceSurfaceFormat(FFLiTextureFormat(m_TextureFormat));
+    return FFLiGetResourceSurfaceFormat(FFLTextureFormat(m_TextureFormat));
 }
 
 FFLiResourceTextureFooter& FFLiResourceTextureFooter::GetFooterImpl(const void* pData, u32 size)
