@@ -229,7 +229,14 @@ public:
     }
 
     bool TextureFormatIsLinear() const override { return true; }
-    bool IgnoreMipMaps() const override { return true; }
+    bool IgnoreMipMaps() const override
+    {
+#ifdef FFL_ALLOW_MIPMAPS_FOR_AFL_2_3
+        return false;
+#else
+        return true;
+#endif
+    }
 
     void SwapEndian() override;
 

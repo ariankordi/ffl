@@ -34,7 +34,8 @@ from ninTexUtils.gx2 import GX2TileMode
 from ninTexUtils.gx2 import GX2CompSel
 from ninTexUtils.gx2 import GX2Texture
 from ninTexUtils.gx2 import GX2TextureToDDS, GX2TextureToPNG
-from ninTexUtils.gx2 import DDSToGX2Texture  # , PNGToGX2Texture
+from ninTexUtils.gx2 import GX2TextureToKTX, KTXToGX2Texture
+from ninTexUtils.gx2 import DDSToGX2Texture, PNGToGX2Texture
 
 import pygltflib
 
@@ -105,6 +106,8 @@ RES_HINT_AFL_2_3 = 3
 
 # big endian default
 endianness_character = '>'
+
+texture_format = 'dds'
 
 # parse now ig
 if '-LE' in sys.argv:
@@ -320,18 +323,13 @@ class FFLiResourceTextureFooter:
             return b''
 
         data = bytearray(gx2Texture.surface.imageData)
-        if disable_mipmaps:
-            gx2Texture.surface.mipSize = 1
-            gx2Texture.surface.numMips = 1
+        if gx2Texture.surface.mipSize == 0:
             mipOffset = 0
         else:
-            if gx2Texture.surface.mipSize == 0:
-                mipOffset = 0
-            else:
-                prevMipOffset = len(data)
-                mipOffset = gx2Texture.surface.mipOffset[0]
-                data += b'\0' * (mipOffset - prevMipOffset)
-                data += gx2Texture.surface.mipData
+            prevMipOffset = len(data)
+            mipOffset = gx2Texture.surface.mipOffset[0]
+            data += b'\0' * (mipOffset - prevMipOffset)
+            data += gx2Texture.surface.mipData
 
         width = gx2Texture.surface.width
         height = gx2Texture.surface.height
@@ -394,7 +392,145 @@ class FFLiResourceTextureFooter:
                     if gx2TextureA.surface.mipData != gx2TextureB.surface.mipData:
                         print(label + ".MipData")
 
+"""
+Probably real file names for Mii assets:
+(Seen in Pikmin Bloom data.unity3d file. They clearly mirror Switch assets, 20 glass types)
+(These names line up with CFLiPartsID though...?)
+-- Shapes
+Path names: mii/meshes/(high,middle)/(beard,cap,faceline,glass,mask,nline,nose,hair,forehead)
+Prefixes mean: n = Normal, c = Cap
+* Beard00
+* Cap000_n
+* Cap000_c
+* Faceline00
+* Glass00    (same as texture)
+* Mask00
+* Nline00    (same as texture)
+* Nose01     (begins from 1?)
+* Hair000_n
+* Hair000_c
+* Forehead000_n
+* Forehead000_c
 
+-- Textures
+Path names: mii/textures/(low,middle)/(facet_beard,cap,eye,eyebrow,mouth,glass,facet_line,facet_make,nline,mustache)
+
+* FaceT_beard01 (01, 02?)
+* Cap000
+* Eye00
+* Eyebrow00
+* FaceT_line00
+* FaceT_make00
+* Glass00      (pikmin bloom has 20)
+* Mole01       (begins from 1?)
+* Mouth00
+* Mustache01   (begins from 1?)
+* Nline00
+
+---------------
+Mii part name official DWARF enums:
+
+-- niconico_develop.axf/CFL
+
+typedef enum CFLiPartsID {
+    CFLiPartsID_IS_SIZED_INT=-2147483647,
+    CFLi_PARTS_ID_BEARD=0,
+    CFLi_PARTS_ID_CAP=1,
+    CFLi_PARTS_ID_FACELINE=2,
+    CFLi_PARTS_ID_FOREHEAD=3,
+    CFLi_PARTS_ID_GLASS=4,
+    CFLi_PARTS_ID_HAIR=5,
+    CFLi_PARTS_ID_MASK=6,
+    CFLi_PARTS_ID_NLINE=7,
+    CFLi_PARTS_ID_NOSE=8,
+    CFLi_PARTS_ID_CAPTEX=9,
+    CFLi_PARTS_ID_SHAPE_COUNT=9,
+    CFLi_PARTS_ID_EYE=10,
+    CFLi_PARTS_ID_EYEBROW=11,
+    CFLi_PARTS_ID_FACET_BEARD=12,
+    CFLi_PARTS_ID_FACET_LINE=13,
+    CFLi_PARTS_ID_FACET_MAKE=14,
+    CFLi_PARTS_ID_GLASSTEX=15,
+    CFLi_PARTS_ID_MOLE=16,
+    CFLi_PARTS_ID_MOUTH=17,
+    CFLi_PARTS_ID_MUSTACHE=18,
+    CFLi_PARTS_ID_NLINETEX=19,
+    CFLi_PARTS_ID_COUNT=20
+} CFLiPartsID;
+
+-- libnn_mii_draw.a/nn::mii, NX
+
+typedef enum ResourceShapeType {
+    ResourceShapeType_Beard=0,
+    ResourceShapeType_Faceline=1,
+    ResourceShapeType_Mask=2,
+    ResourceShapeType_HatForNormal=3,
+    ResourceShapeType_HatForHeadWear=4,
+    ResourceShapeType_ForeheadForNormal=5,
+    ResourceShapeType_ForeheadForHeadWear=6,
+    ResourceShapeType_HairForNormal=7,
+    ResourceShapeType_HairForHeadWear=8,
+    ResourceShapeType_Glass=9,
+    ResourceShapeType_Nose=10,
+    ResourceShapeType_Noseline=11,
+    ResourceShapeType_End=12
+} ResourceShapeType;
+struct ResourceShapeHeader {
+    uint32_t signature;
+    uint32_t version;
+    uint32_t fileSize;
+    uint32_t maxSize[12];
+    uint32_t maxAlignment[12];
+    struct Element beard[4];
+    struct Element faceline[12];
+    struct Element mask[12];
+    struct Element hatNormal[132];
+    struct Element hatCap[132];
+    struct Element foreheadNormal[132];
+    struct Element foreheadCap[132];
+    struct Element hairNormal[132];
+    struct Element hairCap[132];
+    struct Element glass[1];
+    struct Element nose[18];
+    struct Element noseline[18];
+    struct ResourceShapeHairTransform hairTransform[132];
+    struct ResourceShapeFacelineTransform facelineTransform[12];
+};
+
+typedef enum ResourceTextureType {
+    ResourceTextureType_Hat=0,
+    ResourceTextureType_Eye=1,
+    ResourceTextureType_Eyebrow=2,
+    ResourceTextureType_Beard=3,
+    ResourceTextureType_Wrinkle=4,
+    ResourceTextureType_Make=5,
+    ResourceTextureType_Glass=6,
+    ResourceTextureType_Mole=7,
+    ResourceTextureType_Mouth=8,
+    ResourceTextureType_Mustache=9,
+    ResourceTextureType_Noseline=10,
+    ResourceTextureType_End=11
+} ResourceTextureType;
+struct ResourceTextureHeader {
+    uint32_t signature;
+    uint32_t version;
+    uint32_t fileSize;
+    uint32_t maxSize[11];
+    uint32_t maxAlignment[11];
+    struct Element hat[132];
+    struct Element eye[62];
+    struct Element eyebrow[24];
+    struct Element beard[2];
+    struct Element wrinkle[12];
+    struct Element make[12];
+    struct Element glass[20];
+    struct Element mole[2];
+    struct Element mouth[37];
+    struct Element mustache[6];
+    struct Element noseline[18];
+};
+
+"""
 # FFLiTexturePartsType
 FFLI_TEXTURE_PARTS_TYPE_BEARD       =  0
 FFLI_TEXTURE_PARTS_TYPE_CAP         =  1
@@ -409,6 +545,14 @@ FFLI_TEXTURE_PARTS_TYPE_MUSTACHE    =  9
 FFLI_TEXTURE_PARTS_TYPE_NOSELINE    = 10
 FFLI_TEXTURE_PARTS_TYPE_MAX         = 11
 
+texture_format_to_gx2_format = {
+    "R":    GX2SurfaceFormat.Unorm_R8,
+    "RG":   GX2SurfaceFormat.Unorm_RG8,
+    "RGBA": GX2SurfaceFormat.Unorm_RGBA8
+}
+
+# create reverse mapping
+gx2_format_to_texture_format = {value: key for key, value in texture_format_to_gx2_format.items()}
 
 texture_header_parts_info_sizes = [
     3,    # 0 beard
@@ -425,7 +569,7 @@ texture_header_parts_info_sizes = [
 ]
 
 # when this is enabled, no mipmaps are packed (only first mip)
-disable_mipmaps = False  # miitomo resource does not use mips
+ignore_mipmap_extract = False  # miitomo resource does not use mips
 
 tile_mode = GX2TileMode.Default  # or change to linear
 
@@ -725,7 +869,7 @@ class FFLiResourceTextureHeader:
 
         return headerData, data
 
-    def export(self, path='', asPng=True):
+    def export(self, path=''):  # , asPng=True):
         pathIsCwd = not path or path == '.'
 
         if not pathIsCwd:
@@ -752,19 +896,17 @@ class FFLiResourceTextureHeader:
                 if tile_mode != GX2TileMode.Default:
                     gx2Texture.surface.tileMode = tile_mode
 
-                textureFormat = [
-                    GX2SurfaceFormat.Unorm_R8,
-                    GX2SurfaceFormat.Unorm_RG8,
-                    GX2SurfaceFormat.Unorm_RGBA8
-                ].index(gx2Texture.surface.format)
-                s = [
-                    "R",
-                    "RG",
-                    "RGBA"
-                ][textureFormat]
+                textureFormatString = gx2_format_to_texture_format[gx2Texture.surface.format]
+
+                # Only ignore mipmaps upon extraction.
+                if ignore_mipmap_extract:
+                    gx2Texture.surface.mipSize = 1
+                    gx2Texture.surface.numMips = 1
 
                 filename = '%s_%d' % (name, i)
-                texture_filename = filename + (".png" if asPng else ".dds")
+
+                file_extension = "." + texture_format
+                texture_filename = filename + file_extension
 
                 json_dict = {
                     "partsInfo": {
@@ -776,7 +918,7 @@ class FFLiResourceTextureHeader:
                     "texture": {
                         "filename": texture_filename,
                         "numMips": gx2Texture.surface.numMips,
-                        "format": s
+                        "format": textureFormatString
                     }
                 }
 
@@ -784,11 +926,16 @@ class FFLiResourceTextureHeader:
                 with open(json_filename, 'w') as outf:
                     json.dump(json_dict, outf, indent=2, sort_keys=True)
 
-                if asPng:
+                if texture_format == 'ktx':
+                    ktx = GX2TextureToKTX(gx2Texture, False)
+                    with open(texture_filename, "wb+") as outf:
+                        outf.write(ktx)
+
+                elif texture_format == 'png':
                     png = next(GX2TextureToPNG(gx2Texture, False))
                     png.save(texture_filename)
 
-                else:
+                else:  # dds as default
                     dds = GX2TextureToDDS(gx2Texture, False)
                     with open(texture_filename, "wb+") as outf:
                         outf.write(dds)
@@ -837,39 +984,40 @@ class FFLiResourceTextureHeader:
 
                 texture_filename = json_dict["texture"]["filename"]
                 numMips = json_dict["texture"]["numMips"]
-                s = json_dict["texture"]["format"]
+                textureFormatString = json_dict["texture"]["format"]
 
-                textureFormat = [
-                    "R",
-                    "RG",
-                    "RGBA"
-                ].index(s)
-                format = [
-                    GX2SurfaceFormat.Unorm_R8,
-                    GX2SurfaceFormat.Unorm_RG8,
-                    GX2SurfaceFormat.Unorm_RGBA8
-                ][textureFormat]
+                format = texture_format_to_gx2_format[textureFormatString]
 
-                if texture_filename.endswith(".png"):
-                    # # TODO: numMips, format, compSel
-                    # gx2Texture = PNGToGX2Texture([texture_filename], 0, 7, tile_mode, 0, False, (0, 1, 2, 3), False)
-                    raise NotImplementedError("Importing PNG is not implemented yet.")
+                # priority: ktx, dds, png
+
+                if texture_filename.endswith('.ktx'):
+                    gx2Texture = KTXToGX2Texture(texture_filename, 0, 7, tile_mode, 0, False, (0, 1, 2, 3), False)
+
+                elif texture_filename.endswith('.dds'):
+                    gx2Texture = DDSToGX2Texture(texture_filename, 0, 7, tile_mode, 0, False, (0, 1, 2, 3), False)
+
+                elif texture_filename.endswith('.png'):
+                    # TODO: numMips, format, compSel
+                    gx2Texture = PNGToGX2Texture([texture_filename], 0, 7, tile_mode, 0, False, (0, 1, 2, 3), format, False)
+                    print(f"Importing texture {texture_filename} as PNG, texture may be broken")
+                    #raise NotImplementedError("Importing PNG is not implemented yet.")
 
                 else:
-                    assert texture_filename.endswith(".dds")
-                    gx2Texture = DDSToGX2Texture(texture_filename, 0, 7, tile_mode, 0, False, (0, 1, 2, 3), False)
-                    #assert gx2Texture.surface.numMips == numMips
-                    fail = False
-                    if gx2Texture.surface.numMips != numMips:
-                        print(f'{texture_filename} numMips {gx2Texture.surface.numMips} != {numMips}')
-                        #fail = True
-                    if gx2Texture.surface.format != format:
-                        print(f'{texture_filename} format {gx2Texture.surface.format} != {format}')
-                        fail = True
-                    if gx2Texture.compSel != compSel:
-                        print(f'{texture_filename} compSel {gx2Texture.compSel} != {compSel}')
-                        #fail = True
-                    assert not fail
+                    # not sure what this is
+                    raise NameError(f"Unknown file extension for texture: {texture_filename}. Expected ktx, dds, or png")
+
+                #assert gx2Texture.surface.numMips == numMips
+                fail = False
+                if gx2Texture.surface.numMips != numMips:
+                    print(f'{texture_filename} numMips {gx2Texture.surface.numMips} != {numMips}')
+                    #fail = True
+                if gx2Texture.surface.format != format:
+                    print(f'{texture_filename} format {gx2Texture.surface.format} != {format}')
+                    if not texture_filename.endswith('.png'):
+                        fail = True  # temporarily allow png
+                if gx2Texture.compSel != compSel:
+                    print(f'{texture_filename} compSel {gx2Texture.compSel} != {compSel}')
+                assert not fail
 
                 partsInfoArray.append([partsInfo, gx2Texture])
 
@@ -1218,7 +1366,7 @@ class FFLiResourceShapeDataHeader:
 
         else:
             localPos = dataPos[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX]
-            shape.index = struct.unpack_from(">%dH" % indexNum, partsData, localPos)
+            shape.index = struct.unpack_from(endianness_character + '%dH' % indexNum, partsData, localPos)
             assert max(shape.index) < totalVertexNum
 
         if shape.tangent:
@@ -1514,7 +1662,7 @@ class FFLiResourceShapeDataHeader:
 
         primitive = glb.meshes[0].primitives[0]
         accessors = glb.accessors
-        bufferViews=  glb.bufferViews
+        bufferViews = glb.bufferViews
 
         indexBufferIndex = primitive.indices
         indexBufferAccessor = accessors[indexBufferIndex]
@@ -1524,7 +1672,7 @@ class FFLiResourceShapeDataHeader:
         indexNum = indexBufferAccessor.count
         indexBufferView = bufferViews[indexBufferAccessor.bufferView]
         assert indexBufferView.buffer == 0
-        assert indexBufferView.byteLength == 2 * indexNum
+        #assert indexBufferView.byteLength == 2 * indexNum
         assert indexBufferView.target == pygltflib.ELEMENT_ARRAY_BUFFER
         shape.index = struct.unpack_from("<%dH" % indexNum, buffer, indexBufferView.byteOffset)
 
@@ -2198,7 +2346,7 @@ class FFLiResourceHeader:
 
         return data
 
-    def export(self, name, path='', asPng=True):
+    def export(self, name, path=''):  # , asPng=True):
         # Make sure no funny business is happening
         path = os.path.join(path, os.path.dirname(name))
         name = os.path.basename(name)
@@ -2233,7 +2381,7 @@ class FFLiResourceHeader:
         with open(json_filename, 'w') as outf:
             json.dump(json_dict, outf, indent=2, sort_keys=True)
 
-        self.textureHeader.export(texturePath, asPng)
+        self.textureHeader.export(texturePath)  # , asPng)
         self.shapeHeader.export(shapePath)
 
         if not pathIsCwd:
@@ -2286,12 +2434,12 @@ class FFLiResourceHeader:
 resource_header_hint = RES_HINT_DEFAULT
 
 def header_modify_afl():
-    global texture_header_parts_info_sizes, tile_mode, disable_mipmaps, resource_header_hint
+    global texture_header_parts_info_sizes, tile_mode, ignore_mipmap_extract, resource_header_hint
     resource_header_hint = RES_HINT_AFL
     texture_header_parts_info_sizes[2] = 80  # eye type
     texture_header_parts_info_sizes[3] = 28  # eyebrow
     texture_header_parts_info_sizes[8] = 52  # mouth type
-    disable_mipmaps = True
+    ignore_mipmap_extract = True
     tile_mode = GX2TileMode.Linear_Special
 
 def header_modify_afl_2_3():
@@ -2320,6 +2468,13 @@ def main():
     parser.add_argument("-toJSON", action="store_true", help="Unpack a resource")
     parser.add_argument("-PNG", action="store_true", help="Export as PNG")
 
+    parser.add_argument(
+        "-texture-format",
+        choices=["dds", "png", "ktx"],
+        default="dds",
+        help="Choose which format to export/import textures in. DDS is what was originally used and will probably be most reliable. PNG is experimental and reimporting does not work well for glasses. Finally, KTX is newer and should be more compatible but I have had problems with mipmaps on this as of writing.",
+    )
+
     parser.add_argument("input_file", type=str, help="Input file")
     parser.add_argument("output_file", type=str, help="Output file")
 
@@ -2333,6 +2488,9 @@ def main():
         header_modify_afl()
     elif args.type == "afl_2_3":
         header_modify_afl_2_3()
+
+    global texture_format
+    texture_format = args.texture_format
 
     if args.fromJSON:
         if not os.path.isfile(args.input_file):
@@ -2360,7 +2518,7 @@ def main():
 
         header = FFLiResourceHeader()
         header.load(inb)
-        header.export(args.output_file, asPng=args.PNG)
+        header.export(args.output_file)  # , asPng=args.PNG)
 
 
 if __name__ == "__main__":
