@@ -68,6 +68,12 @@ void FFLiEnableSpecialMii(u32 key)
     FFLiManager::GetInstance()->GetDatabaseManager().EnableSpecialMii(key);
 }
 
+#else
+void FFLiEnableSpecialMii(u32 key)
+{
+    // No-op since FFL_NO_DATABASE_FILE is defined.
+}
+
 #endif // !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
 
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion)

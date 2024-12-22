@@ -580,7 +580,7 @@ class FFLiResourceTextureHeader:
         self._recalculate_format_and_size()
 
     def _recalculate_format_and_size(self):
-        self._format = '>%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
+        self._format = endianness_character + '%dI%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds%ds' % (
             FFLI_TEXTURE_PARTS_TYPE_MAX,
             # beard
             FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[0],

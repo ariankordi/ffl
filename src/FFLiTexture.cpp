@@ -48,6 +48,7 @@ FFLResult FFLiLoadTextureWithAllocate(FFLTexture** ppTexture, FFLiTexturePartsTy
 
         // Convert the texture unless the callback needs the original tile mode.
         bool convertTileMode = info.isGX2Tiled && !pCallback->useOriginalTileMode;
+#ifndef FFL_NO_NINTEXUTILS
         if (convertTileMode)
         {
             // Convert texture in place.
@@ -57,6 +58,9 @@ FFLResult FFLiLoadTextureWithAllocate(FFLTexture** ppTexture, FFLiTexturePartsTy
             if (!pResLoader->IsExpand())
                 rio::MemUtil::free(pData);
         }
+#else
+        RIO_LOG("FFLiLoadTextureWithAllocate: NOTE: FFL was built with FFL_NO_NINTEXUTILS enabled and a resource (from Wii U?) has textures that need deswizzling. Proceeding anyway, so your textures may look messed up.\n");
+#endif // FFL_NO_NINTEXUTILS
 
         // Call the texture callback, giving the callback the texture data.
         pCallback->pCreateFunc(pCallback->pObj, &info, reinterpret_cast<FFLTexture*>(ppTexture));

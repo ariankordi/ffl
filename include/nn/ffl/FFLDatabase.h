@@ -27,10 +27,9 @@ FFLResult FFLiGetStoreData(FFLStoreData* pStoreData, FFLDataSource dataSource, u
 
 bool FFLIsAvailableOfficialData(u16 index);
 bool FFLIsRegularOfficialData(u16 index);
-
-void FFLiEnableSpecialMii(u32 key);
 #endif // !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
 
+void FFLiEnableSpecialMii(u32 key);
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion);
 
 #ifdef __cplusplus

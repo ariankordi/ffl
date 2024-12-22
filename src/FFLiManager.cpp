@@ -209,7 +209,7 @@ FFLResult FFLiManager::AfterConstruct(const FFLInitDesc* pInitDesc, const FFLRes
         if (result != FFL_RESULT_OK)
             return result;
 #else
-        RIO_ASSERT(false);
+        RIO_ASSERT(false && "pResDesc is NULL. Usually in this case the resource would be loaded from the filesystem, but since FFL_NO_FS is set, it won't.");
         return FFL_RESULT_ERROR;
 #endif
     }

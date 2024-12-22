@@ -69,6 +69,9 @@ FFLResult FFLiLoadTextureInfo(FFLTextureInfo* textureInfo, FFLiTexturePartsType 
     u32 size = pResLoader->GetTextureAlignedMaxSize(partsType);
     // void* pData;
 
+    // Sanity check. Feel free to remove this if you do have resources this large.
+    RIO_ASSERT(size < 200000000 && "Are you sure this texture is supposed to be over 200 MB large?");
+
     if (!pResLoader->IsExpand())
     {
         *pData = rio::MemUtil::alloc(size, TEXTURE_DATA_MAX_ALIGNMENT);

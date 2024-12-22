@@ -113,6 +113,10 @@ FFLResult FFLiDatabaseFileAccessor::BootLoad()
     return FFL_RESULT_OK;
 }
 
+// NOTE: Most logging handlers for a file not found
+// in this function will not be shown since, if a file
+// is not found it will often not even
+// return FFLI_FS_FILE_RESULT_NOT_FOUND???
 FFLResult FFLiDatabaseFileAccessor::BootLoadImpl()
 {
     bool needInitHidden = true;
@@ -120,11 +124,15 @@ FFLResult FFLiDatabaseFileAccessor::BootLoadImpl()
     FFLiFsResult result = LoadDatabaseHidden(&m_pDatabaseFile->hidden, GetPathHidden());
     if (CheckFFLiFsResult(result))
     {
-        if (m_pDatabaseFile->hidden.IsValid())
+        if (m_pDatabaseFile->hidden.IsValid()) // corrupt?
+        {
+            RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: m_pDatabaseFile->hidden.IsValid() returned false (hidden DB/HDB corrupted?) at %s, attempting to recreate it.\n", GetPathHidden());
             needInitHidden = false;
+        }
     }
     else if (result.fileResult == FFLI_FS_FILE_RESULT_NOT_FOUND)
     {
+        RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: hidden database/HDB was not found at %s.\n", GetPathHidden());
         return ConvertFFLiFsResultToFFLResult(result, FFL_RESULT_FILE_LOAD_ERROR);
     }
 
@@ -135,21 +143,35 @@ FFLResult FFLiDatabaseFileAccessor::BootLoadImpl()
 
         result = SaveDatabaseHidden(m_pDatabaseFile->hidden, m_pFileWriteBuffer, GetPathHidden());
         if (!CheckFFLiFsResult(result))
+        {
+            // Only logging this here since it is the first case
+            // an error will happen with databases not found.
+            // More extensive logging (like of FFLiFsResults...)
+            // .. to be determined (also see what FFL/nn::mii log?)
+            RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: FFL_HDB.dat/hidden database (this is the first one that is loaded) was not found and could not be created at %s. If you don't need database functionality, rebuild FFL with FFL_NO_DATABASE_FILE. Will now return FFL_RESULT_FS_NOT_FOUND (%d).\n", GetPathHidden(), FFL_RESULT_FS_NOT_FOUND);
+            //RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: FFL_HDB.dat/hidden database could not be created at %s (FFLiFsResult.fsStatus: %d)\n", GetPathHidden(), result.fsStatus);
             return ConvertFFLiFsResultToFFLResult(result, FFL_RESULT_FILE_LOAD_ERROR);
+        }
     }
 
     result = LoadDatabaseOfficial(&m_pDatabaseFile->official, GetPathOfficial());
     if (CheckFFLiFsResult(result))
     {
+        // database file corrupt?
         if (m_pDatabaseFile->official.IsValid())
         {
+            RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: m_pDatabaseFile->official.IsValid() returned false (official DB/ODB corrupted?) at %s, finding backup.\n", GetPathOfficial());
+
             if (!IsExistFile(GetPathBackup()))
             {
                 m_IsFlushQuotaNeeded = true;
 
                 result = SaveDatabaseOfficial(m_pDatabaseFile->official, m_pFileWriteBuffer, GetPathBackup());
                 if (!CheckFFLiFsResult(result))
+                {
+                    RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: Cannot save new official DB/ODB at %s (FFLiFsResult.fsStatus: %d)\n", GetPathOfficial(), result.fsStatus);
                     return ConvertFFLiFsResultToFFLResult(result, FFL_RESULT_FILE_LOAD_ERROR);
+                }
             }
 
             return FFL_RESULT_OK;
@@ -157,6 +179,7 @@ FFLResult FFLiDatabaseFileAccessor::BootLoadImpl()
     }
     else if (result.fileResult == FFLI_FS_FILE_RESULT_NOT_FOUND)
     {
+        RIO_LOG("FFLiDatabaseFileAccessor::BootLoadImpl: official database/ODB was not found at %s.\n", GetPathOfficial());
         return ConvertFFLiFsResultToFFLResult(result, FFL_RESULT_FILE_LOAD_ERROR);
     }
 

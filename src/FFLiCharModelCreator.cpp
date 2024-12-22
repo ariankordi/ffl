@@ -123,7 +123,10 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     FFLResourceType resourceType = pDesc->resourceType;
 
     if (!m_pCharModelCreateParam->GetResourceManager()->IsValid(resourceType))
+    {
+        RIO_LOG("m_pCharModelCreateParam->GetResourceManager()->IsValid(resourceType = %d) returned false\n", resourceType);
         return FFL_RESULT_ERROR;
+    }
 
     FFLiResourceLoaderBuffer resLoaderBuffer(m_pCharModelCreateParam->GetResourceManager(), resourceType);
 

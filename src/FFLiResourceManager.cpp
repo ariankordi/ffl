@@ -225,7 +225,10 @@ bool FFLiResourceManager::IsExpand(FFLResourceType resourceType) const
 
 u32 FFLiResourceManager::GetUncompressBufferSize(FFLResourceType resourceType) const
 {
-    return FFLiRoundUp(Header(resourceType)->GetUncompressBufferSize() + rio::FileDevice::cBufferMinAlignment, rio::FileDevice::cBufferMinAlignment);
+    const u32 uncompressBufferSize = Header(resourceType)->GetUncompressBufferSize();
+    // Sanity check. Feel free to remove this if you do have resources this large.
+    RIO_ASSERT(uncompressBufferSize < 200000000 && "m_UncompressBufferSize in the resource header is more than 200 MB, is it supposed to be that large?");
+    return FFLiRoundUp(uncompressBufferSize + rio::FileDevice::cBufferMinAlignment, rio::FileDevice::cBufferMinAlignment);
 }
 
 const char* FFLiResourceManager::GetPath(FFLResourceType resourceType) const

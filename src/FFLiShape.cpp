@@ -78,6 +78,10 @@ FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundin
     void*& pData = *ppShapeData;
 
     u32 size = pResLoader->GetShapeAlignedMaxSize(partsType);
+
+    // Sanity check. Feel free to remove this if you do have resources this large.
+    RIO_ASSERT(size < 200000000 && "Are you sure this shape is supposed to be over 200 MB large?");
+
     pData = rio::MemUtil::alloc(size, rio::FileDevice::cBufferMinAlignment);
 
     FFLResult result = pResLoader->LoadShape(pData, &size, partsType, index);
