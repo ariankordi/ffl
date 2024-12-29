@@ -36,7 +36,7 @@ Both of the below are originally by [Abood](https://github.com/aboood40091), but
 
 ## Building
 
-Also see the [FFL-Testing Makefile](https://github.com/ariankordi/FFL-Testing/blob/master/Makefile).
+Also see the [FFL-Testing CMakeLists](https://github.com/ariankordi/FFL-Testing/blob/master/CMakeLists.txt).
 
 1. Clone this repo and dependencies.
 

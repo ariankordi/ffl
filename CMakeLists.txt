@@ -217,7 +217,8 @@ function(create_ffl_target target_name library_type)
         )
 
     elseif(FFL_MODE STREQUAL "for-rio") # Build mode for RIO targets.
-        #target_compile_definitions(${target_name} PRIVATE FFL_NO_FS)
+        # Do not import GLFW headers when using RIO headers.
+        target_compile_definitions(${target_name} PRIVATE RIO_NO_GLFW_IMPORT)
         # Pass along RIO definitions that FFL supports.
         if(RIO_GLES)
             target_compile_definitions(${target_name} PRIVATE RIO_GLES)
