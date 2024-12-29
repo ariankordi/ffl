@@ -43,8 +43,19 @@
 *.ti
 tgt/*
 
+*.swp
+*.kate-swp
+
 # FFLResource output
 tools/*_shape
 tools/*_texture
 tools/*.json
 tools/*.dat
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+build
+Makefile
+cmake_install.cmake

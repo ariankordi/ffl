@@ -1,5 +1,5 @@
 # FFL Arian Fork
-This is my fork of [AboodXD's FFL decompilation](), which was originally decompiled from FFL 1.3.10 in New SUPER MARIO BROS. U v1.3.0.
+This is my fork of [AboodXD's FFL decompilation](https://github.com/aboood40091/ffl), which was originally decompiled from FFL 1.3.10 in New SUPER MARIO BROS. U v1.3.0.
 
 
 <details>
@@ -19,10 +19,65 @@ See [Sead](https://github.com/aboood40091/sead) for matching policy.
 
 Specifically, this is Abood's port to RIO (OpenGL 3.3) which works on PC alongside Wii U.
 
-## Building?
-Unfortunately I don't have a great build method for FFL as of now :\
+## Dependencies
 
-Which is somewhat because it's not made to work without RIO and ninTexUtils. Best I can do for now is point you to the [FFL-Testing Makefile](https://github.com/ariankordi/FFL-Testing/blob/renderer-server-prototype/Makefile).
+Both of the below are originally by [Abood](https://github.com/aboood40091), but I am linking to my forks since that's what is expected.
+
+* [RIO](https://github.com/ariankordi/rio)
+  - This branch of the FFL decomp relies on it.
+  - This is a framework to abstract functionality between Wii U (RIO_IS_CAFE) and PC (RIO_IS_WIN).
+  - Although you can build without RIO _sources_, you will always need RIO's headers, for now.
+
+* [ninTexUtils](https://github.com/ariankordi/ninTexUtils) (NOT the `python` branch but the cpp one)
+  - This is for "deswizzling" Wii U textures/converting GX2 tiled textures.
+  - Required for FFL resources (FFLResHigh.dat, FFLResMiddle.dat), or else textures can't be read from it.
+  - If you don't want this, build with `FFL_NO_NINTEXUTILS` but you will have to use AFL resources from Miitomo.
+    * You can actually get it here: https://web.archive.org/web/20180502054513/http://download-cdn.miitomo.com/native/20180125111639/android/v2/asset_model_character_mii_AFLResHigh_2_3_dat.zip
+
+## Building
+
+Also see the [FFL-Testing Makefile](https://github.com/ariankordi/FFL-Testing/blob/master/Makefile).
+
+1. Clone this repo and dependencies.
+
+```
+git clone https://github.com/ariankordi/ffl  # This repo.
+git clone https://github.com/ariankordi/rio  # RIO framework.
+git clone https://github.com/ariankordi/ninTexUtils  # ninTexUtils for deswizzling.
+```
+
+The CMake assumes that RIO is located at `../rio`, but you can also pass `-DFFL_WITH_RIO=path/to/rio` (Exact same for ninTexUtils)
+
+2. Choose a build mode. Here are your options:
+
+* For a RIO program/game.
+  - Such as [FFL-Testing](https://github.com/ariankordi/FFL-Testing).
+  - `-DFFL_MODE=for-rio`
+* For an OpenGL program, bundling RIO code with it.
+  - Such as the [FFL raylib samples](https://github.com/ariankordi/ffl-raylib-samples).
+  - `-DFFL_MODE=opengl-33`, `-DFFL_MODE=opengl-es2`
+* Without RIO or OpenGL.
+  - Standalone, for something like [FFLSharp](https://github.com/ariankordi/FFLSharp).
+  - Will most likely use the dynamic library: `-DFFL_BUILD_SHARED=1`
+
+3. Head into the `ffl` folder and use CMake to build.
+
+* `cmake -S . -B build` (Add any extra args at the end)
+* `cmake --build build`
+
+4. Your library is in `build/`
+
+```
+> ls build
+CMakeCache.txt  CMakeFiles/  cmake_install.cmake  libffl.so*  Makefile
+                                                  ^^^^^^^^^^
+```
+* In my case on Linux, it's in `libffl.so` but I think on Windows it will be `ffl.dll`.
+  - For the shared library of course not static
+  - There will be extra prefixes if it's for RIO or OpenGL.
+  - Copy this to your program's directory or include the CMakeLists as a dependency.
+
+More instructions are TBD.
 
 ## New Changes
 Over time, I've added new features that are not included in Abood's original decomp. As of writing (December 2024), these include:
@@ -62,7 +117,6 @@ This documents all of the definitions that this supports to add/remove functiona
 
 #### Not documented (slash useless):
 * FFL_USE_ADJUST_MTX
-* FFL_USE_FACELINE_COLOR_IS_TRANSPARENT_PROPERTY
 * FFL_USE_MINIZ
 * FFL_USE_MODULATE_EYEBROW_EX
 * FFL_LOG_CHARMODEL_CLEANUP
