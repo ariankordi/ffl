@@ -13,10 +13,18 @@ const char* RESOUCE_FILE_NAME[2][FFL_RESOURCE_TYPE_MAX] = {
     {
         "FFLResMiddle.dat",
         "FFLResHigh.dat"
+#ifdef FFL_USE_EXTRA_RESOURCES
+      , "FFLResPoster.dat",
+        "FFLResLow.dat"
+#endif
     },
     {
         "FFLResMiddleLG.dat",
         "FFLResHighLG.dat"
+#ifdef FFL_USE_EXTRA_RESOURCES
+      , "FFLResPosterLG.dat",
+        "FFLResLowLG.dat"
+#endif
     }
 };
 
