@@ -1,4 +1,5 @@
 #include <nn/ffl/FFLiCreateID.h>
+#include <misc/rio_MemUtil.h>
 
 static inline
 FFLiCreateID* GetCreateID(FFLCreateID* pCreateID)
@@ -39,7 +40,11 @@ bool FFLiIsNullMiiID(const FFLCreateID* pCreateID)
 void FFLiGetTemporaryMiiID(FFLCreateID* pCreateID)
 {
     static const FFLiCreateID temporaryMiiID = {
-        FFLI_CREATE_ID_FLAG_TEMPORARY
+        FFLI_CREATE_ID_FLAG_TEMPORARY,
+        0,
+        0,
+        0,
+        { 0 }
     };
 
     *GetCreateID(pCreateID) = temporaryMiiID;

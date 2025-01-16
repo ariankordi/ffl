@@ -122,6 +122,10 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 
     FFLResourceType resourceType = pDesc->resourceType;
 
+    // very high resource type values will cause a CRASH
+    RIO_ASSERT(resourceType < FFL_RESOURCE_TYPE_MAX);
+
+    // is that resource type loaded?:
     if (!m_pCharModelCreateParam->GetResourceManager()->IsValid(resourceType))
     {
         RIO_LOG("m_pCharModelCreateParam->GetResourceManager()->IsValid(resourceType = %d) returned false\n", resourceType);

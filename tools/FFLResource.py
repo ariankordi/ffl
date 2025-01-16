@@ -221,16 +221,17 @@ class FFLiResourcePartsInfo:
                 strategy = self.strategy
 
                 compressobj = zlib.compressobj(compressLevel, zlib.DEFLATED, windowBits, memoryLevel, strategy)
-
                 partsData = b''.join([
                     compressobj.compress(partsData),
                     compressobj.flush()
                 ])
                 compressedSize = len(partsData)
-                #print(f'compressedSize: 0x{compressedSize:X}')
+
                 if compressedSize > maximum_compressed_size:
                     maximum_compressed_size = compressedSize
-                    print(f'new compressedSize: 0x{compressedSize:X}')
+                    print("new compressedSize: 0x%X" % compressedSize)
+            else:
+                compressedSize = 0
 
             data += partsData
 
@@ -606,9 +607,6 @@ class FFLiResourceTextureHeader:
             FFLiResourcePartsInfo.size * texture_header_parts_info_sizes[10]
         )
         self.size = struct.calcsize(self._format)
-        #assert size == 0x13FC
-        #if self.size != 0x13FC:
-        #    print(f"\033[91mFFLiResourceTextureHeader size != 0x13FC, actual size: 0x{self.size:X} (will not work in FFL unmodified)\033[0m")
 
     def load(self, headerData, data, pos=0, isExpand=False):
         (partsMaxSizeBeard,
@@ -999,12 +997,12 @@ class FFLiResourceTextureHeader:
                 elif texture_filename.endswith('.png'):
                     # TODO: numMips, format, compSel
                     gx2Texture = PNGToGX2Texture([texture_filename], 0, 7, tile_mode, 0, False, (0, 1, 2, 3), format, False)
-                    print(f"Importing texture {texture_filename} as PNG, texture may be broken")
+                    print("Importing texture %s as PNG, texture may be broken" % texture_filename)
                     #raise NotImplementedError("Importing PNG is not implemented yet.")
 
                 else:
                     # not sure what this is
-                    raise NameError(f"Unknown file extension for texture: {texture_filename}. Expected ktx, dds, or png")
+                    raise NameError("Unknown file extension for texture: %s. Expected ktx, dds, or png" % texture_filename)
 
                 #assert gx2Texture.surface.numMips == numMips
                 fail = False
@@ -1737,40 +1735,45 @@ class FFLiResourceShapeDataHeader:
                 shape.tangent.append((x / w, y / w, z / w))
 
         colorBufferIndex = primitive.attributes.COLOR_0
-        colorBufferAccessor = accessors[colorBufferIndex]
+        if colorBufferIndex is not None:
+            colorBufferAccessor = accessors[colorBufferIndex]
 
-        # Check the component type
-        if colorBufferAccessor.componentType == pygltflib.FLOAT:
-            assert colorBufferAccessor.type == pygltflib.VEC4
-            assert colorBufferAccessor.count == vertexNum
-            colorBufferView = bufferViews[colorBufferAccessor.bufferView]
-            assert colorBufferView.buffer == 0
-            assert colorBufferView.target == pygltflib.ARRAY_BUFFER
-            shape.color = [
-                struct.unpack_from("<4f", buffer, colorBufferView.byteOffset + i * 4 * 4)
-                for i in range(vertexNum)
-            ]
-        elif colorBufferAccessor.componentType == pygltflib.UNSIGNED_SHORT:
-            assert colorBufferAccessor.type == pygltflib.VEC4
-            assert colorBufferAccessor.count == vertexNum
-            colorBufferView = bufferViews[colorBufferAccessor.bufferView]
-            assert colorBufferView.buffer == 0
-            assert colorBufferView.target == pygltflib.ARRAY_BUFFER
-            # Convert UNSIGNED_SHORT to FLOAT (divide by 65535.0 for normalization)
-            shape.color = [
-                tuple(
-                    c / 65535.0
-                    for c in struct.unpack_from("<4H", buffer, colorBufferView.byteOffset + i * 4 * 2)
-                )
-                for i in range(vertexNum)
-            ]
+            # Check FLOAT or UNSIGNED_SHORT for color:
+            if colorBufferAccessor.componentType == pygltflib.FLOAT:
+                assert colorBufferAccessor.type == pygltflib.VEC4
+                assert colorBufferAccessor.count == vertexNum
+                colorBufferView = bufferViews[colorBufferAccessor.bufferView]
+                assert colorBufferView.buffer == 0
+                assert colorBufferView.target == pygltflib.ARRAY_BUFFER
+                shape.color = [
+                    struct.unpack_from("<4f", buffer, colorBufferView.byteOffset + i * 4 * 4)
+                    for i in range(vertexNum)
+                ]
+            elif colorBufferAccessor.componentType == pygltflib.UNSIGNED_SHORT:
+                assert colorBufferAccessor.type == pygltflib.VEC4
+                assert colorBufferAccessor.count == vertexNum
+                colorBufferView = bufferViews[colorBufferAccessor.bufferView]
+                assert colorBufferView.buffer == 0
+                assert colorBufferView.target == pygltflib.ARRAY_BUFFER
+                # Convert UNSIGNED_SHORT to FLOAT
+                shape.color = [
+                    tuple(
+                        c / 65535.0  # normalization
+                        for c in struct.unpack_from("<4H", buffer, colorBufferView.byteOffset + i * 4 * 2)
+                    )
+                    for i in range(vertexNum)
+                ]
+            else:
+                raise ValueError("Unsupported component type for color attribute :( %d" % colorBufferAccessor.componentType)
+
+            g = itertools.groupby(shape.color)
+            shape.uniformColor = next(g, True) and not next(g, False)
+            if shape.uniformColor:
+                shape.color = shape.color[:1]
         else:
-            raise ValueError(f"Unsupported component type for color attribute :( {colorBufferAccessor.componentType}")
-
-        g = itertools.groupby(shape.color)
-        shape.uniformColor = next(g, True) and not next(g, False)
-        if shape.uniformColor:
-            shape.color = shape.color[:1]
+            shape.color = [(1.0, 1.0, 0.0, 1.0)]
+            g = itertools.groupby(shape.color)
+            shape.uniformColor = next(g, True) and not next(g, False)
 
     @staticmethod
     def compare(shapeA, shapeB, label):
@@ -2287,7 +2290,7 @@ class FFLiResourceHeader:
         self.size = struct.calcsize(self._format)
         #assert size == 0x4A00
         if self.size != FFLIRESOURCEHEADER_DEFAULT_SIZE and resource_header_hint != RES_HINT_AFL and resource_header_hint != RES_HINT_AFL_2_3:
-            print(f"\033[91mFFLiResourceHeader size != 0x{FFLIRESOURCEHEADER_DEFAULT_SIZE:X}, actual size: 0x{self.size:X} (will not work in FFL unmodified)\033[0m")
+            print("\033[91mFFLiResourceHeader size != 0x%X, actual size: 0x%X (will not work in FFL unmodified)\033[0m" % (FFLIRESOURCEHEADER_DEFAULT_SIZE, self.size))
 
     def load(self, data, pos=0):
         (magic,
@@ -2320,11 +2323,11 @@ class FFLiResourceHeader:
 
         total_uncompressed_size += self.size
 
-        print(f'total uncompressed size: 0x{total_uncompressed_size:X}')
+        print("total uncompressed size (pre calc): 0x%X" % total_uncompressed_size)
 
         # pack resource header hint into first 3 bits ig
         total_uncompressed_size = (resource_header_hint << 29) | total_uncompressed_size
-        print(f'0x{total_uncompressed_size:X}')
+        print("total uncompressed size (post calc): 0x%X" % total_uncompressed_size)
 
         # set uncompress buffer size as the maximum compressed size
         self.uncompressBufferSize = maximum_compressed_size

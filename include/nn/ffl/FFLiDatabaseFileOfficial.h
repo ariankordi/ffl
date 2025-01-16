@@ -24,6 +24,7 @@ private:
 
 public:
     void Init();
+    void UpdateSaveCount();
     void UpdateCrc();
 
     bool IsValidCrc() const;
@@ -38,13 +39,30 @@ public:
     bool AdjustRegularList(AdjustRegularBuffer* pBuffer);
 
     void SwapEndian(bool save);
+    /*
+    Deleted in NSMBU:
+
+    DeleteRegularList(FFLCreateID const *)
+    FindEmptyRegularList(unsigned int *) const
+    NumOfAvailable(bool, bool) const
+    DeleteMii(FFLiMiiDataOfficial *, unsigned short)
+    FindBlankIndex(unsigned short *) const
+    Set(FFLiCharInfo const &, unsigned short)
+    Restore(void)
+    ResetAllAuthorID(FFLiAuthorID const &)
+    ResetAuthorID(unsigned short, FFLiAuthorID const &)
+    SetRegular(unsigned short, bool)
+    GetRegularNum(void) const
+    //Num(void) const
+    */
 
 private:
     u32                 m_Magic;
-    u32                 _4;
+    u32                 m_SaveCount;
     FFLiMiiDataOfficial m_MiiDataOfficial[3000];
     FFLCreateID         m_CreateID[50];
-    u8                  _4381c[34];
+    // Not written to by Mii Maker(?):
+    u16                 _4381c[34 / sizeof(u16)];
     u16                 m_Crc;
 };
 NN_STATIC_ASSERT_IS_POD(FFLiDatabaseFileOfficial);

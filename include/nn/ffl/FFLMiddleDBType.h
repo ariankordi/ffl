@@ -7,6 +7,19 @@
 extern "C" {
 #endif
 
+/*
+typedef enum CFLMiddleDBType
+{
+    CFL_MIDDLEDB_TYPE_HIDDEN_RANDOM = 0,
+    CFL_MIDDLEDB_TYPE_HIDDEN_NEWER  = 1,
+    CFL_MIDDLEDB_TYPE_HIDDEN_OLDER  = 2,
+    CFL_MIDDLEDB_TYPE_RANDOM        = 3,
+    CFL_MIDDLEDB_TYPE_NET           = 4,
+    CFL_MIDDLEDB_TYPE_INTERNAL0     = 5
+}
+CFLMiddleDBType;
+*/
+
 typedef enum FFLMiddleDBType
 {
     FFL_MIDDLE_DB_TYPE_HIDDEN_PARAM_RANDOM_UPDATE       = 0,

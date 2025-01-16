@@ -5,7 +5,7 @@
 
 namespace {
     // replacement for rio::TextureFormatUtil::getPixelByteSize
-    static const u32 GetPixelByteSize(FFLTextureFormat format)
+    static u32 GetPixelByteSize(FFLTextureFormat format)
     {
         static const u32
             bytesPerPixelMapping[FFL_TEXTURE_FORMAT_MAX] = {
@@ -20,7 +20,7 @@ namespace {
     }
 
     // replacement for rio::Texture2DUtil::calcImageSize
-    static const u32 CalcImageSize(FFLTextureFormat format, u32 width, u32 height)
+    static u32 CalcImageSize(FFLTextureFormat format, u32 width, u32 height)
     {
         u32 bytesPerPixel = GetPixelByteSize(format);
 
@@ -28,7 +28,7 @@ namespace {
     }
 
     // rio::Texture2DUtil::calcMipmapSize
-    static const u32 CalcMipmapSize(FFLTextureFormat format, u32 width, u32 height,
+    static u32 CalcMipmapSize(FFLTextureFormat format, u32 width, u32 height,
                                     u32 mipLevels, u32* mipLevelOffset)
     {
         if (mipLevelOffset != nullptr)

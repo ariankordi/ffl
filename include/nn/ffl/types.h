@@ -109,6 +109,15 @@
 extern "C" {
 #endif
 
+/*
+    from FFLUtility asserts:
+
+    FFLI_CHAR_INFO_HAIR_TYPE_MIN <= hair && hair < FFLI_CHAR_INFO_HAIR_TYPE_COUNT
+    0 <= aEyeType && aEyeType < FFLI_CHAR_INFO_EYE_TYPE_COUNT
+    0 <= aEyebrowType && aEyebrowType < FFLI_CHAR_INFO_EYEBROW_TYPE_COUNT
+    ^^ suggests these go in FFLiCharInfo.h and using MIN/COUNT instead of MAX?
+*/
+
 enum
 {
     FFL_PATH_MAX_LEN = 256,

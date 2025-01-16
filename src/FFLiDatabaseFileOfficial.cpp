@@ -38,13 +38,18 @@ void FFLiDatabaseFileOfficial::Init()
 {
     m_Magic = 0x46464F43;   // FFOC
 
-    _4 = 0;
+    m_SaveCount = 0;
 
     rio::MemUtil::set(_4381c, 0, sizeof(_4381c));
     rio::MemUtil::set(m_MiiDataOfficial, 0, sizeof(m_MiiDataOfficial));
     rio::MemUtil::set(m_CreateID, 0, sizeof(m_CreateID));
 
     UpdateCrc();
+}
+
+void FFLiDatabaseFileOfficial::UpdateSaveCount()
+{
+    m_SaveCount++;
 }
 
 void FFLiDatabaseFileOfficial::UpdateCrc()
@@ -194,13 +199,13 @@ void FFLiDatabaseFileOfficial::SwapEndian(bool save)
         RIO_ASSERT(IsValidCrc());
 
     m_Magic = FFLiSwapEndianImpl<u32>(m_Magic);
-    _4 = FFLiSwapEndianImpl<u32>(_4);
+    m_SaveCount = FFLiSwapEndianImpl<u32>(m_SaveCount);
 
     for (u32 i = 0; i < 3000; i++)
         m_MiiDataOfficial[i].SwapEndian();
 
-    // Dunno what to do with this
-    // _4381c
+    // Unknown what this is supposed to be:
+    FFLiSwapEndianArrayImpl<u16>(_4381c, 17);
 
     UpdateCrc();
 }

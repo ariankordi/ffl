@@ -14,6 +14,8 @@
 
 #ifndef FFL_NO_DATABASE_RANDOM
 
+// note that AFL includes just the ctor/dtor and nothing else
+
 FFLiDatabaseRandom::FFLiDatabaseRandom(FFLiRandomContext* pContext)
     : m_pRandomContext(pContext)
 {

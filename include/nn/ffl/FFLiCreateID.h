@@ -2,6 +2,7 @@
 #define FFLI_CREATE_ID_H_
 
 #include <nn/ffl/FFLCreateID.h>
+#include <nn/ffl/FFLResult.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,15 +22,27 @@ typedef struct FFLiCreateIDBase
 FFLiCreateIDBase;
 NN_STATIC_ASSERT(sizeof(FFLiCreateIDBase) == FFLI_CREATE_ID_BASE_SIZE);
 
-#define FFLI_CREATE_ID_FLAG_TEMPORARY (1 << 5)
-#define FFLI_CREATE_ID_FLAG_NORMAL    (1 << 7)
+// Bit 0: Normal
+// Bit 1: Set on DS // << Bit 1,3 Set: Wii U, Bit 1,3 Clear: Wii
+// Bit 2: Temporary
+// Bit 3: CTR       // << Bit 1,3 Set: Wii U, Bit 1,3 Clear: Wii
+
+#define FFLI_CREATE_ID_FLAG_TEMPORARY (1 << 5) // 0b00100000
+#define FFLI_CREATE_ID_FLAG_NORMAL    (1 << 7) // 0b10000000
+#define FFLI_CREATE_ID_FLAG_SPECIAL   0        // 0b00000000
 
 #define FFLI_CREATE_ID_TYPE_MASK      ((1 << 6) | (1 << 4))
+                                      // 0b01010000
 
-#define FFLI_CREATE_ID_TYPE_WII       0x00 // Bits 6 and 4 are 0
-#define FFLI_CREATE_ID_TYPE_CTR       (1 << 4)
-#define FFLI_CREATE_ID_TYPE_NTR       (1 << 6)
+#define FFLI_CREATE_ID_TYPE_WII       0 // Bits 6 and 4 are 0.
+#define FFLI_CREATE_ID_TYPE_CTR       (1 << 4) // 0b00010000
+#define FFLI_CREATE_ID_TYPE_NTR       (1 << 6) // 0b01000000
 #define FFLI_CREATE_ID_TYPE_WIIU      ((1 << 6) | (1 << 4))
+                                      // 0b01010000
+
+// For reference:
+// #define RFLi_CREATE_ID_MASK_TEMPORARY 0x20000000   // 0b00100000
+// #define RFLi_CREATE_ID_MASK_NOT_SPECIAL 0x80000000 // 0b10000000
 
 typedef struct FFLiCreateID
 {

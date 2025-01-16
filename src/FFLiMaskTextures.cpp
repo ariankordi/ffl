@@ -605,12 +605,12 @@ void SetupExpressionCharInfo(FFLiCharInfo* pExpressionCharInfo, const FFLiCharIn
     s32 eyeRotateOffset = param.eyeRotateOffset;
     if (param.eyeType >= 0 && param.eyeType != pExpressionCharInfo->parts.eyeType)
     {
-        s32 iVar1 = FFLiiGetEyeRotateOffset(pExpressionCharInfo->parts.eyeType);
-        s32 iVar2 = FFLiiGetEyeRotateOffset(param.eyeType);
+        s32 expEyeOffset = FFLiiGetEyeRotateOffset(pExpressionCharInfo->parts.eyeType);
+        s32 srcEyeOffset = FFLiiGetEyeRotateOffset(param.eyeType);
         if (param.eyeType < 62)
-            eyeRotateOffset = (eyeRotateOffset + iVar1) - iVar2;
+            eyeRotateOffset = (eyeRotateOffset + expEyeOffset) - srcEyeOffset;
         else
-            eyeRotateOffset = (eyeRotateOffset - iVar1) + iVar2;
+            eyeRotateOffset = (eyeRotateOffset - expEyeOffset) + srcEyeOffset;
     }
 
     s32 eyeRotate;

@@ -261,8 +261,8 @@ void FFLiDatabaseFileHidden::SwapEndian(bool save)
         m_MiiDataHidden[i].SwapEndian();
     }
 
-    // Dunno what to do with this
-    // _abe8
+    // Unknown what this is supposed to be:
+    FFLiSwapEndianArrayImpl<u16>(_abe8, 11);
 
     UpdateCrc();
 }

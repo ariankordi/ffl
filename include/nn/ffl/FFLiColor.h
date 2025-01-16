@@ -3,7 +3,27 @@
 
 #include <nn/ffl/types.h>
 
+//void FFLSetLinearGammaMode(); // Deleted in NSMBU
+
 bool FFLiUseOffScreenSrgbFetch();
+//void FFLiSetLinearGammaColor(bool isLinear); // Deleted in NSMBU
+//void FFLiSetOffScreenSrgbFetch(bool isLinear); // Deleted in NSMBU
+
+/*
+void FFLiSetLinearGammaColor(bool isLinear)
+{
+    s_ContainerType = isLinear;
+}
+void FFLiSetOffScreenSrgbFetch(bool useOffScreenSrgbFetch)
+{
+    s_UseOffScreenSrgbFetch = useOffScreenSrgbFetch;
+}
+void FFLSetLinearGammaMode(int param_1)
+{
+    FFLiSetLinearGammaColor((uint)(param_1 != 0));
+    FFLiSetOffScreenSrgbFetch(param_1 != 0);
+}
+*/
 
 struct FFLColor;
 

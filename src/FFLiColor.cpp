@@ -252,6 +252,23 @@ namespace {
 
 void SetupColorContainer(FFLiColorContainer& container)
 {
+    /*
+    Potentially real names for these from FFLUtility:
+
+    Q:/sugar/program/ffl_application/src/viewer/LinearGammaConstColorTest.cpp
+    %s[%2d] : %f,%f,%f
+    eyeBlue
+    glass
+    hair
+    eyeRed
+    mole
+    mouthBlue
+    faceline
+    eyeGreen
+    mouthRed
+    mouthGreen
+    noseLine
+    */
     const FFLColor facelineColor[FFLI_FACELINE_COLOR_NUM] = {
         { 1.000f, 0.827f, 0.678f, 1.000f },
         { 1.000f, 0.714f, 0.420f, 1.000f },

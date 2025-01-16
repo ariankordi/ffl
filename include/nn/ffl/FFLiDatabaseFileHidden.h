@@ -12,7 +12,7 @@ public:
     void Init();
 
     /*
-    Deleted functions:
+    Deleted in NSMBU:
 
     void Clear();
 
@@ -41,7 +41,31 @@ class FFLiMiddleDB;
 class FFLiDatabaseFileHidden
 {
 private:
-    const FFLiMiiDataHidden& GetImpl(u16 index) const;
+    /*
+    Deleted in NSMBU:
+    GetOrder(unsigned short) const
+    GetOrder(unsigned short)
+    FindBlankIndex(unsigned short *) const
+    ClearOrder(unsigned short)
+    AppendOrderToTail(unsigned short)
+    GetOldest(void) const
+    NumOfGenderWithIndex(unsigned short *, FFLGender) const
+    Search(unsigned short *, FFLCreateID const &) const
+    DeleteMii(unsigned short)
+    DeleteMii(FFLCreateID const &)
+    Add(FFLiMiiDataCore const &, bool)
+    Restore(void)
+    Num(void) const
+
+    __N_26_FFLiDatabaseFileHidden_cpp_30b285a2::ShuffleIndices(unsigned short *, unsigned short)
+    __N_26_FFLiDatabaseFileHidden_cpp_30b285a2::SetHiddenDateTime(FFLiDateTimeHidden *)
+
+    __N_26_FFLiDatabaseFileHidden_cpp_30b285a2::IndexIterator::isEnd(void) const
+    __N_26_FFLiDatabaseFileHidden_cpp_30b285a2::IndexIterator::getHidden(void) const
+    __N_26_FFLiDatabaseFileHidden_cpp_30b285a2::IndexIterator::nextImpl(void)
+    __N_26_FFLiDatabaseFileHidden_cpp_30b285a2::IndexIterator::next(void)
+    */
+    const FFLiMiiDataHidden& GetImpl(u16 index) const; // and non-const
 
     u16 NumOfGenderWithIndex(u16* pIndices, FFLGender gender) const;
 
@@ -66,7 +90,7 @@ private:
     u16                 m_EndIndex;
     FFLiOrderData       m_OrderData[500];
     FFLiMiiDataHidden   m_MiiDataHidden[500];
-    u8                  _abe8[22];
+    u16                 _abe8[22 / sizeof(u16)];
     u16                 m_Crc;
 };
 NN_STATIC_ASSERT_IS_POD(FFLiDatabaseFileHidden);
