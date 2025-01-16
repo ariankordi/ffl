@@ -72,6 +72,16 @@ bool FFLiIsTemporaryMiiID(const FFLCreateID* pCreateID);
 bool FFLiIsValidMiiID(const FFLCreateID* pCreateID);
 bool FFLiIsSameMiiID(const FFLCreateID* a, const FFLCreateID* b);
 
+void FFLiGetDefaultCreateIDonCTR(FFLCreateID* pCreateID, s32 index);
+//void FFLiCreateMiiIDonWiiU(FFLCreateID* pCreateID, const FFLiCreateIDBase* pCreateIDBase, u32 date, bool isSpecial); // Deleted in NSMBU
+//void FFLiiSetCreateID(FFLCreateID* pCreateID, bool isSpecial); // Deleted in NSMBU
+//void FFLiSetCreateID(FFLCreateID* pCreateID, bool isSpecial); // Deleted in NSMBU
+//void FFLiIncrementCreateIDTime(FFLiCreateID* pCreateID); // Deleted in NSMBU
+
+//FFLResult FFLiGetCreateIDBaseBySystem(FFLiCreateIDBase* pCreateIDBase); // Deleted in NSMBU
+//FFLiCreateIDBase* FFLiGetCreateIDBase(); // Deleted in NSMBU
+//FFLResult FFLpSetupCreateIDBase(); // FFLp = private?
+
 #ifdef __cplusplus
 }
 #endif

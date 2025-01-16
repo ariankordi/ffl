@@ -123,3 +123,20 @@ bool FFLiIsSameMiiID(const FFLCreateID* a, const FFLCreateID* b)
 
     return false;
 }
+
+void FFLiGetDefaultCreateIDonCTR(FFLCreateID* pCreateID, s32 index)
+{
+    const u8 DEFAULT_CREATE_ID_ON_CTR[FFL_CREATE_ID_SIZE] = {
+        0x80, 0x00, 0x00, 0x00, 0xec,
+        0xff, 0x82, 0xd2, 0x00, 0x00
+        // CFLi_GetDefaultCreateIDonCTR just sets 0x80, index, and:
+        // *(undefined4 *)((int)&createID->field0_0x0 + 4) = 0xd282ffec;
+    };
+
+    if (index < 6)
+    {
+        rio::MemUtil::copy(pCreateID, &DEFAULT_CREATE_ID_ON_CTR, sizeof(DEFAULT_CREATE_ID_ON_CTR));
+        reinterpret_cast<FFLiCreateID*>(&pCreateID)->databaseIndex = index;
+    }
+}
+

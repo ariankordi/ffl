@@ -23,6 +23,14 @@ bool FFLiRange(T min, T max, T value)
     return min <= value && value <= max;
 }
 
+template <typename T>
+T FFLiClamp(T min, T max, T value)
+{
+    if (value < min)  return min;
+    if (max <= value) return max;
+    return value;
+}
+
 u32 FFLiRoundUp(u32 value, u32 alignment);
 void* FFLiRoundUpPtr(void* ptr, u32 alignment);
 

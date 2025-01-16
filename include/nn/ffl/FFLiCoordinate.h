@@ -2,6 +2,15 @@
 #define FFLI_COORDINATE_H_
 
 #include <nn/ffl/types.h>
+#include <nn/ffl/FFLCoordinateType.h>
+
+// not sure where to put this or if it is real
+enum FFLiAxisType
+{
+    FFLI_AXIS_TYPE_X = 0,
+    FFLI_AXIS_TYPE_Y = 1,
+    FFLI_AXIS_TYPE_Z = 2,
+};
 
 struct FFLiSnorm10_10_10_2;
 struct FFLiSnorm8_8_8_8;
@@ -29,7 +38,8 @@ public:
     static u32 FlipValue(FFLiSnorm10_10_10_2* pVec, u32 value);
     static s8 FlipValue(FFLiSnorm8_8_8_8* pVec, s8 value);
 
-    void SetScale(f32 scale);
+    void Set(FFLCoordinateType upType, FFLCoordinateType frontType); // Deleted in NSMBU
+    void SetScale(f32 scale); // Deleted in NSMBU
 
     bool IsDefault() const;
 
@@ -62,12 +72,18 @@ private:
     }
 
 private:
-    u8      m_SwizzleY;
-    u8      m_SwizzleZ;
-    u8      m_SwizzleX;
-    bool    m_FlipY;
-    bool    m_FlipZ;
-    bool    m_FlipX;
+    /* fields of nn::mii::detail::Coordinate:
+    float m_Scale;
+    enum  AxisType m_AxisTypeList[3];
+    bool  m_InvList[3];
+    */
+
+    u8      m_SwizzleY; // Up
+    u8      m_SwizzleZ; // Front
+    u8      m_SwizzleX; // Right
+    bool    m_FlipY;    // Up
+    bool    m_FlipZ;    // Front
+    bool    m_FlipX;    // Right
     f32     m_Scale;
 };
 NN_STATIC_ASSERT(sizeof(FFLiCoordinate) == 0xC);

@@ -37,6 +37,13 @@ public:
         return m_Coordinate;
     }
 
+    // Deleted in NSMBU:
+
+    void Set(FFLCoordinateType upType, FFLCoordinateType frontType)
+    {
+        m_Coordinate.Set(upType, frontType);
+    }
+
     void SetScale(f32 scale)
     {
         m_Coordinate.SetScale(scale);

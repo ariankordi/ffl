@@ -202,6 +202,20 @@ bool FFLiIsAvailableExpression(const FFLiCharModel* pModel, FFLExpression expres
     return false;
 }
 
+void FFLiSetCoordinat(FFLCoordinateType upType, FFLCoordinateType frontType)
+{
+    // This function is deleted in NSMBU.
+    // Therefore, its implementation is only theoretical.
+
+    if (!FFLiManager::IsConstruct())
+        return;
+
+    FFLiManager* pManager = FFLiManager::GetInstance();
+
+    FFLiCharModelCreateParam& createParam = pManager->GetCharModelCreateParam();
+
+    return createParam.Set(upType, frontType);
+}
 
 void FFLiSetScale(f32 scale)
 {

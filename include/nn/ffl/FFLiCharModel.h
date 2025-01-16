@@ -7,6 +7,7 @@
 #include <nn/ffl/FFLExpression.h>
 #include <nn/ffl/FFLModelType.h>
 #include <nn/ffl/FFLPartsTransform.h>
+#include <nn/ffl/FFLCoordinateType.h>
 #include <nn/ffl/FFLResult.h>
 
 #include <nn/ffl/FFLiRenderTexture.h>
@@ -110,6 +111,7 @@ const FFLiRenderTexture* FFLiGetMaskTextureFromCharModel(const FFLiCharModel* pM
 
 #endif // __cplusplus
 
-void FFLiSetScale(f32 scale);
+void FFLiSetCoordinat(FFLCoordinateType upType, FFLCoordinateType frontType); // Deleted in NSMBU
+void FFLiSetScale(f32 scale); // Deleted in NSMBU
 
 #endif // FFLI_CHAR_MODEL_H_

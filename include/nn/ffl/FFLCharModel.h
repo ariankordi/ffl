@@ -77,6 +77,7 @@ void FFLGetPartsTransform(FFLPartsTransform* pTransform, const FFLCharModel* pMo
 
 void FFLSetViewModelType(FFLCharModel* pModel, FFLModelType type);
 
+void FFLSetCoordinate(FFLCoordinateType upType, FFLCoordinateType frontType);
 void FFLSetScale(f32 scale);
 
 // Not sure how else to expose these

@@ -205,6 +205,12 @@ bool FFLIsAvailableExpression(const FFLCharModel* pModel, FFLExpression expressi
 {
     return FFLiIsAvailableExpression(GetCharModel(pModel), expression);
 }
+
+void FFLSetCoordinate(FFLCoordinateType upType, FFLCoordinateType frontType)
+{
+    FFLiSetCoordinat(upType, frontType);
+}
+
 void FFLSetScale(f32 scale)
 {
     FFLiSetScale(scale);
