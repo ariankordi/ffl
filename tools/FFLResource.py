@@ -1738,14 +1738,23 @@ class FFLiResourceShapeDataHeader:
         indexBufferIndex = primitive.indices
         indexBufferAccessor = accessors[indexBufferIndex]
         assert indexBufferAccessor.byteOffset == 0
-        assert indexBufferAccessor.componentType == pygltflib.UNSIGNED_SHORT
+        #assert indexBufferAccessor.componentType == pygltflib.UNSIGNED_SHORT
         assert indexBufferAccessor.type == pygltflib.SCALAR
         indexNum = indexBufferAccessor.count
         indexBufferView = bufferViews[indexBufferAccessor.bufferView]
         assert indexBufferView.buffer == 0
         #assert indexBufferView.byteLength == 2 * indexNum
-        assert indexBufferView.target == pygltflib.ELEMENT_ARRAY_BUFFER
-        shape.index = struct.unpack_from("<%dH" % indexNum, buffer, indexBufferView.byteOffset)
+        #assert indexBufferView.target == pygltflib.ELEMENT_ARRAY_BUFFER
+
+        # Convert if index type is uint32.
+        if indexBufferAccessor.componentType == pygltflib.UNSIGNED_SHORT:
+            # use H for uint16
+            shape.index = struct.unpack_from("<%dH" % indexNum, buffer, indexBufferView.byteOffset)
+        elif indexBufferAccessor.componentType == pygltflib.UNSIGNED_INT:
+            # use I for uint32
+            shape.index = struct.unpack_from("<%dI" % indexNum, buffer, indexBufferView.byteOffset)
+        else:
+            raise ValueError("Unsupported component type for indices: %d" % indexBufferAccessor.componentType)
 
         positionBufferIndex = primitive.attributes.POSITION
         positionBufferAccessor = accessors[positionBufferIndex]
@@ -1757,7 +1766,7 @@ class FFLiResourceShapeDataHeader:
         positionBufferView = bufferViews[positionBufferAccessor.bufferView]
         assert positionBufferView.buffer == 0
         assert positionBufferView.byteLength == 4 * 3 * vertexNum
-        assert positionBufferView.target == pygltflib.ARRAY_BUFFER
+        #assert positionBufferView.target == pygltflib.ARRAY_BUFFER
         shape.position = [struct.unpack_from("<3f", buffer, positionBufferView.byteOffset + i * 4 * 3) for i in range(vertexNum)]
 
         texCoordBufferIndex = primitive.attributes.TEXCOORD_0
@@ -1773,7 +1782,7 @@ class FFLiResourceShapeDataHeader:
             texCoordBufferView = bufferViews[texCoordBufferAccessor.bufferView]
             assert texCoordBufferView.buffer == 0
             assert texCoordBufferView.byteLength == 4 * 2 * vertexNum
-            assert texCoordBufferView.target == pygltflib.ARRAY_BUFFER
+            #assert texCoordBufferView.target == pygltflib.ARRAY_BUFFER
             shape.texCoord = [struct.unpack_from("<2f", buffer, texCoordBufferView.byteOffset + i * 4 * 2) for i in range(vertexNum)]
 
         normalBufferIndex = primitive.attributes.NORMAL
@@ -1785,7 +1794,7 @@ class FFLiResourceShapeDataHeader:
         normalBufferView = bufferViews[normalBufferAccessor.bufferView]
         assert normalBufferView.buffer == 0
         assert normalBufferView.byteLength == 4 * 3 * vertexNum
-        assert normalBufferView.target == pygltflib.ARRAY_BUFFER
+        #assert normalBufferView.target == pygltflib.ARRAY_BUFFER
         shape.normal = [struct.unpack_from("<3f", buffer, normalBufferView.byteOffset + i * 4 * 3) for i in range(vertexNum)]
 
         tangentBufferIndex = primitive.attributes.TANGENT
