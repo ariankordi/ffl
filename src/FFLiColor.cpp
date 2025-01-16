@@ -483,6 +483,41 @@ const FFLiColorContainer& GetColorContainer()
     return s_ColorContainer[s_ContainerType];
 }
 
+
+// nn::mii::detail::FacelineColorTable
+// FacelineColorElement[10]
+// Switch Faceline Colors
+
+// Note that this is placed after the
+// UpperLipColorTable in actual nn::mii but is
+// moved here for better handling of OOB values
+/*
+struct FacelineColorElement {
+    Color3  linear;
+    Color3  srgb;
+    int     ver3FacelineColors;
+    int     _1c;
+};
+*/
+/* Referenced by...
+ * GetSkinColor
+ * GetOrderIndexByFacelineColor
+ * GetFacelineColorToVer3
+ */
+const FFLColor nnmiiFacelineColors[FFLI_NN_MII_FACELINE_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
+    // NOTE: these are passed to switch shaders with A = 0
+    { { 1.0f, 0.6514057f, 0.4178851f, 1.0f }, { 1.0f, 0.827451f, 0.6784314f, 1.0f } },
+    { { 1.0f, 0.4677839f, 0.1470273f, 1.0f }, { 1.0f, 0.7137255f, 0.4196079f, 1.0f } },
+    { { 0.7304609f, 0.1912018f, 0.05448031f, 1.0f }, { 0.8705883f, 0.4745099f, 0.2588236f, 1.0f } },
+    { { 1.0f, 0.4019778f, 0.2622508f, 1.0f }, { 1.0f, 0.6666667f, 0.5490197f, 1.0f } },
+    { { 0.4178851f, 0.08228273f, 0.0221739f, 1.0f }, { 0.6784314f, 0.3176471f, 0.1607844f, 1.0f } },
+    { { 0.1247718f, 0.02518688f, 0.00913407f, 1.0f }, { 0.3882353f, 0.1725491f, 0.0941177f, 1.0f } },
+    { { 1.0f, 0.5149179f, 0.3762622f, 1.0f }, { 1.0f, 0.7450981f, 0.6470589f, 1.0f } },
+    { { 1.0f, 0.5583405f, 0.2746774f, 1.0f }, { 1.0f, 0.7725491f, 0.5607844f, 1.0f } },
+    { { 0.2622508f, 0.04518623f, 0.0168074f, 1.0f }, { 0.5490197f, 0.2352942f, 0.137255f, 1.0f } },
+    { { 0.04518623f, 0.02624122f, 0.0168074f, 1.0f }, { 0.2352942f, 0.1764706f, 0.137255f, 1.0f } }
+};
+
 // nn::mii::detail::CommonColorTable SRGB fields
 // Common colors as used in Switch Miis
 /*
@@ -726,36 +761,6 @@ const FFLColor nnmiiUpperLipColors[FFLI_NN_MII_COMMON_COLOR_MAX][FFLI_CONTAINER_
     { { 0.4072404f, 0.4072404f, 0.4072404f, 1.0f }, { 0.6705883f, 0.6705883f, 0.6705883f, 1.0f } },
     { { 0.5647116f, 0.5332766f, 0.4677839f, 1.0f }, { 0.7764706f, 0.7568628f, 0.7137255f, 1.0f } },
     { { 0.6938719f, 0.6938719f, 0.6938719f, 1.0f }, { 0.8509804f, 0.8509804f, 0.8509804f, 1.0f } }
-};
-
-// nn::mii::detail::FacelineColorTable
-// FacelineColorElement[10]
-// Switch Faceline Colors
-/*
-struct FacelineColorElement {
-    Color3  linear;
-    Color3  srgb;
-    int     ver3FacelineColors;
-    int     _1c;
-};
-*/
-/* Referenced by...
- * GetSkinColor
- * GetOrderIndexByFacelineColor
- * GetFacelineColorToVer3
- */
-const FFLColor nnmiiFacelineColors[FFLI_NN_MII_FACELINE_COLOR_MAX][FFLI_CONTAINER_TYPE_MAX] = {
-    // NOTE: these are passed to switch shaders with A = 0
-    { { 1.0f, 0.6514057f, 0.4178851f, 1.0f }, { 1.0f, 0.827451f, 0.6784314f, 1.0f } },
-    { { 1.0f, 0.4677839f, 0.1470273f, 1.0f }, { 1.0f, 0.7137255f, 0.4196079f, 1.0f } },
-    { { 0.7304609f, 0.1912018f, 0.05448031f, 1.0f }, { 0.8705883f, 0.4745099f, 0.2588236f, 1.0f } },
-    { { 1.0f, 0.4019778f, 0.2622508f, 1.0f }, { 1.0f, 0.6666667f, 0.5490197f, 1.0f } },
-    { { 0.4178851f, 0.08228273f, 0.0221739f, 1.0f }, { 0.6784314f, 0.3176471f, 0.1607844f, 1.0f } },
-    { { 0.1247718f, 0.02518688f, 0.00913407f, 1.0f }, { 0.3882353f, 0.1725491f, 0.0941177f, 1.0f } },
-    { { 1.0f, 0.5149179f, 0.3762622f, 1.0f }, { 1.0f, 0.7450981f, 0.6470589f, 1.0f } },
-    { { 1.0f, 0.5583405f, 0.2746774f, 1.0f }, { 1.0f, 0.7725491f, 0.5607844f, 1.0f } },
-    { { 0.2622508f, 0.04518623f, 0.0168074f, 1.0f }, { 0.5490197f, 0.2352942f, 0.137255f, 1.0f } },
-    { { 0.04518623f, 0.02624122f, 0.0168074f, 1.0f }, { 0.2352942f, 0.1764706f, 0.137255f, 1.0f } }
 };
 
 const FFLColor& GetFacelineColor(const FFLiColorContainer& container, s32 index)
