@@ -231,8 +231,6 @@ class FFLiResourcePartsInfo:
                 if compressedSize > maximum_compressed_size:
                     maximum_compressed_size = compressedSize
                     print("new compressedSize: 0x%X" % compressedSize)
-            else:
-                compressedSize = 0
 
             data += partsData
 
@@ -301,12 +299,20 @@ class FFLiResourceTextureFooter:
             ][textureFormat])
         )
 
+        # NOTE that there's a bug where if you
+        # reimport textures made by FFLResource.py
+        # then this area will assert because the
+        # image size this calculated and the actual
+        # size are mismatched but if you comment
+        # out this entire section it should work
+        # begin comment here
         if mipOffset:
             assert gx2Texture.surface.imageSize <= mipOffset
             assert mipOffset + gx2Texture.surface.mipSize <= footerOffset
 
         else:
             assert gx2Texture.surface.imageSize <= footerOffset
+        # end comment here
 
         gx2Texture.surface.imageData = data[:gx2Texture.surface.imageSize]
 
