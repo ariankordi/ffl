@@ -87,7 +87,7 @@ FFLResult FFLiResourceCache::Attach(void* pData, u32 size, FFLResourceType resou
 
                 u8* pFooterData = (u8*)pData + partsInfo.dataPos;
 
-                FFLiSwapEndianResourceShapeElement(pFooterData, FFLiShapePartsType(i), false);
+                FFLiSwapEndianResourceShapeElement(pFooterData, false, FFLiShapePartsType(i));
             }
         }
     }

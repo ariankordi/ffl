@@ -249,16 +249,18 @@ FFLResult FFLiResourceHeader::GetResult() const
 
 namespace {
 
+static const FFLiSwapEndianDesc SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO[2] = {
+    // dataPos, dataSize, compressedSize
+    { FFLI_SWAP_ENDIAN_TYPE_U32, 3 },
+    { FFLI_SWAP_ENDIAN_TYPE_U8,  4 },
+};
+
 void SwapEndianResourcePartsInfo(FFLiResourcePartsInfo* pPartsInfo, u32 num)
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
     for (u32 i = 0; i < num; i++)
     {
-        pPartsInfo[i].dataPos = FFLiSwapEndianImpl<u32>(pPartsInfo[i].dataPos);
-        pPartsInfo[i].dataSize = FFLiSwapEndianImpl<u32>(pPartsInfo[i].dataSize);
-        pPartsInfo[i].compressedSize = FFLiSwapEndianImpl<u32>(pPartsInfo[i].compressedSize);
+        u32 size = FFLiSwapEndianGroup(&pPartsInfo[i], SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO, sizeof(SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO) / sizeof(FFLiSwapEndianDesc));
+        RIO_ASSERT(size == sizeof(*pPartsInfo));
     }
 }
 
@@ -267,20 +269,25 @@ void SwapEndianResourcePartsInfo(FFLiResourcePartsInfo* pPartsInfo, u32 num)
 // NOTE: both of the below SwapEndian functions
 // assume that everything before parts is already swapped
 
+// Originally FFLiResourceHeader::SwapEndian()
 template <typename T>
 void HeaderSwapEndianImpl(T* pHeader)
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
     /*
     m_Header->m_Magic = FFLiSwapEndianImpl<u32>(m_Header->m_Magic);
     m_Header->m_Version = FFLiSwapEndianImpl<u32>(m_Header->m_Version);
     m_Header->m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_Header->m_UncompressBufferSize);
-
+    m_Header->m_TotalUncompressSize = FFLiSwapEndianImpl<u32>(m_Header->m_TotalUncompressSize); // _c field
     m_Header->m_IsExpand = FFLiSwapEndianImpl<u32>(m_Header->m_IsExpand);
     */
     FFLiSwapEndianArrayImpl<u32>(pHeader->m_Header->m_TextureHeader.partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);
+    FFLiSwapEndianArrayImpl<u32>(pHeader->GetShapeHeader()->partsMaxSize, FFLI_SHAPE_PARTS_TYPE_MAX);
+
+    // Below is inlined in FFL, the
+    // offsets are hardcoded and it only
+    // calls SwapEndianResourcePartsInfo
+
+    // Swap texture PartsInfo
     for (u32 i = 0; i < FFLI_TEXTURE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
@@ -288,7 +295,7 @@ void HeaderSwapEndianImpl(T* pHeader)
         SwapEndianResourcePartsInfo(pPartsInfo, num);
     }
 
-    FFLiSwapEndianArrayImpl<u32>(pHeader->GetShapeHeader()->partsMaxSize, FFLI_SHAPE_PARTS_TYPE_MAX);
+    // Swap shape PartsInfo
     for (u32 i = 0; i < FFLI_SHAPE_PARTS_TYPE_MAX; i++)
     {
         u32 num;
@@ -296,8 +303,7 @@ void HeaderSwapEndianImpl(T* pHeader)
         SwapEndianResourcePartsInfo(pPartsInfo, num);
     }
 
-    // Dunno what to do with this
-    // _49d0
+    //FFLiSwapEndianArrayImpl<u32>(_49d0, sizeof(_49d0) / sizeof(u32));
 }
 
 void FFLiResourceHeaderDefault::SwapEndian()

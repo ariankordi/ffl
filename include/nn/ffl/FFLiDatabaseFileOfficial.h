@@ -38,7 +38,7 @@ public:
 
     bool AdjustRegularList(AdjustRegularBuffer* pBuffer);
 
-    void SwapEndian(bool save);
+    bool SwapEndian(); // Deleted in NSMBU
     /*
     Deleted in NSMBU:
 

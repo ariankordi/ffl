@@ -67,10 +67,10 @@ void* FFLiResourceTextureFooter::GetMipPtrImpl(u32 size) const
 
 void FFLiResourceTextureFooter::SwapEndian()
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
     m_MipOffset = FFLiSwapEndianImpl<u32>(m_MipOffset);
     m_Width = FFLiSwapEndianImpl<u16>(m_Width);
     m_Height = FFLiSwapEndianImpl<u16>(m_Height);
+    // Called by FFL but do nothing:
+    //m_NumMips = FFLiSwapEndianImpl<u8>(m_NumMips);
+    //m_TextureFormat = FFLiSwapEndianImpl<u8>(m_TextureFormat);
 }

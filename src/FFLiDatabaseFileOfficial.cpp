@@ -190,24 +190,23 @@ bool FFLiDatabaseFileOfficial::AdjustRegularList(AdjustRegularBuffer* pBuffer)
     return ret;
 }
 
-void FFLiDatabaseFileOfficial::SwapEndian(bool save)
+bool FFLiDatabaseFileOfficial::SwapEndian()
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
-    if (!save)
-        RIO_ASSERT(IsValidCrc());
+    if (!IsValidCrc())
+        return false;
 
     m_Magic = FFLiSwapEndianImpl<u32>(m_Magic);
     m_SaveCount = FFLiSwapEndianImpl<u32>(m_SaveCount);
 
-    for (u32 i = 0; i < 3000; i++)
-        m_MiiDataOfficial[i].SwapEndian();
-
     // Unknown what this is supposed to be:
     FFLiSwapEndianArrayImpl<u16>(_4381c, 17);
 
+    for (u32 i = 0; i < 3000; i++)
+        m_MiiDataOfficial[i].SwapEndian();
+
     UpdateCrc();
+
+    return true;
 }
 
 #endif // FFL_NO_DATABASE_FILE

@@ -993,6 +993,7 @@ NN_STATIC_ASSERT(sizeof(FFLiMiiDataOfficial) == 0x5C);
 class FFLiStoreData : public FFLiMiiDataOfficial
 {
 public:
+    bool IsValidCRC();
     void SetCRC();
     void SwapEndian();
 
@@ -1015,9 +1016,10 @@ public:
     void SwapEndian();  // Deleted in NSMBU
 
 private:
-    // Theoretical fields copied from CFLiPackedMiiDataHidden
-    u8 m_DateTime[4]; // one u32
-    u8 m_ApplicationID[8]; // CFLiApplicationID (unknown)
+    // Theoretical fields copied from CFLiPackedMiiDataHidden.
+    // SwapEndian() suggests these are two fields?
+    u32 m_DateTime; // CFL: uint8_t[4]
+    u8  m_ApplicationID[8]; // CFLiApplicationID (unknown)
 };
 NN_STATIC_ASSERT_IS_POD(FFLiMiiDataHidden);
 NN_STATIC_ASSERT(sizeof(FFLiMiiDataHidden) == 0x54);

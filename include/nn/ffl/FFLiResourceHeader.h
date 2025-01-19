@@ -245,7 +245,7 @@ private:
         u32                              m_Magic;
         u32                              m_Version; // STILL 0x00070000
         u32                              m_UncompressBufferSize;
-        u32                              _c[4 / sizeof(u32)];
+        u32                              m_TotalUncompressSize;
         int                              m_IsExpand;
         FFLiResourceTextureHeaderAFL_2_3 m_TextureHeader;
         FFLiResourceShapeHeader          m_ShapeHeader;
@@ -314,7 +314,7 @@ private:
         u32                           m_Magic;
         u32                           m_Version; // STILL 0x00070000
         u32                           m_UncompressBufferSize;
-        u32                           _c[4 / sizeof(u32)];
+        u32                           m_TotalUncompressSize;
         int                           m_IsExpand;
         FFLiResourceTextureHeaderAFL  m_TextureHeader;
         FFLiResourceShapeHeader       m_ShapeHeader;

@@ -15,7 +15,7 @@ enum FFLiSwapEndianType
 struct FFLiSwapEndianDesc
 {
     FFLiSwapEndianType  type;
-    u32                 size;
+    u32                 count;
 };
 NN_STATIC_ASSERT(sizeof(FFLiSwapEndianDesc) == 8);
 
@@ -53,9 +53,9 @@ T FFLiSwapEndianImpl(T value)
 #endif
 
 template <typename T>
-void FFLiSwapEndianArrayImpl(T* pArray, u32 size)
+void FFLiSwapEndianArrayImpl(T* pArray, u32 count)
 {
-    for (u32 i = 0; i < size; i++)
+    for (u32 i = 0; i < count; i++)
         pArray[i] = FFLiSwapEndianImpl<T>(pArray[i]);
 }
 

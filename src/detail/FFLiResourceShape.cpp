@@ -96,25 +96,26 @@ const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLi
     return NULL;
 }
 
-void FFLiSwapEndianResourceShapeElement(void* pShapeData, FFLiShapePartsType partsType, bool save)
+void FFLiSwapEndianResourceShapeElement(void* pShapeData, bool save, FFLiShapePartsType partsType)
 {
     // This function is deleted in NSMBU.
     // Therefore, its implementation is only theoretical.
 
+    // In AFL, Second argument = u32 shapeAlignedMaxSize (still unused)
+
     FFLiResourceShapeDataHeader* pShape = static_cast<FFLiResourceShapeDataHeader*>(pShapeData);
 
+    // save argument is not in FFL
     if (!save)
-        pShape->SwapEndian();
+        pShape->SwapEndian(); // FFL calls this first unconditionally
 
     SwapEndianAttribute(pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_POSITION), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_POSITION));
     SwapEndianAttribute(pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL));
     SwapEndianAttribute(pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TEXCOORD), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TEXCOORD));
-    // Tangent and color don't need endianness swap
+    // Tangent and color (8 bit) don't need endian swap
+    // (FFL calls the func to swap them anyway)
 
     SwapEndianIndex(pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX));
-
-    SwapEndianVec3(&(pShape->GetBoundingBox().min));
-    SwapEndianVec3(&(pShape->GetBoundingBox().max));
 
     if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL)
         SwapEndianHairTransform(pShape->GetTransform());
@@ -130,6 +131,9 @@ void FFLiResourceShapeDataHeader::SwapEndian()
 {
     FFLiSwapEndianArrayImpl<u32>(m_ElementPos, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BUFFER_MAX);
     FFLiSwapEndianArrayImpl<u32>(m_ElementSize, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BUFFER_MAX);
+    // real function calls FFLiSwapEndianImpl<f32> x 6
+    SwapEndianVec3(&m_BoundingBox.min);
+    SwapEndianVec3(&m_BoundingBox.max);
 }
 
 void FFLiResourceShapeHairTransform::SwapEndian()
@@ -164,6 +168,8 @@ void SwapEndianAttribute(void* pShapeData, u32 pos, u32 size)
 {
     if (size == 0)
         return;
+    RIO_ASSERT((size % sizeof(float)) == 0);
+    // real function calls FFLiSwapEndianImpl<f32>
 
     FFLiSwapEndianArrayImpl<u32>((u32*)((const u8*)pShapeData + pos), size / sizeof(u32));
 }
@@ -178,6 +184,7 @@ void SwapEndianIndex(void* pShapeData, u32 pos, u32 size)
 
 void SwapEndianVec3(FFLVec3* pVec)
 {
+    // real function calls FFLiSwapEndianImpl<f32> three times
     FFLiSwapEndianArrayImpl<f32>(&pVec->x, sizeof(FFLVec3) / sizeof(f32));
 }
 

@@ -31,7 +31,7 @@ enum FFLiResourceShapeElementType
 
 const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLiShapePartsType partsType, FFLiResourceShapeElementType elementType);
 
-void FFLiSwapEndianResourceShapeElement(void* pShapeData, FFLiShapePartsType partsType, bool save);
+void FFLiSwapEndianResourceShapeElement(void* pShapeData, bool save, FFLiShapePartsType partsType);
 
 // --------------------------------------------------------------------------
 
@@ -109,6 +109,7 @@ public:
     void SwapEndian();  // Deleted in NSMBU
 
 private:
+    // Is this just FFLPartsTransform? Not sure
     FFLVec3 _0[6];
 };
 NN_STATIC_ASSERT(sizeof(FFLiResourceShapeHairTransform) == 0x48);

@@ -204,9 +204,6 @@ bool FFLiIsAvailableExpression(const FFLiCharModel* pModel, FFLExpression expres
 
 void FFLiSetCoordinat(FFLCoordinateType upType, FFLCoordinateType frontType)
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
     if (!FFLiManager::IsConstruct())
         return;
 
@@ -219,9 +216,6 @@ void FFLiSetCoordinat(FFLCoordinateType upType, FFLCoordinateType frontType)
 
 void FFLiSetScale(f32 scale)
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
     if (!FFLiManager::IsConstruct())
         return;
 

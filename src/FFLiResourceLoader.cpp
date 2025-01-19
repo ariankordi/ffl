@@ -188,7 +188,9 @@ FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsT
                 )
             )
         {
-            FFLiSwapEndianResourceShapeElement(pData, partsType, false);
+            // In AFL (real FFL?) this is called
+            // after LoadShape call in FFLiLoadShape.
+            FFLiSwapEndianResourceShapeElement(pData, false, partsType);
         }
     }
     return FFL_RESULT_OK;

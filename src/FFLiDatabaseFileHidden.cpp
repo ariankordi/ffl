@@ -30,9 +30,6 @@ u16 FFLiOrderData::PrevIndex() const
 
 void FFLiOrderData::SwapEndian()
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
     m_NextIndex = FFLiSwapEndianImpl<u16>(m_NextIndex);
     m_PrevIndex = FFLiSwapEndianImpl<u16>(m_PrevIndex);
 }
@@ -243,17 +240,17 @@ FFLResult FFLiDatabaseFileHidden::UpdateMiddleDB(FFLiMiddleDB* pMiddleDB) const
     return result;
 }
 
-void FFLiDatabaseFileHidden::SwapEndian(bool save)
+bool FFLiDatabaseFileHidden::SwapEndian()
 {
-    // This function is deleted in NSMBU.
-    // Therefore, its implementation is only theoretical.
-
-    if (!save)
-        RIO_ASSERT(IsValidCrc());
+    if (!IsValidCrc())
+        return false;
 
     m_Magic = FFLiSwapEndianImpl<u32>(m_Magic);
     m_StartIndex = FFLiSwapEndianImpl<u16>(m_StartIndex);
     m_EndIndex = FFLiSwapEndianImpl<u16>(m_EndIndex);
+
+    // Unknown what this is supposed to be:
+    FFLiSwapEndianArrayImpl<u16>(_abe8, 11);
 
     for (u32 i = 0; i < 500; i++)
     {
@@ -261,10 +258,9 @@ void FFLiDatabaseFileHidden::SwapEndian(bool save)
         m_MiiDataHidden[i].SwapEndian();
     }
 
-    // Unknown what this is supposed to be:
-    FFLiSwapEndianArrayImpl<u16>(_abe8, 11);
-
     UpdateCrc();
+
+    return true;
 }
 
 static u32 GetMiiDataNum()
