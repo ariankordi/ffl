@@ -339,6 +339,13 @@ class FFLiResourceTextureFooter:
             data += b'\0' * (mipOffset - prevMipOffset)
             data += gx2Texture.surface.mipData
 
+        # add padding to make it align
+        padding = (4 - (len(data) % 4)) % 4
+        data = data + (b'\x00' * padding)
+        #assert len(data) % 4 == 0  # check pointer alignment
+        # if this data's length is not aligned then it
+        # will cause the footer's address to be misaligned
+
         width = gx2Texture.surface.width
         height = gx2Texture.surface.height
         numMips = gx2Texture.surface.numMips

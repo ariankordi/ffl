@@ -1,3 +1,4 @@
+#include <nn/ffl/FFLiUtil.h>
 #include <nn/ffl/FFLiTextureInfo.h>
 
 #include <nn/ffl/FFLiResourceHeader.h>
@@ -59,7 +60,7 @@ namespace {
     }
 }
 
-#define TEXTURE_DATA_MAX_ALIGNMENT (0x800)
+#define FFLI_RESOUCE_MAX_ALIGNMENT_TEXTURE (0x800)
 
 // new function to get FFLTextureInfo which is both used to
 // load texture with RIO/GX2 and passed to texture callback
@@ -74,7 +75,7 @@ FFLResult FFLiLoadTextureInfo(FFLTextureInfo* textureInfo, FFLiTexturePartsType 
 
     if (!pResLoader->IsExpand())
     {
-        *pData = rio::MemUtil::alloc(size, TEXTURE_DATA_MAX_ALIGNMENT);
+        *pData = rio::MemUtil::alloc(size, FFLI_RESOUCE_MAX_ALIGNMENT_TEXTURE);
         FFLResult result = pResLoader->LoadTexture(*pData, &size, partsType, index);
         if (result != FFL_RESULT_OK)
         {
@@ -89,6 +90,11 @@ FFLResult FFLiLoadTextureInfo(FFLTextureInfo* textureInfo, FFLiTexturePartsType 
         if (result != FFL_RESULT_OK)
             return result;
     }
+
+    // Make sure that the texture size is aligned
+    // because GetFooterImpl() uses the size to
+    // make a pointer that needs to be aligned
+    RIO_ASSERT(FFLiCheckAlign(size, 4));
 
     const FFLiResourceTextureFooter& footer = FFLiResourceTextureFooter::GetFooterImpl(*pData, size);
 
@@ -109,6 +115,9 @@ FFLResult FFLiLoadTextureInfo(FFLTextureInfo* textureInfo, FFLiTexturePartsType 
     // textureInfo->mipCount = footer.NumMips();
 
     textureInfo->imagePtr = footer.GetImagePtrImpl(size);
+#if RIO_IS_CAFE
+    RIO_ASSERT(FFLiCheckAlignPtr(textureInfo->imagePtr, FFLI_RESOUCE_MAX_ALIGNMENT_TEXTURE));
+#endif // RIO_IS_CAFE
 
     // Determine whether or not to ignore footer's mipmaps.
     if (pHeader->IgnoreMipMaps())
@@ -120,6 +129,9 @@ FFLResult FFLiLoadTextureInfo(FFLTextureInfo* textureInfo, FFLiTexturePartsType 
     {
         textureInfo->mipCount = footer.NumMips();
         textureInfo->mipPtr = footer.GetMipPtrImpl(size);
+#if RIO_IS_CAFE
+        RIO_ASSERT(FFLiCheckAlignPtr(textureInfo->mipPtr, FFLI_RESOUCE_MAX_ALIGNMENT_TEXTURE));
+#endif // RIO_IS_CAFE
     }
     // Calculate mipSize, mipLevelOffset array / zero it out.
     textureInfo->mipSize = CalcMipmapSize(textureFormat, width, height,

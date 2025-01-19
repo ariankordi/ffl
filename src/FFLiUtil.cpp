@@ -1,7 +1,23 @@
 #include <nn/ffl/FFLiUtil.h>
 
+namespace
+{
+
+// Deleted in NSMBU:
+
+bool CheckPower2(u32 value)
+{
+    if (value == 0)
+        return false;
+
+    return ((value - 1) & value) == 0;
+}
+
+}
+
 u32 FFLiRoundUp(u32 value, u32 alignment)
 {
+    RIO_ASSERT(CheckPower2(alignment)); // CheckPower2(digit)
     return (value + alignment - 1) & ~(alignment - 1);
 }
 
@@ -13,22 +29,37 @@ void* FFLiRoundUpPtr(void* ptr, u32 alignment)
     return reinterpret_cast<void*>(rounded);
 }
 
+bool FFLiCheckPowerOfTwo(u32 value)
+{
+    return CheckPower2(value);
+}
+
 bool FFLiCheckAlign(u32 value, u32 alignment)
 {
+    RIO_ASSERT(FFLiCheckPowerOfTwo(alignment));
     return (value & (alignment - 1)) == 0;
 }
 
 bool FFLiCheckAlignPtr(const void* ptr, u32 alignment)
 {
+    RIO_ASSERT(FFLiCheckPowerOfTwo(alignment));
     uintptr_t uintptr = reinterpret_cast<uintptr_t>(ptr);
     return (uintptr & (alignment - 1)) == 0;
 }
 
-void FFLiCopyWcharT2U16(u16* dst, u32 size, const wchar_t* src)
+void FFLiCopyWcharT2U16(u16* dst, u32 num, const wchar_t* src)
 {
-    for (u32 i = 0, j = 0; i < size; i++)
-        if ((dst[i] = src[j]) != L'\0')
+    for (u32 i = 0, j = 0; i < num; i++)
+    {
+        const wchar_t c = src[j];
+        // Make sure character is in range.
+        RIO_ASSERT(FFLiRange<wchar_t>(0, 0xFFFF, c));
+
+        if ((dst[i] = c) != L'\0')
             j++;
+    }
+    // Ensure null termination.
+    RIO_ASSERT(dst[num-1] == '\0');
 }
 
 s32 FFLiCompareString16(const u16* s1, const u16* s2, s32 n)

@@ -36,6 +36,7 @@ FFLiResourceManager::FFLiResourceManager(FFLiResourceMultiHeader* pHeader)
 #endif
 {
 #ifndef FFL_NO_FS
+    //RIO_ASSERT(FFLiCheckAlignPtr(pHeader, 64));
     rio::MemUtil::set(m_pResourceMultiHeader, 0, sizeof(FFLiResourceMultiHeader));
 #endif
     rio::MemUtil::set(m_Path, 0, (s32)FFL_RESOURCE_TYPE_MAX * (s32)FFL_PATH_MAX_LEN);
@@ -89,7 +90,11 @@ FFLResult FFLiResourceManager::LoadResourceHeaderImpl()
         char pHeaderPreData[sizeof(FFLiResourceHeaderDefaultData)];
 
         if (!device->tryOpen(&fileHandle, GetPath(FFLResourceType(i)), rio::FileDevice::FILE_OPEN_FLAG_READ))
+        {
+            const rio::RawErrorCode code = device->getLastRawError();
+            RIO_LOG("FFLiResourceManager::LoadResourceHeaderImpl: Failed to load resource type %d with path %s with error: %d\n", i, GetPath(FFLResourceType(i)), code);
             return FFL_RESULT_FILE_INVALID;
+        }
 
         u32 readSize = 0;
         // ... read into the small buffer.
