@@ -12,8 +12,8 @@ typedef struct FFLAdditionalInfo
 {
     u16         name[10 + 1];
     u16         creatorName[10 + 1];
-    FFLCreateID creatorID;
     FFLColor    facelineColor;
+    FFLCreateID createID;
     union
     {
         struct

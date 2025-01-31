@@ -48,7 +48,7 @@ u16 FFLiDatabaseFileHidden::NumOfGenderWithIndex(u16* pIndices, FFLGender gender
     for (u16 i = 0; i < GetMiiDataNum(); i++)
     {
         const FFLiMiiDataHidden& hidden = GetImpl(i);
-        if (!FFLiIsNullMiiID(&hidden.CreatorID()))
+        if (!FFLiIsNullMiiID(&hidden.CreateID()))
         {
             if (gender == FFL_GENDER_MAX || gender == hidden.Gender())
             {

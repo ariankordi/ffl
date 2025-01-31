@@ -33,7 +33,7 @@ FFLResult FFLiDatabaseRandom::UpdateMiddleDB(FFLiMiddleDB* pMiddleDB)
     {
         FFLiCharInfo charInfo;
         Get(&charInfo, param.Gender(), param.Age(), param.Race());
-        FFLiGetTemporaryMiiID(&charInfo.creatorID);
+        FFLiGetTemporaryMiiID(&charInfo.createID);
 
         bool add = true;
 

@@ -116,6 +116,11 @@ extern "C" {
     0 <= aEyeType && aEyeType < FFLI_CHAR_INFO_EYE_TYPE_COUNT
     0 <= aEyebrowType && aEyebrowType < FFLI_CHAR_INFO_EYEBROW_TYPE_COUNT
     ^^ suggests these go in FFLiCharInfo.h and using MIN/COUNT instead of MAX?
+
+    FFL_HOST_IO_DIR
+    FFL_NAME_LENGTH_SHORT
+    FFL_CREATORNAME_LENGTH_SHORT
+    FFL_GENDER_COUNT
 */
 
 enum

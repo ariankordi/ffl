@@ -84,7 +84,7 @@ bool FFLiDatabaseFileOfficial::Get(FFLiCharInfo* pCharInfo, u16 miiDataIndex, bo
         return false;
 
     const FFLiMiiDataOfficial& official = GetImpl(miiDataIndex);
-    const FFLCreateID* pCreateID = &official.CreatorID();
+    const FFLCreateID* pCreateID = &official.CreateID();
 
     if (FFLiIsNullMiiID(pCreateID))
         return false;
@@ -119,7 +119,7 @@ bool FFLiDatabaseFileOfficial::Search(u16* pMiiDataIndex, const FFLCreateID& cre
     for (u16 i = 0; i < GetMiiDataNum(); i++)
     {
         const FFLiMiiDataOfficial& official = GetImpl(i);
-        const FFLCreateID* pCreateID = &official.CreatorID();
+        const FFLCreateID* pCreateID = &official.CreateID();
 
         if (FFLiIsSameMiiID(pCreateID, &createID))
         {
@@ -143,7 +143,7 @@ bool FFLiDatabaseFileOfficial::IsRegular(u16 miiDataIndex, bool checkSpecial, bo
     if (!Get(&charInfo, miiDataIndex, checkSpecial, allowSpecial))
         return false;
 
-    return FindRegularList(NULL, &charInfo.creatorID);
+    return FindRegularList(NULL, &charInfo.createID);
 }
 
 namespace {
@@ -172,7 +172,7 @@ bool FFLiDatabaseFileOfficial::AdjustRegularList(AdjustRegularBuffer* pBuffer)
     {
         FFLiCharInfo charInfo;
         if (Get(&charInfo, i, true, true))
-            pBuffer->createID[pBuffer->size++] = charInfo.creatorID;
+            pBuffer->createID[pBuffer->size++] = charInfo.createID;
     }
 
     bool ret = false;

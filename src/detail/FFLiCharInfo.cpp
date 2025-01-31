@@ -253,7 +253,7 @@ FFLiVerifyReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharInfo, boo
     if (!(1 <= pCharInfo->birthPlatform && pCharInfo->birthPlatform <= 7))
         return FFLI_VERIFY_REASON_BIRTH_PLATFORM_INVALID;
 
-    if (FFLiIsValidMiiID(&pCharInfo->creatorID) && !FFLiIsNormalMiiID(&pCharInfo->creatorID) && !pCharInfo->localOnly)
+    if (FFLiIsValidMiiID(&pCharInfo->createID) && !FFLiIsNormalMiiID(&pCharInfo->createID) && !pCharInfo->localOnly)
         return FFLI_VERIFY_REASON_CREATEID_INVALID;
 
     return FFLI_VERIFY_REASON_OK;
@@ -404,9 +404,9 @@ bool FFLiCompareCharInfoWithAdditionalInfo(s32* pFlagOut, s32 flagIn, const FFLi
         if (FFLiCompareString16(pAdditionalInfoA->creatorName, pAdditionalInfoB->creatorName, 10 + 1) != 0)
             flag |= FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_NAME;
 
-    if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_ID)
-        if (!FFLiIsSameMiiID(&pAdditionalInfoA->creatorID, &pAdditionalInfoB->creatorID))
-            flag |= FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_ID;
+    if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_CREATE_ID)
+        if (!FFLiIsSameMiiID(&pAdditionalInfoA->createID, &pAdditionalInfoB->createID))
+            flag |= FFLI_COMPARE_CHAR_INFO_FLAG_CREATE_ID;
 
     if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_GENDER)
         if (pAdditionalInfoA->gender != pAdditionalInfoB->gender)

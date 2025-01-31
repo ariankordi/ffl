@@ -63,14 +63,14 @@ void FFLiGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, const FFLiCharInf
         ReplaceInvalidNameChar(pAdditionalInfo->name, 10);
         ReplaceInvalidNameChar(pAdditionalInfo->creatorName, 10);
 
-        if (checkFontRegion && !IsAvailableFontRegion(pCharInfo->fontRegion, fontRegion))
+        if (checkFontRegion && !IsAvailableFontRegion(FFLFontRegion(pCharInfo->fontRegion), fontRegion))
         {
             ReplaceNonAsciiNameChar(pAdditionalInfo->name, 10);
             ReplaceNonAsciiNameChar(pAdditionalInfo->creatorName, 10);
         }
     }
 
-    rio::MemUtil::copy(&pAdditionalInfo->creatorID, &pCharInfo->creatorID, sizeof(FFLCreateID));
+    rio::MemUtil::copy(&pAdditionalInfo->createID, &pCharInfo->createID, sizeof(FFLCreateID));
 
     pAdditionalInfo->gender = pCharInfo->gender;
 

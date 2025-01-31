@@ -16,7 +16,8 @@ typedef struct FFLiTextureTempObject
 {
     FFLiMaskTexturesTempObject      maskTextures;
     FFLiFacelineTextureTempObject   facelineTexture;
-} FFLiTextureTempObject;
+}
+FFLiTextureTempObject;
 NN_STATIC_ASSERT32(sizeof(FFLiTextureTempObject) == 0x4D4);
 
 // defined in FFLiCharModelCreator.cpp

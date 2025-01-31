@@ -13,74 +13,171 @@
 extern "C" {
 #endif
 
+/* TODO: Replace existing FFLiCharInfo with this
+more accurate struct from DWARF information for CFL.
+Also closer to the structure of RFLiCharInfo: https://github.com/SMGCommunity/Petari/blob/d34c595ba7dfcd92ef776964ecf668f37cbb7123/libs/RVLFaceLib/include/RFLi_Types.h#L140
+
+// Seems to be the same as CFLiCharInfo:
 typedef struct FFLiCharInfo
 {
-    u32                 miiVersion;
+    s32          miiVersion;
+    struct {
+        s32      type;
+        s32      color;
+        s32      texture;
+        s32      make;
+    } faceline;
+    struct {
+        s32      type;
+        s32      color;
+        s32      flip;
+    } hair;
+    struct {
+        s32      type;
+        s32      color;
+        s32      scale;
+        s32      aspect;
+        s32      rotate;
+        s32      x;
+        s32      y;
+    } eye;
+    struct {
+        s32      type;
+        s32      color;
+        s32      scale;
+        s32      aspect;
+        s32      rotate;
+        s32      x;
+        s32      y;
+    } eyebrow;
+    struct {
+        s32      type;
+        s32      scale;
+        s32      y;
+    } nose;
+    struct {
+        s32      type;
+        s32      color;
+        s32      scale;
+        s32      aspect;
+        s32      y;
+    } mouth;
+    struct {
+        s32      mustache;
+        s32      type;
+        s32      color;
+        s32      scale;
+        s32      y;
+    } beard;
+    struct {
+        s32      type;
+        s32      color;
+        s32      scale;
+        s32      y;
+    } glass;
+    struct {
+        s32      type;
+        s32      scale;
+        s32      x;
+        s32      y;
+    } mole;
+    struct {
+        s32      height;
+        s32      build;
+    } body;
+    struct {
+        u16      name[10 + 1];
+        u16      creator[10 + 1];
+        s32      gender;
+        s32      birthMonth;
+        s32      birthDay;
+        s32      favoriteColor;
+        u8       favorite;  // GLboolean/bool
+        u8       copyable;  // GLboolean/bool
+        u8       ngWord;    // GLboolean/bool
+        u8       localonly; // GLboolean/bool
+        s32      regionMove;
+        s32      fontRegion;
+        s32      roomIndex;
+        s32      positionInRoom;
+        s32      birthPlatform;
+    } personal;
+    FFLCreateID  createID;
+    u16          padding_0;
+    s32          authorType; // Copied to FFLiMiiDataCore, unused?
+    FFLiAuthorID authorID;
+}
+FFLiCharInfo;
+*/
+
+typedef struct FFLiCharInfo
+{
+    s32                 miiVersion;
     struct
     {
         s32             faceType;
-        s32             facelineColor; // faceColor
-        s32             faceLine;      // faceTex
-        s32             faceMakeup;    // faceMake
+        s32             facelineColor;     // faceColor
+        s32             faceLine;          // faceTex
+        s32             faceMakeup;        // faceMake
         s32             hairType;
         s32             hairColor;
-        s32             hairDir;
+        s32             hairDir;           // hairFlip
         s32             eyeType;
         s32             eyeColor;
         s32             eyeScale;
-        s32             eyeScaleY;
+        s32             eyeScaleY;         // eyeAspect
         s32             eyeRotate;
-        s32             eyeSpacingX;
-        s32             eyePositionY;
+        s32             eyeSpacingX;       // eyeX
+        s32             eyePositionY;      // eyeY
         s32             eyebrowType;
         s32             eyebrowColor;
         s32             eyebrowScale;
-        s32             eyebrowScaleY;
+        s32             eyebrowScaleY;     // eyebrowAspect
         s32             eyebrowRotate;
-        s32             eyebrowSpacingX;
-        s32             eyebrowPositionY;
+        s32             eyebrowSpacingX;   // eyebrowX
+        s32             eyebrowPositionY;  // eyebrowY
         s32             noseType;
         s32             noseScale;
-        s32             nosePositionY;
+        s32             nosePositionY;     // noseY
         s32             mouthType;
         s32             mouthColor;
         s32             mouthScale;
-        s32             mouthScaleY;
-        s32             mouthPositionY;
+        s32             mouthScaleY;       // mouthAspect
+        s32             mouthPositionY;    // mouthY
         s32             mustacheType;
         s32             beardType;
         s32             beardColor;
-        s32             mustacheScale;
-        s32             mustachePositionY;
+        s32             mustacheScale;     // beardScale
+        s32             mustachePositionY; // beardY
         s32             glassType;
         s32             glassColor;
         s32             glassScale;
-        s32             glassPositionY;
+        s32             glassPositionY;    // glassY
         s32             moleType;
         s32             moleScale;
-        s32             molePositionX;
-        s32             molePositionY;
+        s32             molePositionX;     // moleX
+        s32             molePositionY;     // moleY
     } parts;
-    u32                 height;
-    u32                 build;
+    s32                 height;
+    s32                 build;
     u16                 name[10 + 1];
     u16                 creatorName[10 + 1];
-    FFLGender           gender;
-    u32                 birthMonth;
-    u32                 birthDay;
-    FFLFavoriteColor    favoriteColor; // NOTE: u32
+    s32                 gender;
+    s32                 birthMonth;
+    s32                 birthDay;
+    s32                 favoriteColor; // NOTE: u32
     u8                  favoriteMii;
     u8                  copyable;
     u8                  ngWord;
     u8                  localOnly;
-    u32                 regionMove;
-    FFLFontRegion       fontRegion;
-    u32                 pageIndex;
-    u32                 slotIndex;
-    FFLBirthPlatform    birthPlatform;
-    FFLCreateID         creatorID;
-    u16                 _112;   // Padding
-    u32                 authorType;   // previously _0_24_27
+    s32                 regionMove;
+    s32                 fontRegion;
+    s32                 pageIndex;
+    s32                 slotIndex;
+    s32                 birthPlatform;
+    FFLCreateID         createID;
+    u16                 padding_0;
+    s32                 authorType;   // previously _0_24_27
     FFLiAuthorID        authorID;
 }
 FFLiCharInfo;
@@ -178,7 +275,7 @@ enum FFLiCompareCharInfoFlag
     FFLI_COMPARE_CHAR_INFO_FLAG_PARTS           = 1 <<  0,
     FFLI_COMPARE_CHAR_INFO_FLAG_NAME            = 1 <<  1,
     FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_NAME    = 1 <<  2,
-    FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_ID      = 1 <<  3,
+    FFLI_COMPARE_CHAR_INFO_FLAG_CREATE_ID       = 1 <<  3,
     FFLI_COMPARE_CHAR_INFO_FLAG_GENDER          = 1 <<  4,
     FFLI_COMPARE_CHAR_INFO_FLAG_BIRTH_MONTH     = 1 <<  5,
     FFLI_COMPARE_CHAR_INFO_FLAG_BIRTH_DAY       = 1 <<  6,

@@ -119,14 +119,14 @@ public:
         return m_AuthorID;
     }
 
-    FFLCreateID& CreatorID()
+    FFLCreateID& CreateID()
     {
-        return m_CreatorID;
+        return m_CreateID;
     }
 
-    const FFLCreateID& CreatorID() const
+    const FFLCreateID& CreateID() const
     {
-        return m_CreatorID;
+        return m_CreateID;
     }
 
     u8* Padding1()
@@ -694,7 +694,7 @@ private:
 
     union
     {
-        FFLCreateID m_CreatorID;
+        FFLCreateID m_CreateID;
 
         u8  _c[0xA];
     };
@@ -1269,7 +1269,7 @@ public:
     u16 m_Name[10];
     u8  m_Height;
     u8  m_Build;
-    u8  m_CreatorID[4];
+    u8  m_CreateID[4];
     u8  m_SystemID[4];
     u16 m_FaceFlag;
     u16 m_HairFlag;
