@@ -11,9 +11,10 @@ extern "C" {
 typedef struct FFLAdditionalInfo FFLAdditionalInfo;
 typedef struct FFLStoreData FFLStoreData;
 
+typedef struct FFLiCharInfo FFLiCharInfo;
+
 #ifndef FFL_NO_DATABASE_RANDOM
 
-typedef struct FFLiCharInfo FFLiCharInfo;
 #include <nn/ffl/FFLGender.h>
 #include <nn/ffl/FFLAge.h>
 #include <nn/ffl/FFLRace.h>
@@ -29,8 +30,11 @@ bool FFLIsAvailableOfficialData(u16 index);
 bool FFLIsRegularOfficialData(u16 index);
 #endif // !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
 
-void FFLiEnableSpecialMii(u32 key);
+// FFLiGetRandomCharInfo
+//FFLResult FFLiPickupCharInfo(FFLiCharInfo* pCharInfo, FFLDataSource dataSource, const void* pBuffer, u16 index); // Deleted in NSMBU
+
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion);
+void FFLiEnableSpecialMii(u32 key);
 
 #ifdef __cplusplus
 }
