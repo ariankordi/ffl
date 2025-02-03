@@ -131,13 +131,24 @@ void EndianSwap(void* ptr, u32 size)
 
 void InitPrimitive(FFLPrimitiveParam* pPrimitive)
 {
-    const u32 INDEX_BUFFER_SIZE = sizeof(u16) * 4;
+#ifndef FFL_USE_2D_TRIANGLE_STRIP
+    static const u32 INDEX_COUNT = 6;
+#else
+    static const u32 INDEX_COUNT = 4;
+#endif
 
-    static const u16 INDEX_BUFFER[4] = { 2, 1, 3, 0 };
+    static const u32 INDEX_BUFFER_SIZE = sizeof(u16) * INDEX_COUNT;
+
+#ifndef FFL_USE_2D_TRIANGLE_STRIP
+    pPrimitive->primitiveType = rio::Drawer::TRIANGLES;
+    static const u16 INDEX_BUFFER[INDEX_COUNT] = { 2, 1, 3, 1, 3, 0 };
+#else
+    pPrimitive->primitiveType = rio::Drawer::TRIANGLE_STRIP;
+    static const u16 INDEX_BUFFER[INDEX_COUNT] = { 2, 1, 3, 0 };
+#endif
     NN_STATIC_ASSERT(sizeof(INDEX_BUFFER) == INDEX_BUFFER_SIZE);
 
-    pPrimitive->primitiveType = rio::Drawer::TRIANGLE_STRIP;
-    pPrimitive->indexCount = 4;
+    pPrimitive->indexCount = INDEX_COUNT;
     pPrimitive->pIndexBuffer = FFLiBugVgtFixedIndexPtr(Allocate(FFLiBugCanVgtFixedIndexSize(FFLiBugCanSwapSize(INDEX_BUFFER_SIZE)), rio::Drawer::cIdxAlignment));
 
     rio::MemUtil::copy(pPrimitive->pIndexBuffer, INDEX_BUFFER, INDEX_BUFFER_SIZE);
