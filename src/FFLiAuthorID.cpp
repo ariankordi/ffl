@@ -1,6 +1,11 @@
 #include <nn/ffl/FFLiAuthorID.h>
 #include <nn/ffl/FFLiSystem.h>
 
+bool FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID)
+{
+    return FFLiIsSameAuthorID(pAuthorID, FFLiGetUserID());
+}
+
 bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b)
 {
     [[maybe_unused]] const u32 count = FFLI_AUTHOR_ID_SIZE / sizeof(u16);
@@ -21,7 +26,25 @@ bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b)
     return true;
 }
 
-bool FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID)
+bool FFLiIsNullAuthorID(const FFLiAuthorID* pAuthorID)
 {
-    return FFLiIsSameAuthorID(pAuthorID, FFLiGetUserID());
+    if (pAuthorID != NULL)
+    {
+        [[maybe_unused]] const u32 count = FFLI_AUTHOR_ID_SIZE / sizeof(u16);
+        NN_STATIC_ASSERT(count == 4);
+
+        if (pAuthorID->value16[0] == 0 &&
+            pAuthorID->value16[1] == 0 &&
+            pAuthorID->value16[2] == 0 &&
+            pAuthorID->value16[3] == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return false;
 }

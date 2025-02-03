@@ -54,7 +54,7 @@ void FFLiDatabaseFileOfficial::UpdateSaveCount()
 
 void FFLiDatabaseFileOfficial::UpdateCrc()
 {
-    FFLiPutCRC16(this, sizeof(FFLiDatabaseFileOfficial));
+    FFLiPutCRC16(0, this, sizeof(FFLiDatabaseFileOfficial));
     RIO_ASSERT(IsValidCrc());
 }
 

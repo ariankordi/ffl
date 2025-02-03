@@ -1,4 +1,8 @@
 #include <nn/ffl/FFLiCreateID.h>
+#include <nn/ffl/FFLiRFLCreateID.h>
+
+#include <nn/ffl/detail/FFLiCrc.h>
+
 #include <misc/rio_MemUtil.h>
 
 static inline
@@ -140,3 +144,79 @@ void FFLiGetDefaultCreateIDonCTR(FFLCreateID* pCreateID, s32 index)
     }
 }
 
+
+
+bool FFLiRFLCreateID::Convert(FFLCreateID* pCreateID, const FFLiAuthorID* pAuthorID) const
+{
+    if (!IsValidOnNand())
+        return false;
+
+    if (pCreateID == NULL || pAuthorID == NULL)
+        return false;
+
+    if (FFLiIsNullAuthorID(pAuthorID))
+        return false;
+
+    u16 crc = FFLiGetCRC16(0x7f03, &pAuthorID, FFLI_RFL_CREATE_ID_SIZE);
+
+    rio::MemUtil::copy(pCreateID, this, 8);
+
+    // Put CRC here..???
+    pCreateID->value16[4] = crc;
+    //pCreateID->data[8] = (u8)(crc >> 8);
+    //pCreateID->data[9] = (u8)crc;
+
+    // Clear temporary flag if it is there (0b11101111 / 0xef)
+    pCreateID->data[0] &= ~FFLI_CREATE_ID_FLAG_TEMPORARY;
+    return true;
+
+}
+
+bool FFLiRFLCreateID::IsValid() const
+{
+    // Basically checks if any byte is non-null
+    for (s32 i = 0; i < FFLI_RFL_CREATE_ID_SIZE; i++)
+        if (this->data[i] != '\0')
+            return true;
+
+    return false;
+}
+
+bool FFLiRFLCreateID::IsValidOnNand() const
+{
+    if (IsValid() && !IsTemporary())
+        return true;
+
+    return false;
+}
+
+bool FFLiRFLCreateID::IsTemporary() const
+{
+    RIO_ASSERT(IsValid());
+    return (this->data[0] & FFLI_CREATE_ID_FLAG_TEMPORARY) != 0;
+    //return this->data[0] >> 5 & 1;
+}
+
+bool FFLiRFLCreateID::IsNormal() const
+{
+    RIO_ASSERT(IsValid());
+    return (this->data[0] & FFLI_CREATE_ID_FLAG_NORMAL) != 0;
+    //return this->data[0] >> 7;
+}
+
+bool FFLiRFLCreateID::IsSpecial() const
+{
+    return !IsNormal();
+}
+
+bool FFLiRFLCreateID::IsDs() const
+{
+    RIO_ASSERT(IsValid());
+    return (this->data[0] & FFLI_CREATE_ID_TYPE_MASK) == FFLI_CREATE_ID_TYPE_NTR;
+    //return this->data[0] >> 6 & 1;
+}
+
+bool FFLiRFLCreateID::IsWii() const
+{
+    return !IsDs();
+}

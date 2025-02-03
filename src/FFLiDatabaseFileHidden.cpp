@@ -198,7 +198,7 @@ void FFLiDatabaseFileHidden::Init()
 
 void FFLiDatabaseFileHidden::UpdateCrc()
 {
-    FFLiPutCRC16(this, sizeof(FFLiDatabaseFileHidden));
+    FFLiPutCRC16(0, this, sizeof(FFLiDatabaseFileHidden));
     RIO_ASSERT(IsValidCrc());
 }
 

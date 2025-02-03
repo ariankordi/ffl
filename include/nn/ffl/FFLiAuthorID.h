@@ -3,7 +3,7 @@
 
 #include <nn/ffl/types.h>
 
-#define FFLI_AUTHOR_ID_SIZE  (int)sizeof(u64)
+#define FFLI_AUTHOR_ID_SIZE  (8)
 
 typedef struct FFLiAuthorID
 {
@@ -16,7 +16,7 @@ typedef struct FFLiAuthorID
 FFLiAuthorID;
 NN_STATIC_ASSERT(sizeof(FFLiAuthorID) == FFLI_AUTHOR_ID_SIZE);
 
-bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b);
 bool FFLiIsHomeAuthorID(const FFLiAuthorID* pAuthorID);
-
+bool FFLiIsSameAuthorID(const FFLiAuthorID* a, const FFLiAuthorID* b);
+bool FFLiIsNullAuthorID(const FFLiAuthorID* pAuthorID); // Deleted in NSMBU
 #endif // FFLI_AUTHOR_ID_H_

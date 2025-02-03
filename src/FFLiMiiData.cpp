@@ -124,7 +124,14 @@ bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreR
     pCharInfo->name[10] = L'\0';
     bool nameReplaced = replaceName ? ReplaceNameFromRFL(pCharInfo->name, 10, 5) : false;
 
-    rio::MemUtil::set(&pCharInfo->createID, 0, sizeof(FFLCreateID));                         // Create ID is cleared here...
+    rio::MemUtil::set(&pCharInfo->createID, 0, sizeof(FFLCreateID));
+    // @bug Source createID is not copied to destination.
+    // This is done in CFLi_UnpackRFLMiiDataCore:
+    // `__ARM_common_memcpy4_8((undefined4 *)&dst->createID,(undefined4 *)src->createID);`
+
+    // The only place a Wii CreateID is copied is in
+    // some private function in Mii Maker that is meant
+    // to copy from vWii using FFLiRFLCreateID::Convert
 
     pCharInfo->birthMonth = miiDataCoreRFL.BirthMonth();
     pCharInfo->birthDay = miiDataCoreRFL.BirthDay();
@@ -136,8 +143,11 @@ bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreR
     pCharInfo->creatorName[10] = L'\0';
     bool creatorNameReplaced = replaceName ? ReplaceNameFromRFL(pCharInfo->creatorName, 10, 0) : false;
 
+    // @bug createID was cleared earlier but still checked
     bool isNTR = FFLiIsNTRMiiID(&pCharInfo->createID);
-    pCharInfo->birthPlatform = isNTR ? FFL_BIRTH_PLATFORM_NTR : FFL_BIRTH_PLATFORM_WII; //  ... yet they still check it LOL
+    // birthPlatform will never be NTR because of this
+
+    pCharInfo->birthPlatform = isNTR ? FFL_BIRTH_PLATFORM_NTR : FFL_BIRTH_PLATFORM_WII;
 
     pCharInfo->padding_0 = 0;
 
