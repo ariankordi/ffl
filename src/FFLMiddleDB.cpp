@@ -11,6 +11,16 @@ const FFLiMiddleDB* GetMiddleDB(const FFLMiddleDB* pMiddleDB);
 
 }
 
+FFLMiddleDBType FFLGetMiddleDBType(FFLMiddleDB* pMiddleDB)
+{
+    return FFLiGetMiddleDBType(GetMiddleDB(pMiddleDB));
+}
+
+s32 FFLGetMiddleDBSize(FFLMiddleDB* pMiddleDB)
+{
+    return FFLiGetMiddleDBSize(GetMiddleDB(pMiddleDB));
+}
+
 u32 FFLGetMiddleDBBufferSize(u16 miiDataNum)
 {
     return FFLiGetMiddleDBBufferSize(miiDataNum);

@@ -82,10 +82,19 @@ FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource
         return FFL_RESULT_MANAGER_NOT_CONSTRUCT;
 
     FFLiManager* pManager = FFLiManager::GetInstance();
-    FFLiCharInfo charInfo;
-    FFLResult result = pManager->GetDatabaseManager().PickupCharInfo(&charInfo, dataSource, pBuffer, index);
-    if (result == FFL_RESULT_OK)
-        FFLiGetAdditionalInfo(pAdditionalInfo, &charInfo, checkFontRegion, pManager->GetInitDesc().fontRegion);
-    return result;
+
+    if (dataSource == FFL_DATA_SOURCE_DIRECT_POINTER)
+    {
+        FFLiGetAdditionalInfo(pAdditionalInfo, reinterpret_cast<const FFLiCharInfo*>(pBuffer), checkFontRegion, pManager->GetInitDesc().fontRegion);
+        return FFL_RESULT_OK;
+    }
+    else
+    {
+        FFLiCharInfo charInfo;
+        FFLResult result = pManager->GetDatabaseManager().PickupCharInfo(&charInfo, dataSource, pBuffer, index);
+        if (result == FFL_RESULT_OK)
+            FFLiGetAdditionalInfo(pAdditionalInfo, &charInfo, checkFontRegion, pManager->GetInitDesc().fontRegion);
+        return result;
+    }
 }
 

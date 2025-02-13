@@ -142,6 +142,7 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 #endif
 
     pModel->pTextureTempObject = new FFLiTextureTempObject;
+    //rio::MemUtil::set(pModel->pTextureTempObject, 0, sizeof(FFLiTextureTempObject));
 
     pModel->expression = FFLiInitMaskTextures(&pModel->maskTextures, pModel->charModelDesc.allExpressionFlag, resolution, isEnabledMipMap);
 
@@ -180,6 +181,12 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
             FFLiDeleteTextureTempObject(pModel);
             return result;
         }
+    }
+    else
+    {
+        // Memset the FFLiFacelineTextureTempObject if there is no
+        // faceline texture to draw, since most everything else is written to
+        rio::MemUtil::set(&pModel->pTextureTempObject->facelineTexture, 0, sizeof(FFLiFacelineTextureTempObject));
     }
 #ifdef FFL_ENABLE_NEW_MASK_ONLY_FLAG
     if (!(pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_NEW_MASK_ONLY))
