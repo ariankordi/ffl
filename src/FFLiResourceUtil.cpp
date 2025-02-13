@@ -44,16 +44,16 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
 
     // NOTE: size checking happens HERE
 
-    u32 totalUncompressSizeNoVersion = pHeaderDefault->m_TotalUncompressSize & 0x1FFFFFFF; // only last 29 bits
+    u32 totalUncompressSizeNoVersion = pHeaderDefault->m_ExpandedBufferSize & 0x1FFFFFFF; // only last 29 bits
 
     // take first 30 bits, use last 3 as ResourceHeaderTypeHint enum
-    FFLiResourceTypeHint hint = static_cast<FFLiResourceTypeHint>(pHeaderDefault->m_TotalUncompressSize >> 29); // first 3 bits
+    FFLiResourceTypeHint hint = static_cast<FFLiResourceTypeHint>(pHeaderDefault->m_ExpandedBufferSize >> 29); // first 3 bits
 
     //RIO_LOG("header m_TotalUncompressSize: 0x%04X\n", totalUncompressSizeNoVersion);
     //RIO_LOG("header resource hint: %i (raw: 0x%04X)\n", hint, pHeaderDefault->m_TotalUncompressSize);
 
     // old versions of FFLResource.py set it to this
-    RIO_ASSERT(pHeaderDefault->m_TotalUncompressSize != 0);
+    RIO_ASSERT(pHeaderDefault->m_ExpandedBufferSize != 0);
 
     switch (hint)
     {

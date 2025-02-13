@@ -401,7 +401,7 @@ bool FFLiCompareCharInfoWithAdditionalInfo(s32* pFlagOut, s32 flagIn, const FFLi
             flag |= FFLI_COMPARE_CHAR_INFO_FLAG_NAME;
 
     if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_NAME)
-        if (FFLiCompareString16(pAdditionalInfoA->creatorName, pAdditionalInfoB->creatorName, 10 + 1) != 0)
+        if (FFLiCompareString16(pAdditionalInfoA->creator, pAdditionalInfoB->creator, 10 + 1) != 0)
             flag |= FFLI_COMPARE_CHAR_INFO_FLAG_CREATOR_NAME;
 
     if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_CREATE_ID)
@@ -433,7 +433,7 @@ bool FFLiCompareCharInfoWithAdditionalInfo(s32* pFlagOut, s32 flagIn, const FFLi
             flag |= FFLI_COMPARE_CHAR_INFO_FLAG_BUILD;
 
     if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_FACELINE_COLOR)
-        if (std::memcmp(&pAdditionalInfoA->facelineColor, &pAdditionalInfoB->facelineColor, sizeof(FFLColor)) != 0)
+        if (std::memcmp(&pAdditionalInfoA->skinColor, &pAdditionalInfoB->skinColor, sizeof(FFLColor)) != 0)
             flag |= FFLI_COMPARE_CHAR_INFO_FLAG_FACELINE_COLOR;
 
     if (flagIn & FFLI_COMPARE_CHAR_INFO_FLAG_MII_VERSION)

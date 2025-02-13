@@ -249,6 +249,17 @@ FFLResult FFLiResourceHeader::GetResult() const
 
 namespace {
 
+/*
+    Deleted in NSMBU:
+FFLExpandResourceBuffer
+FFLGetExpandedResourceBufferSize
+
+__N_22_FFLiResourceHeader_cpp_823cc586::Uncompress(void *, unsigned int, void const *, unsigned int, FFLExpandBuffer *, int)
+__N_22_FFLiResourceHeader_cpp_823cc586::ExpandPartsInfoAndData(FFLiResourcePartsInfo &, FFLiResourcePartsInfo const &, FFLiResourceHeader const *, FFLiResourceHeader const *, FFLiBufferAllocator &, unsigned int, FFLExpandBuffer *)
+FFLResult __N_22_FFLiResourceHeader_cpp_823cc586::ExpandHeaderAndData<class Z1 = __N_22_FFLiResourceHeader_cpp_823cc586::TextureDesc, class Z2 = FFLiResourceTextureHeader>(Z2 &, Z2 const &, FFLiResourceHeader const *, FFLiResourceHeader const *, FFLiBufferAllocator &, FFLExpandBuffer *)
+FFLResult __N_22_FFLiResourceHeader_cpp_823cc586::ExpandHeaderAndData<class Z1 = __N_22_FFLiResourceHeader_cpp_823cc586::ShapeDesc, class Z2 = FFLiResourceShapeHeader>(Z2 &, Z2 const &, FFLiResourceHeader const *, FFLiResourceHeader const *, FFLiBufferAllocator &, FFLExpandBuffer *)
+*/
+
 static const FFLiSwapEndianDesc SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO[2] = {
     // dataPos, dataSize, compressedSize
     { FFLI_SWAP_ENDIAN_TYPE_U32, 3 },
@@ -277,7 +288,7 @@ void HeaderSwapEndianImpl(T* pHeader)
     m_Header->m_Magic = FFLiSwapEndianImpl<u32>(m_Header->m_Magic);
     m_Header->m_Version = FFLiSwapEndianImpl<u32>(m_Header->m_Version);
     m_Header->m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_Header->m_UncompressBufferSize);
-    m_Header->m_TotalUncompressSize = FFLiSwapEndianImpl<u32>(m_Header->m_TotalUncompressSize); // _c field
+    m_Header->m_ExpandBufferSize = FFLiSwapEndianImpl<u32>(m_Header->m_ExpandBufferSize); // _c field
     m_Header->m_IsExpand = FFLiSwapEndianImpl<u32>(m_Header->m_IsExpand);
     */
     FFLiSwapEndianArrayImpl<u32>(pHeader->m_Header->m_TextureHeader.partsMaxSize, FFLI_TEXTURE_PARTS_TYPE_MAX);

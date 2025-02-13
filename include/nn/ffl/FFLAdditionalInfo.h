@@ -11,9 +11,9 @@ extern "C" {
 typedef struct FFLAdditionalInfo
 {
     u16         name[10 + 1];
-    u16         creatorName[10 + 1];
-    FFLColor    facelineColor;
+    u16         creator[10 + 1];
     FFLCreateID createID;
+    FFLColor    skinColor; // Called "skinColor" in CFLAdditionalInfo and NWF
     union
     {
         struct
@@ -27,9 +27,9 @@ typedef struct FFLAdditionalInfo
             u32 build           : 7;
             u32 ngWord          : 1;
             u32 fontRegion      : 2;
-            u32 hairDir         : 1;    // (LSB)
+            u32 hairFlip        : 1;
 #else
-            u32 hairDir         : 1;    // (LSB)
+            u32 hairFlip        : 1;
             u32 fontRegion      : 2;
             u32 ngWord          : 1;
             u32 build           : 7;
@@ -43,7 +43,7 @@ typedef struct FFLAdditionalInfo
 
         u32 flags;
     };
-    u8          faceType;
+    u8          facelineType;
     u8          hairType;
 }
 FFLAdditionalInfo;

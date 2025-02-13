@@ -198,9 +198,13 @@ FFLResult FFLiResourceLoader::LoadShape(void* pData, u32* pSize, FFLiShapePartsT
 
 FFLResult FFLiResourceLoader::GetPointerTextureByExpandCache(void** ppPtr, u32* pSize, FFLiTexturePartsType partsType, u32 index)
 {
+    // There is also GetPointerShapeByExpandCache deleted in NSMBU
     RIO_ASSERT(IsExpand());
     if (!IsExpand())
+    {
+        RIO_ASSERT(false); // "Should not reach here."
         return FFL_RESULT_FILE_LOAD_ERROR;
+    }
 
     u32 num;
     FFLiResourcePartsInfo* pPartsInfo = FFLiGetTextureResoucePartsInfos(&num, Header(), partsType);

@@ -35,6 +35,8 @@ void HeaderSwapEndianImpl(T* pHeader);
 // --------------------------------------------------------------------------
 
 #define FFLI_RESOURCE_HEADER_VERSION    (0x00070000)
+// NOTE: "FFLI_RESOURCE_EXPAND_TYPE_TERM" = 1 (seen in asserts?)
+// asserts: resourceType < FFLI_RESOURCE_EXPAND_TYPE_TERM
 
 // Abstract type
 class FFLiResourceHeader
@@ -84,7 +86,7 @@ public:
         m_Magic = FFLiSwapEndianImpl<u32>(m_Magic);
         m_Version = FFLiSwapEndianImpl<u32>(m_Version);
         m_UncompressBufferSize = FFLiSwapEndianImpl<u32>(m_UncompressBufferSize);
-        m_TotalUncompressSize = FFLiSwapEndianImpl<u32>(m_TotalUncompressSize);
+        m_ExpandedBufferSize = FFLiSwapEndianImpl<u32>(m_ExpandedBufferSize);
         m_IsExpand = FFLiSwapEndianImpl<u32>(m_IsExpand);
     }
 
@@ -92,7 +94,7 @@ public:
     u32                         m_Version;                  // I think? Always 0x00070000
     u32                         m_UncompressBufferSize;
     // Used by FFLResource.py and in FFLiResourceUtil.cpp to store "resource hint":
-    u32                         m_TotalUncompressSize;      // _c, unused
+    u32                         m_ExpandedBufferSize;      // _c, unused
     int                         m_IsExpand;                 // Must be 1 specifically to be true, not just non-zero
     FFLiResourceTextureHeader   m_TextureHeader;
     FFLiResourceShapeHeader     m_ShapeHeader;
@@ -245,7 +247,7 @@ private:
         u32                              m_Magic;
         u32                              m_Version; // STILL 0x00070000
         u32                              m_UncompressBufferSize;
-        u32                              m_TotalUncompressSize;
+        u32                              m_ExpandedBufferSize;
         int                              m_IsExpand;
         FFLiResourceTextureHeaderAFL_2_3 m_TextureHeader;
         FFLiResourceShapeHeader          m_ShapeHeader;
@@ -314,7 +316,7 @@ private:
         u32                           m_Magic;
         u32                           m_Version; // STILL 0x00070000
         u32                           m_UncompressBufferSize;
-        u32                           m_TotalUncompressSize;
+        u32                           m_ExpandedBufferSize;
         int                           m_IsExpand;
         FFLiResourceTextureHeaderAFL  m_TextureHeader;
         FFLiResourceShapeHeader       m_ShapeHeader;

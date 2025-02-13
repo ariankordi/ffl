@@ -49,24 +49,24 @@ void FFLiGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, const FFLiCharInf
 {
     if (pCharInfo->ngWord && !FFLiIsHomeAuthorID(&pCharInfo->authorID))
     {
-        FFLiCopyWcharT2U16(pAdditionalInfo->name,        10 + 1, L"???");
-        FFLiCopyWcharT2U16(pAdditionalInfo->creatorName, 10 + 1, L"???");
+        FFLiCopyWcharT2U16(pAdditionalInfo->name,    10 + 1, L"???");
+        FFLiCopyWcharT2U16(pAdditionalInfo->creator, 10 + 1, L"???");
     }
     else
     {
         rio::MemUtil::copy(pAdditionalInfo->name, pCharInfo->name, sizeof(u16) * (10 + 1));
         pAdditionalInfo->name[10] = L'\0';
 
-        rio::MemUtil::copy(pAdditionalInfo->creatorName, pCharInfo->creatorName, sizeof(u16) * (10 + 1));
-        pAdditionalInfo->creatorName[10] = L'\0';
+        rio::MemUtil::copy(pAdditionalInfo->creator, pCharInfo->creatorName, sizeof(u16) * (10 + 1));
+        pAdditionalInfo->creator[10] = L'\0';
 
         ReplaceInvalidNameChar(pAdditionalInfo->name, 10);
-        ReplaceInvalidNameChar(pAdditionalInfo->creatorName, 10);
+        ReplaceInvalidNameChar(pAdditionalInfo->creator, 10);
 
         if (checkFontRegion && !IsAvailableFontRegion(FFLFontRegion(pCharInfo->fontRegion), fontRegion))
         {
             ReplaceNonAsciiNameChar(pAdditionalInfo->name, 10);
-            ReplaceNonAsciiNameChar(pAdditionalInfo->creatorName, 10);
+            ReplaceNonAsciiNameChar(pAdditionalInfo->creator, 10);
         }
     }
 
@@ -107,8 +107,8 @@ void FFLiGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, const FFLiCharInf
 
     pAdditionalInfo->ngWord = bool(pCharInfo->ngWord);
     pAdditionalInfo->fontRegion = pCharInfo->fontRegion;
-    pAdditionalInfo->hairDir = pCharInfo->parts.hairDir;
-    pAdditionalInfo->faceType = pCharInfo->parts.faceType;
+    pAdditionalInfo->hairFlip = pCharInfo->parts.hairDir;
+    pAdditionalInfo->facelineType = pCharInfo->parts.faceType;
     pAdditionalInfo->hairType = pCharInfo->parts.hairType;
-    pAdditionalInfo->facelineColor = FFLiGetFacelineColor(pCharInfo->parts.facelineColor);
+    pAdditionalInfo->skinColor = FFLiGetFacelineColor(pCharInfo->parts.facelineColor);
 }
