@@ -270,7 +270,7 @@ void SwapEndianResourcePartsInfo(FFLiResourcePartsInfo* pPartsInfo, u32 num)
 {
     for (u32 i = 0; i < num; i++)
     {
-        u32 size = FFLiSwapEndianGroup(&pPartsInfo[i], SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO, sizeof(SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO) / sizeof(FFLiSwapEndianDesc));
+        [[maybe_unused]] u32 size = FFLiSwapEndianGroup(&pPartsInfo[i], SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO, sizeof(SWAP_ENDIAN_DESC_RESOURCE_PARTS_INFO) / sizeof(FFLiSwapEndianDesc));
         RIO_ASSERT(size == sizeof(*pPartsInfo));
     }
 }

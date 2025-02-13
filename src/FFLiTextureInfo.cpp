@@ -4,31 +4,39 @@
 #include <nn/ffl/FFLiResourceHeader.h>
 #include <nn/ffl/FFLiResourceLoader.h>
 
+struct TextureFormatParam
+{
+    // Bytes per pixel, or block size in bytes for compressed
+    u32 size;
+    // 0 = uncompressed, block size (usually 4) for compressed
+    u32 block;
+};
+
 namespace {
-    // replacement for rio::TextureFormatUtil::getPixelByteSize
-    static u32 GetPixelByteSize(FFLTextureFormat format)
-    {
-        static const u32
-            bytesPerPixelMapping[FFL_TEXTURE_FORMAT_MAX] = {
-            1, // FFL_TEXTURE_FORMAT_R8_UNORM
-            2, // FFL_TEXTURE_FORMAT_R8_G8_UNORM
-            4, // FFL_TEXTURE_FORMAT_R8_G8_B8_A8_UNORM
-        };
-
-        RIO_ASSERT(format < FFL_TEXTURE_FORMAT_MAX && "undefined texture format?");
-
-        return bytesPerPixelMapping[format]; // resolve from table
-    }
+    // Table of supported texture formats.
+    static const TextureFormatParam TextureFormatTable[FFL_TEXTURE_FORMAT_MAX] = {
+        {  1, 0 }, // FFL_TEXTURE_FORMAT_R8_UNORM
+        {  2, 0 }, // FFL_TEXTURE_FORMAT_R8_G8_UNORM
+        {  4, 0 }  // FFL_TEXTURE_FORMAT_R8_G8_B8_A8_UNORM
+    };
+    NN_STATIC_ASSERT(sizeof(TextureFormatTable) == sizeof(TextureFormatParam) * FFL_TEXTURE_FORMAT_MAX);
 
     // replacement for rio::Texture2DUtil::calcImageSize
     static u32 CalcImageSize(FFLTextureFormat format, u32 width, u32 height)
     {
-        u32 bytesPerPixel = GetPixelByteSize(format);
+        const TextureFormatParam param = TextureFormatTable[format]; // resolve from table
 
-        return width * height * bytesPerPixel;
+        const u32 size = param.size;
+        if (param.block > 0) // Compressed format
+        {
+            width  = (width  + param.block - 1) / param.block;
+            height = (height + param.block - 1) / param.block;
+        }
+
+        return width * height * size;
     }
 
-    // rio::Texture2DUtil::calcMipmapSize
+    // replacement for rio::Texture2DUtil::calcMipmapSize
     static u32 CalcMipmapSize(FFLTextureFormat format, u32 width, u32 height,
                                     u32 mipLevels, u32* mipLevelOffset)
     {
@@ -39,8 +47,9 @@ namespace {
         // Maximum mipmaps of 14.
         mipLevels = std::min(std::max(mipLevels, 1u), 14u);
 
-        u32 bytesPerPixel = GetPixelByteSize(format);
+        const TextureFormatParam param = TextureFormatTable[format]; // resolve from table
 
+        const u32 size = param.size;
         u32 mipmapSize = 0;
 
         for (u32 i = 1; i < mipLevels; i++)
@@ -51,9 +60,13 @@ namespace {
             u32 mipWidth  = std::max(width  >> i, 1u);
             u32 mipHeight = std::max(height >> i, 1u);
 
-            // NOTE: Does not account for compressed textures at all.
+            if (param.block > 0) // Compressed format
+            {
+                mipWidth  = (mipWidth  + param.block - 1) / param.block;
+                mipHeight = (mipHeight + param.block - 1) / param.block;
+            }
 
-            mipmapSize += mipWidth * mipHeight * bytesPerPixel;
+            mipmapSize += mipWidth * mipHeight * size;
         }
 
         return mipmapSize;
