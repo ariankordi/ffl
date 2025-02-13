@@ -1,0 +1,21 @@
+[
+    "_malloc",
+    "_free",
+    "_FFLInitRes",
+    "_FFLInitResGPUStep",
+    "_FFLInitCharModelCPUStep",
+    "_FFLDeleteCharModel",
+    "_FFLSetExpression",
+    "_FFLExit",
+    "_FFLSetNormalIsSnorm8_8_8_8",
+    "_FFLSetTextureFlipY",
+    "_FFLSetTextureCallback",
+    "_FFLGetAdditionalInfo",
+    "_FFLGetFavoriteColor",
+    "_FFLiInvalidatePartsTextures",
+    "_FFLiInvalidateTempObjectFacelineTexture",
+    "_FFLiDeleteTempObjectFacelineTexture",
+    "_FFLiInvalidateRawMask",
+    "_FFLiDeleteTempObjectMaskTextures",
+    "_FFLiDeleteTextureTempObject"
+]

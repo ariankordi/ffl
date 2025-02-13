@@ -142,8 +142,15 @@ function(create_ffl_target target_name library_type)
     # Standalone mode does not add RIO sources. It only references RIO headers.
     endif()
 
-    # Create a library target (static or shared)
-    add_library(${target_name} ${library_type} ${FFL_SOURCES})
+    # Create target.
+    if(EMSCRIPTEN)
+        # For Emscripten, override and build an executable.
+        message(STATUS "Building an executable instead of a library for Emscripten. FFL_BUILD_SHARED/STATIC ignored.")
+        add_executable(${target_name} ${FFL_SOURCES})
+    else()
+        # Create a library target (static or shared)
+        add_library(${target_name} ${library_type} ${FFL_SOURCES})
+    endif()
 
     target_include_directories(${target_name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -263,6 +270,11 @@ else()
     set(FFL_TARGET_NAME "${PROJECT_NAME}-${FFL_MODE}")
 endif()
 
+if(EMSCRIPTEN)
+    # Force "ffl-emscripten" suffix for Emscripten.
+    set(FFL_TARGET_NAME "${FFL_TARGET_NAME}-emscripten")
+endif()
+
 # Static library
 if(FFL_BUILD_STATIC)
     create_ffl_target("${FFL_TARGET_NAME}" STATIC)
@@ -279,6 +291,40 @@ if(FFL_BUILD_SHARED)
 
 endif()
 
+# ------------ Emscripten-Specific Options -----------
+# Apply Emscripten-specific options if building for web.
+if(EMSCRIPTEN)
+    # Force inclusion of gl2.h to satisfy rio_DrawerWin.h includes.
+    target_compile_options(${FFL_TARGET_NAME} PRIVATE -include GLES2/gl2.h)
+    # Path to exports JSON for Emscripten.
+    set(EXPORTS_JSON ${PROJECT_SOURCE_DIR}/emscripten-exports.json)
+    # Set emcc flags: exports, zlib, addFunction, WASM=1
+    set(LINK_FLAGS
+        -s EXPORTED_FUNCTIONS=\"@${EXPORTS_JSON}\"
+        -s MALLOC=emmalloc # Not tested if this is good
+        -s USE_ZLIB=1
+
+        # Allow addFunction.
+        -s ALLOW_TABLE_GROWTH=1
+        -s EXPORTED_RUNTIME_METHODS=addFunction
+        -s EXPORT_NAME="ModuleFFL" # Custom export name.
+
+        -s ENVIRONMENT=web
+        -s FILESYSTEM=0
+        -s EXIT_RUNTIME=0
+        -s MODULARIZE=0 # Not using async/modularize for now.
+
+        -s ALLOW_MEMORY_GROWTH=1 # Not tested if this is needed
+        -s WASM=1
+    )
+    string(REPLACE ";" " " LINK_FLAGS_STR "${LINK_FLAGS}")
+    set_target_properties(${FFL_TARGET_NAME}
+        PROPERTIES
+        LINK_FLAGS "${LINK_FLAGS_STR}"
+        LINK_DEPENDS "${EXPORTS_JSON}"
+        #SUFFIX ".js"
+    )
+endif()
 
 # ------------------ Installation (Optional) -------------------
 # You can add install rules if you want to make these libraries installable
@@ -314,3 +360,8 @@ endif()
 message(STATUS "FFL: Static library = ${FFL_BUILD_STATIC}")
 message(STATUS "FFL: Shared library = ${FFL_BUILD_SHARED}")
 message(STATUS "FFL: Build type: ${CMAKE_BUILD_TYPE}")
+
+# force mfs building for web to not distribute a 9 GB binary
+if(EMSCRIPTEN AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(WARNING "If you are building for the web, PLEASE make sure you know that debug is the default build mode, so use release (-DCMAKE_BUILD_TYPE=Release) for smaller binaries.")
+endif()
