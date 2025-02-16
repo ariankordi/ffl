@@ -36,6 +36,10 @@ bool FFLIsRegularOfficialData(u16 index);
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion);
 void FFLiEnableSpecialMii(u32 key);
 
+// Not sure where these are supposed to go:
+bool FFLpGetStoreDataFromCharInfo(FFLStoreData* pStoreData, const FFLiCharInfo* pCharInfo); // Deleted in NSMBU
+bool FFLpGetCharInfoFromStoreData(FFLiCharInfo* pCharInfo, FFLStoreData* pStoreData); // Deleted in NSMBU
+
 #ifdef __cplusplus
 }
 #endif

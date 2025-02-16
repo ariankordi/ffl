@@ -244,14 +244,12 @@ typedef enum FFLiVerifyReason
 }
 FFLiVerifyReason;
 
+// All exported below:
+
 bool FFLiVerifyCharInfo(const FFLiCharInfo* pCharInfo, bool verifyName);
 
 // Enum name found from string in FFLUtility: "Cannot pick up FFLAdditionalInfo: FFLResult[%u] FFLiVerifyReason[%u]"
 FFLiVerifyReason FFLiVerifyCharInfoWithReason(const FFLiCharInfo* pCharInfo, bool verifyName);
-
-#ifdef __cplusplus
-
-}
 
 // --------------------------------------------------------------------------
 
@@ -267,6 +265,10 @@ f32 FFLiiGetAdjustedEyeH(f32 height, s32 type);
 bool FFLiIsValidCharacterForName(u16 c);
 
 // --------------------------------------------------------------------------
+
+#ifdef __cplusplus
+
+}
 
 struct FFLAdditionalInfo;
 

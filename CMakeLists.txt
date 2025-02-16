@@ -28,6 +28,10 @@ option(FFL_USE_EXTRA_RESOURCES "Expand resource types to add two more: very high
 option(FFL_BUILD_STATIC "Build FFL as a static library (.a, .lib)" OFF)
 option(FFL_BUILD_SHARED "Build FFL as a shared/dynamically linked library (.dll, .so, .dylib)" ON)
 # Note that FFL_ADD_GLAD_GL_IMPLEMENTATION is enabled when FFL_BUILD_SHARED is used.
+if(EMSCRIPTEN)
+    # Emscripten-specific option to build for WASM or not.
+    option(FFL_BUILD_WASM "Build for WebAssembly" ON)
+endif()
 
 set(CMAKE_CACHE_ARGS_INCLUDE_HELP TRUE) # Include option descriptions with cmake -LH.
 
@@ -295,10 +299,11 @@ endif()
 # Apply Emscripten-specific options if building for web.
 if(EMSCRIPTEN)
     # Force inclusion of gl2.h to satisfy rio_DrawerWin.h includes.
-    target_compile_options(${FFL_TARGET_NAME} PRIVATE -include GLES2/gl2.h)
+    #target_compile_options(${FFL_TARGET_NAME} PRIVATE -include GLES2/gl2.h) # Previously needed, not anymore?????
+
     # Path to exports JSON for Emscripten.
     set(EXPORTS_JSON ${PROJECT_SOURCE_DIR}/emscripten-exports.json)
-    # Set emcc flags: exports, zlib, addFunction, WASM=1
+    # Set emcc flags: exports, zlib, addFunction...
     set(LINK_FLAGS
         -s EXPORTED_FUNCTIONS=\"@${EXPORTS_JSON}\"
         -s MALLOC=emmalloc # Not tested if this is good
@@ -315,8 +320,12 @@ if(EMSCRIPTEN)
         -s MODULARIZE=0 # Not using async/modularize for now.
 
         -s ALLOW_MEMORY_GROWTH=1 # Not tested if this is needed
-        -s WASM=1
     )
+    if (FFL_BUILD_WASM)
+        set(LINK_FLAGS ${LINK_FLAGS} -s WASM=1)
+    else()
+        set(LINK_FLAGS ${LINK_FLAGS} -s WASM=0)
+    endif()
     string(REPLACE ";" " " LINK_FLAGS_STR "${LINK_FLAGS}")
     set_target_properties(${FFL_TARGET_NAME}
         PROPERTIES

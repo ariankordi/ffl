@@ -1,6 +1,7 @@
 #include <nn/ffl/FFLDatabase.h>
 
 #include <nn/ffl/FFLiAdditionalInfo.h>
+#include <nn/ffl/FFLiMiiData.h>
 #include <nn/ffl/FFLiDatabaseFile.h>
 #include <nn/ffl/FFLiManager.h>
 
@@ -75,6 +76,25 @@ void FFLiEnableSpecialMii(u32 key)
 }
 
 #endif // !defined(FFL_NO_DATABASE_FILE) && !defined(FFL_NO_DATABASE_DEFAULT) && !defined(FFL_NO_DATABASE_RANDOM)
+
+bool FFLpGetStoreDataFromCharInfo(FFLStoreData* pStoreData, const FFLiCharInfo* pCharInfo)
+{
+    if (!FFLiiVerifyCharInfo(pCharInfo, true))
+        return false;
+
+    if (FFLiCharInfoToStoreDataCFL(static_cast<FFLiStoreDataCFL*>(pStoreData), pCharInfo) == FFL_RESULT_OK)
+        return true;
+
+    return false;
+}
+
+bool FFLpGetCharInfoFromStoreData(FFLiCharInfo* pCharInfo, FFLStoreData* pStoreData)
+{
+    if (FFLiStoreDataCFLToCharInfo(pCharInfo, *static_cast<FFLiStoreDataCFL*>(pStoreData)) == FFL_RESULT_OK)
+        return FFLiiVerifyCharInfo(pCharInfo, true);
+
+    return false;
+}
 
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion)
 {
