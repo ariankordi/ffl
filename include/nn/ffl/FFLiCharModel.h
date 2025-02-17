@@ -44,7 +44,7 @@ typedef struct FFLiCharModel
     FFLVec3                 faceCenterPos;  // Used to calculate nose(line) and glass position
     FFLPartsTransform       partsTransform;
     FFLModelType            modelType;
-    FFLBoundingBox          boundingBox[3];
+    FFLBoundingBox          boundingBox[FFL_MODEL_TYPE_MAX];
 }
 FFLiCharModel;
 #ifndef __EMSCRIPTEN__
@@ -75,13 +75,13 @@ void FFLiDeleteCharModel(FFLiCharModel* pModel);
 // names collide (even though this isnt extern C???)
 void FFLiGetCharInfoFromCharModel(FFLiCharInfo* pCharInfo, const FFLiCharModel* pModel);
 bool FFLiIsAvailableExpression(const FFLiCharModel* pModel, FFLExpression expression);
-//FFLiGetDrawParamFromCharModel(FFLiCharModel const *, FFLDrawType)
+// FFLiGetDrawParamFromCharModel(const FFLiCharModel* pModel, FFLDrawType type);
     // Meant to be exported as FFLGetDrawParamFromCharModel
     // ... but it needs FFLDrawType enum which is used in shader stuff
-//FFLiGetModelInfo
-//FFLiSetModelInfo // Calls FFLInitCharModel
-//FFLiInitCharModel(FFLiCharModel *, FFLDataSource, void const *, unsigned short, FFLResolution, unsigned int, unsigned int, void *)
-//FFLiCopyCharModel(FFLiCharModel *, void *, unsigned int, FFLiCharModel const *)
+// void AFLiGetModelInfo(undefined4 param_1,undefined4 param_2) -> __aeabi_memcpy(param_1, param_2, 220);
+// FFLiSetModelInfo // Calls FFLInitCharModel
+// FFLiInitCharModel(FFLiCharModel *, FFLDataSource, void const *, unsigned short, FFLResolution, unsigned int, unsigned int, void *)
+// FFLiCopyCharModel(FFLiCharModel *, void *, unsigned int, FFLiCharModel const *)
 
 #endif // __cplusplus
 
@@ -91,6 +91,9 @@ FFLExpression FFLiGetExpression(const FFLiCharModel* pModel);
 void FFLiGetPartsTransform(FFLPartsTransform* pTransform, const FFLiCharModel* pModel);
 
 void FFLiSetViewModelType(FFLiCharModel* pModel, FFLModelType type);
+// FFLModelType FFLiGetViewModelType(const FFLiCharModel* pModel); FFLGetViewModelType
+
+void FFLiGetBoundingBoxCharModel(FFLBoundingBox* pBoundingBox, const FFLiCharModel* pModel); // original arg names: box, model
 
 const FFLDrawParam* FFLiGetDrawParamOpaFacelineFromCharModel(const FFLiCharModel* pModel);
 const FFLDrawParam* FFLiGetDrawParamOpaBeardFromCharModel(const FFLiCharModel* pModel);

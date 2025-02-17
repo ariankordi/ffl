@@ -41,5 +41,8 @@
     "_FFLIsAvailable",
     "_FFLIsAvailableExpression",
     "_FFLInitCharModelCPUStepWithCallback",
-    "_FFLSetFrontCullForFlipX"
+    "_FFLSetFrontCullForFlipX",
+    "_FFLSetCoordinate",
+    "_FFLGetBoundingBox",
+    "_FFLSetLinearGammaMode"
 ]

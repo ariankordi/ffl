@@ -12,6 +12,8 @@ void SwapEndianVec3(FFLVec3* pVec);
 void SwapEndianHairTransform(void* pTransformData);
 void SwapEndianFacelineTransform(void* pTransformData);
 
+void ConvertNormalTo8_8_8_8(u32* pData); // custom
+
 }
 
 // Controls whether the normal attribute should be converted in-place
@@ -46,21 +48,9 @@ const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLi
             if (*pSize >> 2 == 0)
                 return pElement; // skip if there are less than 4 bytes
 
-            for (u32 i = 0; i < (*pSize >> 2); i++) // for each u32
-            {
-                u32 curNormal = pElement[i];
-                u32 topTwo = curNormal >> 30;  // top two bits (bits 30-31)
+            for (u32 i = 0; i < (*pSize >> 2); i++)
+                ConvertNormalTo8_8_8_8(&pElement[i]);
 
-                // should be equivalent to AFLiGetResourceShapeElement
-                pElement[i] =
-                    // Extract and rearrange bits 8_8_8_8 format
-                    ((curNormal >> 4) & 0xFF00) |         // Extract bits 4-11 and shift them to 8-15
-                    ((curNormal >> 6) & 0xFF0000) |       // Extract bits 6-13 and shift them to 16-23
-                    (((curNormal << 22) >> 24) & 0xFF) |  // Extract bits 0-7 (shifted to 0-7)
-                    (((topTwo << 2 | curNormal >> 30 |    // Combine the two highest bits (30-31) and shift them
-                        topTwo << 4 | topTwo << 6)        // with some additional shifting for alpha
-                        << 24));                          // Shift it to the most significant byte (24-31)
-            }
             return pElement;
         }
         return GetElement(pSize, pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL));
@@ -196,6 +186,34 @@ void SwapEndianHairTransform(void* pTransformData)
 void SwapEndianFacelineTransform(void* pTransformData)
 {
     static_cast<FFLiResourceShapeFacelineTransform*>(pTransformData)->SwapEndian();
+}
+
+void ConvertNormalTo8_8_8_8(u32* pData)
+{
+    u32 val = *pData;
+
+    // Extract the 10-bit fields (Red, Green, Blue) and the 2-bit alpha.
+    int r = (int)((val >> 20) & 0x3FF); // red: bits 20-29
+    int g = (int)((val >> 10) & 0x3FF); // green: bits 10-19
+    int b = (int)(val & 0x3FF);         // blue: bits 0-9
+    int a = (int)((val >> 30) & 0x3);     // alpha: bits 30-31
+
+    // Sign-extend the 10-bit values (if bit 9 is set, fill upper bits with 1's)
+    if (r & 0x200) r |= ~0x3FF;
+    if (g & 0x200) g |= ~0x3FF;
+    if (b & 0x200) b |= ~0x3FF;
+
+    // Convert the 10-bit SNORM range (-512..511) to 8-bit SNORM (-128..127)
+    r = (r * 127) / 511;
+    g = (g * 127) / 511;
+    b = (b * 127) / 511;
+
+    // Convert the 2-bit SNORM alpha (-2..1) to 8-bit (0..255).
+    // Mapping: -2 -> 0, -1 -> 85, 0 -> 170, 1 -> 255.
+    a = ((a + 2) * 85);
+
+    // Pack the channels into an 8_8_8_8 integer.
+    *pData = ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
 }
 
 }

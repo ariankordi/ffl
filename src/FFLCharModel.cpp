@@ -199,6 +199,10 @@ void FFLSetViewModelType(FFLCharModel* pModel, FFLModelType type)
 {
     FFLiSetViewModelType(GetCharModel(pModel), type);
 }
+void FFLGetBoundingBox(FFLBoundingBox* pBoundingBox, const FFLCharModel* pModel)
+{
+    FFLiGetBoundingBoxCharModel(pBoundingBox, GetCharModel(pModel));
+}
 
 // Deleted in NSMBU:
 bool FFLIsAvailableExpression(const FFLCharModel* pModel, FFLExpression expression)

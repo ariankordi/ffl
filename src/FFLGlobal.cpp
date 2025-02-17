@@ -74,6 +74,12 @@ FFLColor FFLGetFavoriteColor(s32 index)
     return FFLiGetFavoriteColor(index);
 }
 
+void FFLSetLinearGammaMode(bool isLinear)
+{
+    FFLiSetLinearGammaColor(isLinear);//mode != 0);
+    FFLiSetOffScreenSrgbFetch(isLinear);//mode != 0);
+}
+
 // All functions below are not originally in FFL:
 
 FFLColor FFLGetFacelineColor(s32 index)

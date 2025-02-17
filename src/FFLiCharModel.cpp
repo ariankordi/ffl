@@ -77,6 +77,17 @@ void FFLiSetViewModelType(FFLiCharModel* pModel, FFLModelType type)
     }
 }
 
+void FFLiGetBoundingBoxCharModel(FFLBoundingBox* pBoundingBox, const FFLiCharModel* pModel)
+{
+    RIO_ASSERT(pBoundingBox);
+    RIO_ASSERT(pModel);
+
+    FFLModelType modelType = pModel->modelType;
+
+    // (abood voice) Unsure if this is correct
+    rio::MemUtil::copy(pBoundingBox, &pModel->boundingBox[modelType], sizeof(FFLBoundingBox));
+}
+
 const FFLDrawParam* FFLiGetDrawParamOpaFacelineFromCharModel(const FFLiCharModel* pModel)
 {
     return &(pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE]);

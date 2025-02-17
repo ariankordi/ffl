@@ -35,7 +35,8 @@ typedef enum FFLExpression
     FFL_EXPRESSION_LIKE                  = 16,
     FFL_EXPRESSION_LIKE_WINK_RIGHT       = 17,
     FFL_EXPRESSION_FRUSTRATED            = 18,
-
+    // Max expressions in FFL pre-modifications.
+    FFL_EXPRESSION_FFL_MAX               = 19,
 
     // Below are from AFL/Miitomo.
     // I could not find internal names for any of the

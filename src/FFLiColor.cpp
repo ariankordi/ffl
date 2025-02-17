@@ -1,51 +1,50 @@
-#include <nn/ffl/FFLColor.h>
-
 #include <nn/ffl/FFLiColor.h>
 
-#include <cstring>
+#include <misc/rio_MemUtil.h>
 
 namespace {
 
-enum FFLiColorType
-{
-    FFLI_COLOR_TYPE_FACELINE_COLOR_0    = 0,
-    FFLI_COLOR_TYPE_HAIR_COLOR_0        = FFLI_COLOR_TYPE_FACELINE_COLOR_0  + FFLI_FACELINE_COLOR_NUM,
-    FFLI_COLOR_TYPE_EYE_COLOR_R_0       = FFLI_COLOR_TYPE_HAIR_COLOR_0      + FFLI_HAIR_COLOR_NUM,
-    FFLI_COLOR_TYPE_EYE_COLOR_G         = FFLI_COLOR_TYPE_EYE_COLOR_R_0     + FFLI_EYE_COLOR_R_NUM,
-    FFLI_COLOR_TYPE_EYE_COLOR_B_0,   // = FFLI_COLOR_TYPE_EYE_COLOR_G       + 1,
-    FFLI_COLOR_TYPE_GLASS_COLOR_0       = FFLI_COLOR_TYPE_EYE_COLOR_B_0     + FFLI_EYE_COLOR_B_NUM,
-    FFLI_COLOR_TYPE_MOUTH_COLOR_R_0     = FFLI_COLOR_TYPE_GLASS_COLOR_0     + FFLI_GLASS_COLOR_NUM,
-    FFLI_COLOR_TYPE_MOUTH_COLOR_G_0     = FFLI_COLOR_TYPE_MOUTH_COLOR_R_0   + FFLI_MOUTH_COLOR_R_NUM,
-    FFLI_COLOR_TYPE_MOUTH_COLOR_B       = FFLI_COLOR_TYPE_MOUTH_COLOR_G_0   + FFLI_MOUTH_COLOR_G_NUM,
-    FFLI_COLOR_TYPE_MOLE_COLOR,      // = FFLI_COLOR_TYPE_MOUTH_COLOR_B     + 1,
-    FFLI_COLOR_TYPE_FAVORITE_COLOR_0,// = FFLI_COLOR_TYPE_MOLE_COLOR        + 1,
-    FFLI_COLOR_TYPE_FACE_LINE           = FFLI_COLOR_TYPE_FAVORITE_COLOR_0  + FFLI_FAVORITE_COLOR_NUM,
-    FFLI_COLOR_TYPE_MAX              // = FFLI_COLOR_TYPE_FACE_LINE         + 1
-};
-NN_STATIC_ASSERT(FFLI_COLOR_TYPE_MAX == 55);
-
-enum FFLiContainerType
-{
-    FFLI_CONTAINER_TYPE_NORMAL  = 0,
-    FFLI_CONTAINER_TYPE_SRGB    = 1,
-    FFLI_CONTAINER_TYPE_MAX     = 2
-};
-
-struct FFLiColorContainer
-{
-    FFLColor    colors[FFLI_COLOR_TYPE_MAX];
-};
-
 FFLiColorContainer s_ColorContainer[FFLI_CONTAINER_TYPE_MAX];
-FFLiContainerType s_ContainerType = FFLI_CONTAINER_TYPE_NORMAL;
-bool s_UseOffScreenSrgbFetch = true;
+// It seems that the container type is inverse to the desired gamma mode.
+#ifndef FFL_USE_LINEAR_GAMMA
+    FFLiContainerType s_ContainerType = FFLI_CONTAINER_TYPE_NORMAL;
+    bool s_UseOffScreenSrgbFetch = true;
+#else
+    FFLiContainerType s_ContainerType = FFLI_CONTAINER_TYPE_SRGB;
+    bool s_UseOffScreenSrgbFetch = false;
+#endif // FFL_USE_LINEAR_GAMMA
+
 bool s_IsIntializedColorContainer = false;
 
-}
+const u8 COLOR_NUM[FFLI_COLOR_TYPE_MAX] = {
+    6, 8, 3, 1,
+    6, 6, 5, 5,
+    1, 1, 12, 1
+};
 
 static bool UseOffScreenSrgbFetch()
 {
     return s_UseOffScreenSrgbFetch;
+}
+
+static s32 GetInverseContainerType()
+{
+    if (s_ContainerType == FFLI_CONTAINER_TYPE_NORMAL)
+        return 1;
+    else
+        return 0;
+}
+
+}
+
+void FFLiSetLinearGammaColor(bool isLinear)
+{
+    s_ContainerType = FFLiContainerType(isLinear);
+}
+
+void FFLiSetOffScreenSrgbFetch(bool useOffScreenSrgbFetch)
+{
+    s_UseOffScreenSrgbFetch = useOffScreenSrgbFetch;
 }
 
 bool FFLiUseOffScreenSrgbFetch()
@@ -53,10 +52,18 @@ bool FFLiUseOffScreenSrgbFetch()
     return UseOffScreenSrgbFetch() && s_ContainerType == FFLI_CONTAINER_TYPE_SRGB;
 }
 
+bool FFLiGetOffScreenSrgbFetch()
+{
+    return UseOffScreenSrgbFetch();
+}
+
 namespace {
 
 const FFLiColorContainer& GetSrgbFetchColorContainer();
 const FFLiColorContainer& GetColorContainer();
+
+u32 GetColorNum(FFLiColorType type);
+FFLColor* GetColor(FFLiColorType type, u32 index);
 
 const FFLColor& GetFacelineColor(const FFLiColorContainer& container, s32 index);
 const FFLColor& GetBeardColor(const FFLiColorContainer& container, s32 index);
@@ -76,6 +83,48 @@ const FFLColor& GetFaceLine(const FFLiColorContainer& container);
 const FFLColor& GetCapColor(const FFLiColorContainer& container, s32 index);
 const FFLColor& GetNoselineColor(const FFLiColorContainer& container);
 
+}
+
+
+u32 FFLiGetColorNum(FFLiColorType type)
+{
+    return GetColorNum(type);
+}
+
+void FFLiSetColor(FFLColor color, FFLiColorType type, u32 index)
+{
+    FFLColor* tmp = GetColor(type, index);
+    RIO_ASSERT(tmp);
+    tmp->r = color.r;
+    tmp->g = color.g;
+    tmp->b = color.b;
+    tmp->a = color.a;
+}
+
+void FFLiGetColor(FFLColor* pColor, FFLiColorType type, u32 index)
+{
+    FFLColor* tmp = GetColor(type, index);
+    RIO_ASSERT(tmp);
+    pColor->r = tmp->r;
+    pColor->g = tmp->g;
+    pColor->b = tmp->b;
+    pColor->a = tmp->a;
+}
+
+void FFLiSetColorContainer(const FFLiColorContainer* pContainer, FFLiContainerType type)
+{
+    RIO_ASSERT(type < FFLI_CONTAINER_TYPE_MAX);
+
+    FFLiColorContainer* tmp = &s_ColorContainer[type];
+    rio::MemUtil::copy(tmp, pContainer, sizeof(FFLiColorContainer));
+}
+
+void FFLiGetColorContainer(FFLiColorContainer* pContainer, FFLiContainerType type)
+{
+    RIO_ASSERT(type < FFLI_CONTAINER_TYPE_MAX);
+
+    FFLiColorContainer* tmp = &s_ColorContainer[type];
+    rio::MemUtil::copy(pContainer, tmp, sizeof(FFLiColorContainer));
 }
 
 const FFLColor& FFLiGetSrgbFetchFacelineColor(s32 index)
@@ -356,14 +405,14 @@ void SetupColorContainer(FFLiColorContainer& container)
     const FFLColor faceLine =
         { 0.000f, 0.000f, 0.000f, 1.000f };
 
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_FACELINE_COLOR_0]),  facelineColor,  sizeof(facelineColor));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0]),      hairColor,      sizeof(hairColor));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_EYE_COLOR_R_0]),     eyeColorR,      sizeof(eyeColorR));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_EYE_COLOR_B_0]),     eyeColorB,      sizeof(eyeColorB));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_GLASS_COLOR_0]),     glassColor,     sizeof(glassColor));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_R_0]),   mouthColorR,    sizeof(mouthColorR));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_G_0]),   mouthColorG,    sizeof(mouthColorG));
-    std::memcpy(&(container.colors[FFLI_COLOR_TYPE_FAVORITE_COLOR_0]),  favoriteColor,  sizeof(favoriteColor));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_FACELINE_COLOR_0]),  facelineColor,  sizeof(facelineColor));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0]),      hairColor,      sizeof(hairColor));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_EYE_COLOR_R_0]),     eyeColorR,      sizeof(eyeColorR));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_EYE_COLOR_B_0]),     eyeColorB,      sizeof(eyeColorB));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_GLASS_COLOR_0]),     glassColor,     sizeof(glassColor));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_R_0]),   mouthColorR,    sizeof(mouthColorR));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_G_0]),   mouthColorG,    sizeof(mouthColorG));
+    rio::MemUtil::copy(&(container.colors[FFLI_COLOR_TYPE_FAVORITE_COLOR_0]),  favoriteColor,  sizeof(favoriteColor));
 
     container.colors[FFLI_COLOR_TYPE_EYE_COLOR_G]   = eyeColorG;
     container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_B] = mouthColorB;
@@ -766,15 +815,14 @@ const FFLColor nnmiiUpperLipColors[FFLI_NN_MII_COMMON_COLOR_MAX][FFLI_CONTAINER_
 const FFLColor& GetFacelineColor(const FFLiColorContainer& container, s32 index)
 {
     // NOTE: ver3 faceline colors ARE COMPATIBLE WITH the switch faceline color table
-    // 1 = sRGB always
-    return nnmiiFacelineColors[index][1];
+    return nnmiiFacelineColors[index][GetInverseContainerType()];
 }
 
 const FFLColor& GetBeardColor(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0
 )
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
@@ -782,21 +830,21 @@ const FFLColor& GetEyebrowColor(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0
 )
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetMustacheColor(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
 const FFLColor& GetHairColor(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_HAIR_COLOR_0 + index];
 }
 
@@ -813,21 +861,21 @@ const FFLColor& GetEyeColorG(const FFLiColorContainer& container, s32 index)
 const FFLColor& GetEyeColorB(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_EYE_COLOR_B_0 + index];
 }
 
 const FFLColor& GetGlassColor(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_GLASS_COLOR_0 + index];
 }
 
 const FFLColor& GetMouthColorR(const FFLiColorContainer& container, s32 index)
 {
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
-        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiCommonColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_R_0 + index];
 }
 
@@ -835,7 +883,7 @@ const FFLColor& GetMouthColorG(const FFLiColorContainer& container, s32 index)
 {
     // NOTE: supposed to be slightly darker than the lower lip color
     if ((index & FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK) != 0)
-        return nnmiiUpperLipColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][1];
+        return nnmiiUpperLipColors[index & FFLI_NN_MII_COMMON_COLOR_MASK][GetInverseContainerType()];
     return container.colors[FFLI_COLOR_TYPE_MOUTH_COLOR_G_0 + index];
 }
 
@@ -867,6 +915,56 @@ const FFLColor& GetCapColor(const FFLiColorContainer& container, s32 index)
 const FFLColor& GetNoselineColor(const FFLiColorContainer& container)
 {
     return container.colors[FFLI_COLOR_TYPE_FACE_LINE];
+}
+
+u32 GetColorNum(FFLiColorType type)
+{
+    if (type < FFLI_COLOR_TYPE_MAX)
+        return COLOR_NUM[type];
+    RIO_ASSERT(type);
+
+    return 0;
+}
+
+FFLColor* GetColor(FFLiColorType type, u32 index)
+{
+    RIO_ASSERT(false);
+/*
+    InitializeColorContainerIfUninitialized(); // done in AFL
+    const FFLiColorContainer& container = GetColorContainer();
+    RIO_ASSERT(index < FFLiGetColorNum(type));
+
+    switch(type)
+    {
+    case 0:
+        return &container + index * sizeof(FFLColor);
+    case 1:
+        return &container + index * sizeof(FFLColor) + 0x60;
+    case 2:
+        return &container + index * sizeof(FFLColor) + 0xe0;
+    case 3:
+        return &container + index * sizeof(FFLColor) + 0x110;
+    case 4:
+        return &container + index * sizeof(FFLColor) + 0x120;
+    case 5:
+        return &container + index * sizeof(FFLColor) + 0x180;
+    case 6:
+        return &container + index * sizeof(FFLColor) + 0x1e0;
+    case 7:
+        return &container + index * sizeof(FFLColor) + 0x230;
+    case 8:
+        return &container + index * sizeof(FFLColor) + 0x280;
+    case 9:
+        return &container + index * sizeof(FFLColor) + 0x290;
+    case 10:
+        return &container + index * sizeof(FFLColor) + 0x2a0;
+    case 0xb:
+        return &container + index * sizeof(FFLColor) + 0x360;
+    default:
+        RIO_ASSERT(type);
+        return NULL;
+    }
+*/
 }
 
 }

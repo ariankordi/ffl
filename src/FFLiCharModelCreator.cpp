@@ -100,6 +100,13 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 #endif
         pModel->charModelDesc.allExpressionFlag.flag.mid = 0;
         pModel->charModelDesc.allExpressionFlag.flag.high = 0;
+#if RIO_DEBUG
+        static const u32 mask = ~((1U << FFL_EXPRESSION_FFL_MAX) - 1); // Bits above the limit
+        if ((pModel->charModelDesc.allExpressionFlag.flags[0] & mask) != 0)
+        {
+            RIO_LOG("FFLiCharModelCreator::ExecuteCPUStep: Note that in order to use expressions higher than 31, you will need to apply FFL_MODEL_FLAG_NEW_EXPRESSIONS to your modelFlag.\n");
+        }
+#endif
     }
 
     pModel->modelType = ModelFlagToModelType(pModel->charModelDesc.modelFlag);
@@ -422,24 +429,25 @@ void UpdateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc)
     }
 }
 
-static const bool UPDATE_BOUNDING_BOX[FFLI_SHAPE_PARTS_TYPE_MAX][3] = {
-    {  true,  true,  true },
-    {  true, false, false },
-    { false,  true, false },
-    {  true,  true,  true },
-    { false, false, false },
-    { false, false, false },
-    {  true,  true,  true },
-    {  true,  true,  true },
-    {  true, false, false },
-    { false,  true, false },
-    {  true, false, false },
-    { false,  true, false }
+static const bool UPDATE_BOUNDING_BOX[FFLI_SHAPE_PARTS_TYPE_MAX][FFL_MODEL_TYPE_MAX] = {
+    // Normal -Hat- FaceOnly
+    {  true,  true,  true },  // FFLI_SHAPE_PARTS_TYPE_BEARD
+    {  true, false, false },  // FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL
+    { false,  true, false },  // FFLI_SHAPE_PARTS_TYPE_HAT_CAP
+    {  true,  true,  true },  // FFLI_SHAPE_PARTS_TYPE_FACELINE
+    { false, false, false },  // FFLI_SHAPE_PARTS_TYPE_GLASS
+    { false, false, false },  // FFLI_SHAPE_PARTS_TYPE_MASK
+    {  true,  true,  true },  // FFLI_SHAPE_PARTS_TYPE_NOSELINE
+    {  true,  true,  true },  // FFLI_SHAPE_PARTS_TYPE_NOSE
+    {  true, false, false },  // FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL
+    { false,  true, false },  // FFLI_SHAPE_PARTS_TYPE_HAIR_CAP
+    {  true, false, false },  // FFLI_SHAPE_PARTS_TYPE_FOREHEAD_NORMAL
+    { false,  true, false }   // FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP
 };
 
 void CalcluateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc, FFLiShapePartsType partsType)
 {
-    for (u32 i = 0; i < 3; i++)
+    for (u32 i = 0; i < FFL_MODEL_TYPE_MAX; i++)
         if (UPDATE_BOUNDING_BOX[partsType][i])
             UpdateBoundingBox(&(pDst[i]), pSrc);
 }
@@ -485,7 +493,7 @@ struct ModelTypeShapePartsInfo
 
 const ModelTypeShapePartsInfo* GetModelTypeShapePartsInfo(u32 modelFlag)
 {
-    static ModelTypeShapePartsInfo modelTypeShapePartsInfo[2 * 3] = {
+    static ModelTypeShapePartsInfo modelTypeShapePartsInfo[2 * FFL_MODEL_TYPE_MAX] = {
         // FFL_MODEL_TYPE_NORMAL
         { false, FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL },
         { false, FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL },
@@ -510,7 +518,7 @@ const ModelTypeShapePartsInfo* GetModelTypeShapePartsInfo(u32 modelFlag)
     return modelTypeShapePartsInfo;
 }
 
-void DeleteShape_Hair(FFLiCharModel* pModel, u32 count = 2 * 3)
+void DeleteShape_Hair(FFLiCharModel* pModel, u32 count = 2 * FFL_MODEL_TYPE_MAX)
 {
     u32 modelFlag = pModel->charModelDesc.modelFlag & 7;
 
@@ -565,7 +573,7 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
 
         bool flipHair = pModel->charInfo.parts.hairDir > 0;
 
-        for (u32 i = 0; i < 2 * 3; i++)
+        for (u32 i = 0; i < 2 * FFL_MODEL_TYPE_MAX; i++)
         {
             if (modelTypeShapePartsInfo[i].enable)
             {

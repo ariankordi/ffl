@@ -63,6 +63,8 @@ FFLResult FFLiResourceManager::AfterConstruct()
 {
     for (u32 i = 0; i < FFL_RESOURCE_TYPE_MAX; i++)
     {
+        // TODO: isLG is always false?? is linear gamma
+        // a compile-time flag? do some games use this?
         FFLResult result = GetResourcePath(m_Path[i], FFL_PATH_MAX_LEN, FFLResourceType(i), false);
         if (result != FFL_RESULT_OK)
             return result;

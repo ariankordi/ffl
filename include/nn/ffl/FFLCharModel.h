@@ -76,9 +76,10 @@ bool FFLIsAvailableExpression(const FFLCharModel* pModel, FFLExpression expressi
 void FFLGetPartsTransform(FFLPartsTransform* pTransform, const FFLCharModel* pModel);
 
 void FFLSetViewModelType(FFLCharModel* pModel, FFLModelType type);
+void FFLGetBoundingBox(FFLBoundingBox* pBoundingBox, const FFLCharModel* pModel); // Deleted in NSMBU
 
-void FFLSetCoordinate(FFLCoordinateType upType, FFLCoordinateType frontType);
-void FFLSetScale(f32 scale);
+void FFLSetCoordinate(FFLCoordinateType upType, FFLCoordinateType frontType); // Deleted in NSMBU
+void FFLSetScale(f32 scale); // Deleted in NSMBU
 
 // Not sure how else to expose these
 const FFLiRenderTexture* FFLiGetFaceTextureFromCharModel(const FFLCharModel* pModel);
