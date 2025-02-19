@@ -13,7 +13,11 @@ set(FFL_MLC_PATH "./" CACHE STRING "MLC path for FFL to use to search for resour
 # Disable database functionality:
 option(FFL_NO_DATABASE_FILE "Disable functionality to open databases in FFL." OFF)
 option(FFL_NO_DATABASE_RANDOM "Disable random database in FFL." OFF)
-option(FFL_NO_DATABASE_DEFAULT "Disable default database (6 entries) in FFL." OFF)
+if(EMSCRIPTEN)
+    option(FFL_NO_DATABASE_DEFAULT "Disable default database (6 entries) in FFL." ON) # Save 1.6 ms when initializing FFL...
+else()
+    option(FFL_NO_DATABASE_DEFAULT "Disable default database (6 entries) in FFL." OFF)
+endif()
 option(FFL_NO_MIDDLE_DB "Disable MiddleDB functionality in FFL. NOTE that you cannot disable MiddleDB if you need any other databases" OFF)
 
 # Enabled by default in FFL-Testing:
@@ -63,6 +67,10 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-private-field -Wno-missing-braces")
 endif()
+
+# Set flags to reduce dependence on libstdc++ in release mode.
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-exceptions -fno-rtti -fno-threadsafe-statics")
+# Only libstdc++ funcs used are: __cxa_pure_virtual, new/delete
 
 # ------------------ Detect RIO -------------------
 
@@ -311,21 +319,27 @@ if(EMSCRIPTEN)
 
         # Allow addFunction.
         -s ALLOW_TABLE_GROWTH=1
-        -s EXPORTED_RUNTIME_METHODS=addFunction
-        -s EXPORT_NAME="ModuleFFL" # Custom export name.
+        -s STRICT=1
+        # STRICT=1 requires exporting
+        -s EXPORTED_RUNTIME_METHODS=\"['addFunction','HEAP8','HEAPU8','HEAPU16','HEAPU32','HEAP32','HEAPF32']\"
+        #-s EXPORT_NAME="ModuleFFL" # Custom export name.
 
         -s ENVIRONMENT=web
+        # -s MINIMAL_RUNTIME=1 # depends on calledRun/onRuntimeInitialized (need to use modularize)
+        -s ERROR_ON_UNDEFINED_SYMBOLS=0 # $stackTrace
         -s FILESYSTEM=0
-        -s EXIT_RUNTIME=0
+        -s DYNAMIC_EXECUTION=2
         -s MODULARIZE=0 # Not using async/modularize for now.
 
-        -s ALLOW_MEMORY_GROWTH=1 # Not tested if this is needed
+        -s INITIAL_HEAP=6MB -s ALLOW_MEMORY_GROWTH=1
+        #--memoryprofiler
     )
     if (FFL_BUILD_WASM)
         set(LINK_FLAGS ${LINK_FLAGS} -s WASM=1)
     else()
         set(LINK_FLAGS ${LINK_FLAGS} -s WASM=0)
     endif()
+
     string(REPLACE ";" " " LINK_FLAGS_STR "${LINK_FLAGS}")
     set_target_properties(${FFL_TARGET_NAME}
         PROPERTIES

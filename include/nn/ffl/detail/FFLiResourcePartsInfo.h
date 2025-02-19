@@ -62,6 +62,8 @@ enum FFLiResourceStrategy
     FFLI_RESOURCE_STRATEGY_MAX              = 6
 };
 
+// NOTE: actually a class
+// FFLiResourcePartsInfo::ZlibWindowBits(void) const -> thunk to FFLiResourceWindowBitsToZlibWindowBits
 struct FFLiResourcePartsInfo
 {
     u32 dataPos;

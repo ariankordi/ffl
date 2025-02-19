@@ -22,7 +22,7 @@ FFLResult FFLExit(void);
 bool FFLIsAvailable(void);
 
 FFLColor FFLGetFavoriteColor(s32 index);
-void FFLSetLinearGammaMode(bool isLinear);
+void FFLSetLinearGammaMode(bool isLinear); // Deleted in NSMBU
 
 FFLColor FFLGetFacelineColor(s32 index); // NOTE: this and below are not in FFL
 void FFLSetTextureFlipY(bool textureFlipY);

@@ -77,6 +77,9 @@ FFLColor FFLGetFavoriteColor(s32 index)
 void FFLSetLinearGammaMode(bool isLinear)
 {
     FFLiSetLinearGammaColor(isLinear);//mode != 0);
+#ifdef FFL_NO_RENDER_TEXTURE
+    isLinear = !isLinear; // Invert FFLiSetOffScreenSrgbFetch
+#endif
     FFLiSetOffScreenSrgbFetch(isLinear);//mode != 0);
 }
 

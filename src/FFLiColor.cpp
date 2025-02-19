@@ -929,6 +929,7 @@ u32 GetColorNum(FFLiColorType type)
 FFLColor* GetColor(FFLiColorType type, u32 index)
 {
     RIO_ASSERT(false);
+    return NULL;
 /*
     InitializeColorContainerIfUninitialized(); // done in AFL
     const FFLiColorContainer& container = GetColorContainer();

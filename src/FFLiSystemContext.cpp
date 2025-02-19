@@ -6,9 +6,23 @@
 #include <nn/act.h>
 #endif // RIO_IS_CAFE
 
+#ifdef __EMSCRIPTEN__
+    #include <emscripten.h>
+#endif
+
 FFLiSystemContext::FFLiSystemContext()
 {
-    Init(FFLiGetSecondsFrom_2000_01_01());
+#ifndef FFL_NO_DATABASE_RANDOM
+    #ifdef __EMSCRIPTEN__
+        // Use emscripten_random so this can be like 6ms faster
+        const u32 seed = emscripten_random() * static_cast<f32>(UINT32_MAX);
+    #else
+        const u32 seed = FFLiGetSecondsFrom_2000_01_01();
+    #endif
+#else
+    static const u32 seed = 0;
+#endif
+    Init(seed);
 }
 
 FFLiSystemContext::~FFLiSystemContext()

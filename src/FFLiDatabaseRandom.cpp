@@ -10,7 +10,7 @@
 
 #include <nn/ffl/detail/FFLiCharInfo.h>
 
-#include <cstring>
+#include <misc/rio_MemUtil.h>
 
 #ifndef FFL_NO_DATABASE_RANDOM
 
@@ -1061,10 +1061,10 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
     pCharInfo->height = 64;
     pCharInfo->build = 64;
 
-    std::memset(pCharInfo->name, 0, sizeof(u16) * (10 + 1));
+    rio::MemUtil::set(pCharInfo->name, 0, sizeof(u16) * (10 + 1));
     FFLiCopyWcharT2U16(pCharInfo->name, 10 + 1, L"no name");
 
-    std::memset(pCharInfo->creatorName, 0, sizeof(u16) * (10 + 1));
+    rio::MemUtil::set(pCharInfo->creatorName, 0, sizeof(u16) * (10 + 1));
 
     pCharInfo->gender = gender;
 
@@ -1088,7 +1088,7 @@ void FFLiDatabaseRandom::Get(FFLiCharInfo* pCharInfo, FFLGender gender, FFLAge a
 
     pCharInfo->authorType = 0;
 
-    std::memset(&pCharInfo->authorID, 0, sizeof(FFLiAuthorID));
+    rio::MemUtil::set(&pCharInfo->authorID, 0, sizeof(FFLiAuthorID));
 }
 
 #endif // FFL_NO_DATABASE_RANDOM

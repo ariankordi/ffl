@@ -5,21 +5,13 @@
 
 #include <nn/ffl/FFLColor.h>
 
-void FFLSetLinearGammaMode(); // Deleted in NSMBU
-
 void FFLiSetLinearGammaColor(bool isLinear); // Deleted in NSMBU
 void FFLiSetOffScreenSrgbFetch(bool isLinear); // Deleted in NSMBU
 
 bool FFLiUseOffScreenSrgbFetch();
 bool FFLiGetOffScreenSrgbFetch(); // Deleted in NSMBU
 
-/*
-void FFLSetLinearGammaMode(u32 mode)
-{
-    FFLiSetLinearGammaColor(mode != 0);
-    FFLiSetOffScreenSrgbFetch(mode != 0);
-}
-*/
+// FFLSetLinearGammaMode(u32): in FFLGlobal.cpp
 
 struct FFLColor;
 
@@ -100,8 +92,8 @@ void FFLiGetColorContainer(FFLiColorContainer* pContainer, FFLiContainerType typ
 
 // Somewhat of a HACK: Mark s32 color values as being colors
 // meant to be looked up in the common color table (Switch Mii colors)
-#define FFLI_NN_MII_COMMON_COLOR_MASK 0x7FFFFFFF
-#define FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK 1 << 31
+#define FFLI_NN_MII_COMMON_COLOR_MASK ~(1 << 31)
+#define FFLI_NN_MII_COMMON_COLOR_ENABLE_MASK (1 << 31)
 
 #define FFLI_NN_MII_COMMON_COLOR_MAX 100
 #define FFLI_NN_MII_FACELINE_COLOR_MAX 10
