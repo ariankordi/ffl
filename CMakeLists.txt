@@ -30,9 +30,12 @@ option(FFL_USE_EXTRA_RESOURCES "Expand resource types to add two more: very high
 
 # Target output options:
 option(FFL_BUILD_STATIC "Build FFL as a static library (.a, .lib)" OFF)
-option(FFL_BUILD_SHARED "Build FFL as a shared/dynamically linked library (.dll, .so, .dylib)" ON)
+option(FFL_BUILD_SHARED "Build FFL as a shared/dynamically linked library (.dll, .so, .dylib)" ON) # Not available with Emscripten
 # Note that FFL_ADD_GLAD_GL_IMPLEMENTATION is enabled when FFL_BUILD_SHARED is used.
 if(EMSCRIPTEN)
+    # By default when using Emscripten, this will be built
+    # as an executable that functions as an Emscripten module.
+    option(FFL_BUILD_EMSCRIPTEN_MODULE "Build as an Emscripten module" ON)
     # Emscripten-specific option to build for WASM or not.
     option(FFL_BUILD_WASM "Build for WebAssembly" ON)
 endif()
@@ -155,9 +158,9 @@ function(create_ffl_target target_name library_type)
     endif()
 
     # Create target.
-    if(EMSCRIPTEN)
-        # For Emscripten, override and build an executable.
-        message(STATUS "Building an executable instead of a library for Emscripten. FFL_BUILD_SHARED/STATIC ignored.")
+    if(FFL_BUILD_EMSCRIPTEN_MODULE)
+        # If making Emscripten module, instead build an executable.
+        message(STATUS "Building an executable instead of a library in order to build an Emscripten module. To disable this, turn off FFL_BUILD_EMSCRIPTEN_MODULE.")
         add_executable(${target_name} ${FFL_SOURCES})
     else()
         # Create a library target (static or shared)
@@ -282,8 +285,8 @@ else()
     set(FFL_TARGET_NAME "${PROJECT_NAME}-${FFL_MODE}")
 endif()
 
-if(EMSCRIPTEN)
-    # Force "ffl-emscripten" suffix for Emscripten.
+if(FFL_BUILD_EMSCRIPTEN_MODULE)
+    # Force "ffl-emscripten" suffix for module.
     set(FFL_TARGET_NAME "${FFL_TARGET_NAME}-emscripten")
 endif()
 
@@ -303,12 +306,9 @@ if(FFL_BUILD_SHARED)
 
 endif()
 
-# ------------ Emscripten-Specific Options -----------
-# Apply Emscripten-specific options if building for web.
-if(EMSCRIPTEN)
-    # Force inclusion of gl2.h to satisfy rio_DrawerWin.h includes.
-    #target_compile_options(${FFL_TARGET_NAME} PRIVATE -include GLES2/gl2.h) # Previously needed, not anymore?????
-
+# ------------ Emscripten Module Options -----------
+# Apply Emscripten-specific options if building a module.
+if(FFL_BUILD_EMSCRIPTEN_MODULE)
     # Path to exports JSON for Emscripten.
     set(EXPORTS_JSON ${PROJECT_SOURCE_DIR}/emscripten-exports.json)
     # Set emcc flags: exports, zlib, addFunction...
@@ -320,8 +320,9 @@ if(EMSCRIPTEN)
         # Allow addFunction.
         -s ALLOW_TABLE_GROWTH=1
         -s STRICT=1
-        # STRICT=1 requires exporting
+        # Required explicit parameters for strict mode:
         -s EXPORTED_RUNTIME_METHODS=\"['addFunction','HEAP8','HEAPU8','HEAPU16','HEAPU32','HEAP32','HEAPF32']\"
+        -s INCOMING_MODULE_JS_API=onRuntimeInitialized
         #-s EXPORT_NAME="ModuleFFL" # Custom export name.
 
         -s ENVIRONMENT=web
