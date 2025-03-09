@@ -4,6 +4,7 @@
 #include <nn/ffl/FFLiResourceManager.h>
 #include <nn/ffl/FFLiUtil.h>
 #include <nn/ffl/FFLiZlibInflator.h>
+#include <nn/ffl/FFLiBrotliInflator.h>
 
 #include <filedevice/rio_FileDeviceMgr.h>
 
@@ -373,9 +374,26 @@ rio::RawErrorCode FFLiResourceLoader::Close()
 
 namespace {
 
-bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
+#ifdef FFL_USE_BROTLI
+bool UncompressBrotli(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
 {
+    FFLiBrotliInflator inflator;
+
+    void* dst = pDst;
+    u32 dstSize = partsInfo.dataSize;
+    const void* src = pSrc;
+    u32 srcSize = partsInfo.compressedSize;
+
+    s32 ret = inflator.Process(&dst, &dstSize, &src, &srcSize, 0); // 1 = m_IsStreamEnd
+    RIO_ASSERT(ret == 1);
+
+    return (ret == 1);
+}
+#endif // FFL_USE_BROTLI
+
 #ifndef FFL_NO_ZLIB
+bool UncompressZlib(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
+{
     FFLiZlibInflator inflator(FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits(partsInfo.windowBits)));
 
     void* dst = pDst;
@@ -387,10 +405,23 @@ bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuf
     s32 ret = inflator.Process(&dst, &dstSize, &src, &srcSize, Z_FINISH);
     RIO_ASSERT(ret == Z_STREAM_END);
     return ret == Z_STREAM_END;
+}
+#endif // FFL_NO_ZLIB
+
+
+bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
+{
+#ifdef FFL_USE_BROTLI
+    if (partsInfo.strategy == FFLI_RESOURCE_STRATEGY_BROTLI)
+        return UncompressBrotli(pDst, pSrc, pBuffer, partsInfo);
+#endif // FFL_USE_BROTLI
+
+#ifndef FFL_NO_ZLIB
+    return UncompressZlib(pDst, pSrc, pBuffer, partsInfo);
 #else
     RIO_ASSERT(false && "This was built with FFL_NO_ZLIB, but a resource in this file is compressed. You will have to make a completely uncompressed resource file with FFLResource.py.");
     return false;
-#endif
+#endif // FFL_NO_ZLIB
 }
 
 }

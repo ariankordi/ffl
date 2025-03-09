@@ -74,6 +74,7 @@ public:
     virtual ~FFLiResourceHeader() {}
 
     bool m_NeedsEndianSwap;
+    bool m_IgnoreMipMaps;
 };
 
 // casted to this to identify header type
@@ -156,6 +157,7 @@ public:
     }
 
     bool TextureFormatIsLinear() const override { return false; }
+    // Always use mipmaps for default FFL resource.
     bool IgnoreMipMaps() const override { return false; }
 
 private:
@@ -231,14 +233,7 @@ public:
     }
 
     bool TextureFormatIsLinear() const override { return true; }
-    bool IgnoreMipMaps() const override
-    {
-#ifdef FFL_ALLOW_MIPMAPS_FOR_AFL_2_3
-        return false;
-#else
-        return true;
-#endif
-    }
+    bool IgnoreMipMaps() const override { return m_IgnoreMipMaps; }
 
     void SwapEndian() override;
 
@@ -307,7 +302,7 @@ public:
     }
 
     bool TextureFormatIsLinear() const override { return true; }
-    bool IgnoreMipMaps() const override { return true; }
+    bool IgnoreMipMaps() const override { return m_IgnoreMipMaps; }
 
     void SwapEndian() override;
 

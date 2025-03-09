@@ -55,28 +55,43 @@ FFLiResourceHeader* DetermineAndAllocateResourceHeaderType(void* pData, bool* ne
     // old versions of FFLResource.py set it to this
     RIO_ASSERT(pHeaderDefault->m_ExpandedBufferSize != 0);
 
+    FFLiResourceHeader* pHeader = nullptr;
     switch (hint)
     {
         case FFL_RESOURCE_TYPE_HINT_AFL:
-            return new FFLiResourceHeaderAFL();
+            pHeader = new FFLiResourceHeaderAFL();
             break;
         case FFL_RESOURCE_TYPE_HINT_AFL_2_3:
-            return new FFLiResourceHeaderAFL_2_3();
+            pHeader = new FFLiResourceHeaderAFL_2_3();
             break;
         default:
             break;
         // fall through to uncompress size logic below
     }
+    // m_IgnoreMipMaps is only read on AFL and AFL_2_3 classes.
+    // Do not ignore mipmaps for custom resources with hint.
+    if (pHeader)
+    {
+        pHeader->m_IgnoreMipMaps = false;
+        return pHeader;
+    }
 
     #define UNCOMPRESS_SIZE_AFLRESHIGH_2_3_DAT 0x2502DE0
     #define UNCOMPRESS_SIZE_AFLRESHIGH_DAT     0x239D5E0
+    // Ignored because there's also middle, LG variants...:
     #define UNCOMPRESS_SIZE_FFLRESHIGH_DAT     0x0CBBDE0
 
     if (totalUncompressSizeNoVersion == UNCOMPRESS_SIZE_AFLRESHIGH_DAT)
-        return new FFLiResourceHeaderAFL();
+        pHeader = new FFLiResourceHeaderAFL();
     else if (totalUncompressSizeNoVersion == UNCOMPRESS_SIZE_AFLRESHIGH_2_3_DAT)
-        return new FFLiResourceHeaderAFL_2_3();
+        pHeader = new FFLiResourceHeaderAFL_2_3();
     else
         // assume default FFL resource format
-        return new FFLiResourceHeaderDefault();
+        pHeader = new FFLiResourceHeaderDefault();
+
+    // Ignore mipmaps because both official AFL resources
+    // erroneously state they have mipmaps that are swizzled
+    // and the base textures aren't. IGNORED for FFL resources
+    pHeader->m_IgnoreMipMaps = true;
+    return pHeader;
 }

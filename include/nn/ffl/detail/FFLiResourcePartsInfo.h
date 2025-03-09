@@ -59,7 +59,10 @@ enum FFLiResourceStrategy
     FFLI_RESOURCE_STRATEGY_RLE              = 3,
     FFLI_RESOURCE_STRATEGY_FIXED            = 4,
     FFLI_RESOURCE_STRATEGY_UNCOMPRESSED     = 5,
-    FFLI_RESOURCE_STRATEGY_MAX              = 6
+
+    FFLI_RESOURCE_STRATEGY_BROTLI           = 6,
+
+    FFLI_RESOURCE_STRATEGY_MAX              = 7//6
 };
 
 // NOTE: actually a class

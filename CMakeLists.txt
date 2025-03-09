@@ -5,6 +5,7 @@ project(ffl LANGUAGES CXX)
 
 option(FFL_NO_NINTEXUTILS "Disable ninTexUtils (then you can only use AFL resources)" OFF)
 option(FFL_NO_ZLIB "Disable zlib (then you need to disable zlib on a resource made with FFLResource.py)" OFF)
+option(FFL_USE_BROTLI "Enable brotli support for unofficial resource files. Do NOT enable this if you are not going to use a resource explicitly packed with brotli." OFF)
 option(FFL_NO_FS "Disables FFL's use of RIO filesystem, for databases and non-cached resource loading." OFF)
 # This should probably be changeable at runtime:
 set(FFL_MLC_PATH "./" CACHE STRING "MLC path for FFL to use to search for resource and database files.")
@@ -102,7 +103,7 @@ if(NOT FFL_NO_NINTEXUTILS)
     endif()
 endif()
 
-# ------------------ Zlib (Optional) -------------------
+# ------------------ zlib, brotli -------------------
 
 if(NOT FFL_NO_ZLIB)
     find_package(ZLIB QUIET)
@@ -112,6 +113,11 @@ if(NOT FFL_NO_ZLIB)
     endif()
 else()
     message(WARNING "zlib disabled. Will proceed without zlib features (FFL_NO_ZLIB).")
+endif()
+
+if(FFL_USE_BROTLI)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(BROTLI_DEC libbrotlidec libbrotlicommon REQUIRED)
 endif()
 
 # ------------------ Source Files -------------------
@@ -182,6 +188,11 @@ function(create_ffl_target target_name library_type)
         target_link_libraries(${target_name} PRIVATE ZLIB::ZLIB)
     else()
         target_compile_definitions(${target_name} PRIVATE FFL_NO_ZLIB)
+    endif()
+
+    if(FFL_USE_BROTLI) # Link brotli.
+        target_link_libraries(${target_name} PRIVATE ${BROTLI_DEC_LIBRARIES} ${BROTLI_COMMON_LIBRARIES})
+        target_compile_definitions(${target_name} PRIVATE FFL_USE_BROTLI)
     endif()
 
     if(FFL_NO_FS) # Exclude RIO filesystem support
@@ -311,7 +322,7 @@ endif()
 if(FFL_BUILD_EMSCRIPTEN_MODULE)
     # Path to exports JSON for Emscripten.
     set(EXPORTS_JSON ${PROJECT_SOURCE_DIR}/emscripten-exports.json)
-    # Set emcc flags: exports, zlib, addFunction...
+    # Set emcc flags: exports, zlib, remove/addFunction...
     set(LINK_FLAGS
         -s EXPORTED_FUNCTIONS=\"@${EXPORTS_JSON}\"
         -s MALLOC=emmalloc # Not tested if this is good
@@ -321,19 +332,20 @@ if(FFL_BUILD_EMSCRIPTEN_MODULE)
         -s ALLOW_TABLE_GROWTH=1
         -s STRICT=1
         # Required explicit parameters for strict mode:
-        -s EXPORTED_RUNTIME_METHODS=\"['addFunction','HEAP8','HEAPU8','HEAPU16','HEAPU32','HEAP32','HEAPF32']\"
-        -s INCOMING_MODULE_JS_API=onRuntimeInitialized
-        #-s EXPORT_NAME="ModuleFFL" # Custom export name.
+        -s EXPORTED_RUNTIME_METHODS=\"['addFunction','removeFunction','HEAP8','HEAPU8','HEAPU16','HEAPU32','HEAP32','HEAPF32']\"
+        -s INCOMING_MODULE_JS_API=\"['locateFile', 'onRuntimeInitialized']\"
+        -s EXPORT_NAME="ModuleFFL" # Custom export name.
 
         -s ENVIRONMENT=web
         # -s MINIMAL_RUNTIME=1 # depends on calledRun/onRuntimeInitialized (need to use modularize)
         -s ERROR_ON_UNDEFINED_SYMBOLS=0 # $stackTrace
         -s FILESYSTEM=0
         -s DYNAMIC_EXECUTION=2
-        -s MODULARIZE=0 # Not using async/modularize for now.
+        -s MODULARIZE=1
 
-        -s INITIAL_HEAP=6MB -s ALLOW_MEMORY_GROWTH=1
+        -s INITIAL_HEAP=1MB -s ALLOW_MEMORY_GROWTH=1
         #--memoryprofiler
+        #-s SAFE_HEAP=1
     )
     if (FFL_BUILD_WASM)
         set(LINK_FLAGS ${LINK_FLAGS} -s WASM=1)
@@ -371,6 +383,10 @@ if(FFL_NO_ZLIB)
     message(STATUS "FFL: zlib disabled or not found")
 else()
     message(STATUS "FFL: zlib enabled")
+endif()
+
+if(FFL_USE_BROTLI)
+    message(STATUS "FFL: brotli enabled")
 endif()
 
 if(FFL_MODE STREQUAL "for-rio")

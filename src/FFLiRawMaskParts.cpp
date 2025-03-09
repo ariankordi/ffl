@@ -46,14 +46,15 @@ void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const 
     CalcMVMatrix(&mvMatrix, pDesc);
     mvpMatrix.fromMatrix34(mvMatrix);
     mvpMatrix.setMul(static_cast<const rio::Matrix44f&>(*pProjMatrix), mvpMatrix);
+    #ifdef FFL_USE_ADJUST_MTX
+        pDrawParam->primitiveParam.pAdjustMatrix = NULL;
+    #else
+        pDrawParam->primitiveParam._8 = 0;
+    #endif
 
     InitPrimitive(&pDrawParam->primitiveParam);
     InitAttributes(&pDrawParam->attributeBufferParam, pDesc->originPos, &mvpMatrix);
     pDrawParam->cullMode = FFL_CULL_MODE_MAX;
-
-#ifdef FFL_USE_ADJUST_MTX
-    pDrawParam->primitiveParam.pAdjustMatrix = NULL;
-#endif
 }
 
 void FFLiDeleteDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam)

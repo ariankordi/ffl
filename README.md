@@ -29,10 +29,10 @@ Both of the below are originally by [Abood](https://github.com/aboood40091), but
   - Although you can build without RIO _sources_, you will always need RIO's headers, for now.
 
 * [ninTexUtils](https://github.com/ariankordi/ninTexUtils) (NOT the `python` branch but the cpp one)
-  - This is for "deswizzling" Wii U textures/converting GX2 tiled textures.
-  - Required for FFL resources (FFLResHigh.dat, FFLResMiddle.dat), or else textures can't be read from it.
-  - If you don't want this, build with `FFL_NO_NINTEXUTILS` but you will have to use AFL resources from Miitomo.
-    * You can actually get it here: https://web.archive.org/web/20180502054513/http://download-cdn.miitomo.com/native/20180125111639/android/v2/asset_model_character_mii_AFLResHigh_2_3_dat.zip
+  - This is for "deswizzling" Wii U textures/converting textures with GX2 default tile mode to linear tile mode.
+  - Required for FFL resources (FFLResHigh.dat, FFLResMiddle.dat), or else textures will look wrong because they are tiled.
+  - If you don't want this, build with `FFL_NO_NINTEXUTILS` but you will have to use AFL resource files from Miitomo.
+    * You can actually get AFLResHigh_2_3.dat here: https://web.archive.org/web/20180502054513/http://download-cdn.miitomo.com/native/20180125111639/android/v2/asset_model_character_mii_AFLResHigh_2_3_dat.zip
 
 ## Building
 
@@ -74,7 +74,7 @@ CMakeCache.txt  CMakeFiles/  cmake_install.cmake  libffl.so*  Makefile
 ```
 * In my case on Linux, it's in `libffl.so` but I think on Windows it will be `ffl.dll`.
   - For the shared library of course not static
-  - There will be extra prefixes if it's for RIO or OpenGL.
+  - There will be extra suffixes if it's for RIO or OpenGL.
   - Copy this to your program's directory or include the CMakeLists as a dependency.
 
 More instructions are TBD.

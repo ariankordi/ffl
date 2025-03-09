@@ -48,6 +48,7 @@ tgt/*
 
 # FFLResource output
 tools/*_shape
+tools/*FLRes*
 tools/*_texture
 tools/*.json
 tools/*.dat
@@ -56,6 +57,6 @@ tools/*.dat
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
-build
+build*
 Makefile
 cmake_install.cmake

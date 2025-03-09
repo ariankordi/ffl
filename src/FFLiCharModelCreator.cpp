@@ -263,11 +263,9 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     // default GL clip control is being used
 
     // (NOTE: Now being done to the primitives directly based on g_TextureFlipY)
-/*
 #ifdef RIO_NO_CLIP_CONTROL
-    mvpMatrix.m[1][1] *= -1.f;
+    //mvpMatrix.m[1][1] *= -1.f;
 #endif
-*/
 
     shaderCallback.CallSetMatrix(&mvpMatrix);
 
@@ -465,6 +463,8 @@ FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 ind
 
 #ifdef FFL_USE_ADJUST_MTX
     pDrawParam->primitiveParam.pAdjustMatrix = NULL;
+#else
+    pDrawParam->primitiveParam._8 = 0;
 #endif
     FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_FLATTEN_NOSE);
     CalcluateBoundingBox(pModel->boundingBox, &boundingBox, partsType);

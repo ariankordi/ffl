@@ -39,7 +39,12 @@ from ninTexUtils.gx2 import DDSToGX2Texture, PNGToGX2Texture
 
 import pygltflib
 
-#import binascii  # NOTE NEEDED FOR HALF FLOAT
+# Optionally include brotli, if unavailable just warn on use
+try:
+    import brotli
+    brotli_import_error = None
+except ImportError as e:
+    brotli_import_error = e  # Store the import error.
 
 FS_IO_BUFFER_ALIGN = 0x40
 TEXTURE_DATA_MAX_ALIGNMENT = 0x800
@@ -77,6 +82,13 @@ FFLI_RESOURCE_WINDOW_BITS_ZLIB_OR_GZIP_15   = 16    # Window size = 0x8000 (32 K
 
 FFLI_RESOURCE_WINDOW_BITS_MAX   = 17    # Equivalent to FFLI_RESOURCE_WINDOW_BITS_ZLIB_15, although most likely unintentional
 
+window_bits_table = [
+        8,      9,      10,      11,      12,      13,      14,      15,  # zlib
+16 + 8, 16 + 9, 16 + 10, 16 + 11, 16 + 12, 16 + 13, 16 + 14, 16 + 15,     # gzip
+                                                                32 + 15,  # zlib or gzip
+                                                                    15    # default
+]
+
 # FFLiResourceMemoryLevel
 FFLI_RESOURCE_MEMORY_LEVEL_1    = 0
 FFLI_RESOURCE_MEMORY_LEVEL_2    = 1
@@ -96,7 +108,12 @@ FFLI_RESOURCE_STRATEGY_HUFFMAN_ONLY     = 2
 FFLI_RESOURCE_STRATEGY_RLE              = 3
 FFLI_RESOURCE_STRATEGY_FIXED            = 4
 FFLI_RESOURCE_STRATEGY_UNCOMPRESSED     = 5
-FFLI_RESOURCE_STRATEGY_MAX              = 6
+
+# custom!!!
+FFLI_RESOURCE_STRATEGY_BROTLI           = 6  # tightest
+
+
+FFLI_RESOURCE_STRATEGY_MAX              = 7#6
 
 
 # ResHeaderHint
@@ -123,6 +140,9 @@ total_uncompressed_size = 0
 maximum_compressed_size = 0
 
 force_no_compression = False
+
+use_brotli_compression = False
+force_window_bits_15 = False  # TODO NOT WORKING
 
 class FFLiResourcePartsInfo:
     _format = endianness_character + '3I4B'
@@ -164,12 +184,7 @@ class FFLiResourcePartsInfo:
             assert self.strategy < FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
 
             # compressLevel = -1 if self.compressLevel == FFLI_RESOURCE_COMPRESS_LEVEL_DEFAULT_COMPRESSION else self.compressLevel
-            windowBits = [
-                     8,      9,      10,      11,      12,      13,      14,      15,   # zlib
-                16 + 8, 16 + 9, 16 + 10, 16 + 11, 16 + 12, 16 + 13, 16 + 14, 16 + 15,   # gzip
-                                                                             32 + 15,   # zlib or gzip
-                                                                                  15    # default
-            ][self.windowBits]
+            windowBits = window_bits_table[self.windowBits]
             # memoryLevel = self.memoryLevel + 1
             # strategy = self.strategy
 
@@ -179,7 +194,13 @@ class FFLiResourcePartsInfo:
         return partsData
 
     def save(self, partsData, currentFileSize, isExpand=False, expandAlignment=0):
-        global total_uncompressed_size, maximum_compressed_size
+        global total_uncompressed_size
+
+        def update_max_compressed_size(compressed_size):
+            global maximum_compressed_size
+            if compressed_size > maximum_compressed_size:
+                maximum_compressed_size = compressed_size
+                print("new compressedSize: 0x%X" % compressed_size)
 
         data = bytearray()
 
@@ -202,22 +223,38 @@ class FFLiResourcePartsInfo:
 
             total_uncompressed_size += dataSize
 
-            if self.strategy == FFLI_RESOURCE_STRATEGY_UNCOMPRESSED:
-                compressedSize = 0
+            # --- brotli compression path ---
+            if use_brotli_compression:
+                # error if the import failed previously
+                if brotli_import_error is not None:
+                    print("Could not import brotli, raising previous ImportError:")
+                    raise brotli_import_error
 
-            else:
+                self.strategy = FFLI_RESOURCE_STRATEGY_BROTLI
+                # Hardcoded Brotli settings for now
+                # Quality = 11 (maximum), Window = 22
+                self.compressLevel = 11
+                # Unused for Brotli.
+                self.windowBits = 0
+                self.memoryLevel = 0
+
+                partsData = brotli.compress(partsData, quality=self.compressLevel)
+                compressedSize = len(partsData)
+                update_max_compressed_size(compressedSize)
+
+            # --- zlib compression path ---
+            elif self.strategy != FFLI_RESOURCE_STRATEGY_UNCOMPRESSED:
                 assert self.compressLevel < FFLI_RESOURCE_COMPRESS_LEVEL_MAX
                 assert self.windowBits < FFLI_RESOURCE_WINDOW_BITS_MAX
                 assert self.memoryLevel < FFLI_RESOURCE_MEMORY_LEVEL_MAX
                 assert self.strategy < FFLI_RESOURCE_STRATEGY_UNCOMPRESSED
 
                 compressLevel = -1 if self.compressLevel == FFLI_RESOURCE_COMPRESS_LEVEL_DEFAULT_COMPRESSION else self.compressLevel
-                windowBits = [
-                         8,      9,      10,      11,      12,      13,      14,      15,   # zlib
-                    16 + 8, 16 + 9, 16 + 10, 16 + 11, 16 + 12, 16 + 13, 16 + 14, 16 + 15,   # gzip
-                                                                                 32 + 15,   # zlib or gzip
-                                                                                      15    # default
-                ][self.windowBits]
+
+                if force_window_bits_15:
+                    windowBits = 15
+                else:
+                    windowBits = window_bits_table[self.windowBits]
                 memoryLevel = self.memoryLevel + 1
                 strategy = self.strategy
 
@@ -227,10 +264,10 @@ class FFLiResourcePartsInfo:
                     compressobj.flush()
                 ])
                 compressedSize = len(partsData)
+                update_max_compressed_size(compressedSize)
 
-                if compressedSize > maximum_compressed_size:
-                    maximum_compressed_size = compressedSize
-                    print("new compressedSize: 0x%X" % compressedSize)
+            else:
+                compressedSize = 0
 
             data += partsData
 
@@ -2380,7 +2417,7 @@ class FFLiResourceHeader:
         self._recalculate_format_and_size()
 
     def _recalculate_format_and_size(self):
-        # five ints: m_Magic, m_Version, m_UncompressBufferSize, _c, m_IsExpand
+        # five ints: m_Magic, m_Version, m_UncompressBufferSize, m_ExpandedBufferSize, m_IsExpand
         self._format = endianness_character + '5I%ds%ds48x' % (FFLiResourceTextureHeader().size, FFLiResourceShapeHeader.size)
         self.size = struct.calcsize(self._format)
         #assert size == 0x4A00
@@ -2391,7 +2428,7 @@ class FFLiResourceHeader:
         (magic,
          version,
          self.uncompressBufferSize,
-         _c,
+         _c,  # expandedBufferSize
          isExpand,
          textureHeaderData,
          shapeHeaderData) = struct.unpack_from(self._format, data, pos)
@@ -2432,7 +2469,7 @@ class FFLiResourceHeader:
             0x46465241,  # b'FFRA',
             0x00070000,
             self.uncompressBufferSize,
-            total_uncompressed_size,
+            total_uncompressed_size,  # expandedBufferSize
             #(0x2502DE0 if texture_header_parts_info_sizes[6] == 20 else 0x0CBBDE0),  # _c
             int(self.isExpand),
             textureHeaderData,
@@ -2469,7 +2506,7 @@ class FFLiResourceHeader:
             os.mkdir(shapePath)
 
         json_dict = {
-            "uncompressBufferSize": self.uncompressBufferSize,
+            #"uncompressBufferSize": self.uncompressBufferSize,
             "isExpand": int(self.isExpand),
             "texturePath": texturePath,
             "shapePath": shapePath
@@ -2505,7 +2542,8 @@ class FFLiResourceHeader:
         with open(json_filename, 'r') as inf:
             json_dict = json.load(inf)
 
-        self.uncompressBufferSize = json_dict["uncompressBufferSize"]
+        self.uncompressBufferSize = 0
+        #self.uncompressBufferSize = json_dict["uncompressBufferSize"]
         self.isExpand = json_dict["isExpand"] == 1
         texturePath = json_dict["texturePath"]
         shapePath = json_dict["shapePath"]
@@ -2578,6 +2616,7 @@ def main():
 
     parser.add_argument("-LE", action="store_true", help="Export resource header as little endian")
     parser.add_argument("-noZlib", action="store_true", help="Force disable compression when exporting")
+    parser.add_argument("-brotli", action="store_true", help="Pack with Brotli compression instead of zlib")
 
     args = parser.parse_args()
 
@@ -2589,6 +2628,10 @@ def main():
 
     global texture_format
     texture_format = args.texture_format
+
+    if args.brotli:
+        global use_brotli_compression
+        use_brotli_compression = True
 
     if args.fromJSON:
         if not os.path.isfile(args.input_file):
