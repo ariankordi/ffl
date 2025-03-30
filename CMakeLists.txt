@@ -26,6 +26,7 @@ option(FFL_NO_DRAW_MASK_ALPHA_VALUES "Skips clearing alpha (fill)/drawing alpha 
 option(FFL_ENABLE_NEW_MASK_ONLY_FLAG "Enable functionality for FFLInitCharModelCPUStep to create the mask without any other shapes, causing a potential crash." OFF)
 
 # Misc:
+option(FFL_USE_ADJUST_MTX "Changes behavior of FFLiAdjustShape, so that instead of performing operations on the CPU to adjust scale/translate on shapes, it will instead set pAdjustMatrix and let the caller do that adjustment itself. Needed for using half float types." OFF)
 option(FFL_PART_INDEX_WRAP "When this is enabled, out of bounds parts IDs will.. wrap. Invalid parts IDs will still map to something. In other words, It will make pretty much force all invalid CharInfo to render." OFF)
 option(FFL_USE_EXTRA_RESOURCES "Expand resource types to add two more: very high (FFLResPoster.dat) and low (meant to be CFL_Res.dat quality)." OFF)
 
@@ -232,6 +233,9 @@ function(create_ffl_target target_name library_type)
     endif()
     if(FFL_ENABLE_NEW_MASK_ONLY_FLAG)
         target_compile_definitions(${target_name} PUBLIC FFL_ENABLE_NEW_MASK_ONLY_FLAG)
+    endif()
+    if(FFL_USE_ADJUST_MTX)
+        target_compile_definitions(${target_name} PUBLIC FFL_USE_ADJUST_MTX)
     endif()
     if(FFL_PART_INDEX_WRAP)
         target_compile_definitions(${target_name} PRIVATE FFL_PART_INDEX_WRAP)

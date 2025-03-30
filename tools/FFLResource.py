@@ -140,8 +140,8 @@ total_uncompressed_size = 0
 maximum_compressed_size = 0
 
 force_no_compression = False
-
 use_brotli_compression = False
+encode_half_float = False
 force_window_bits_15 = False  # TODO NOT WORKING
 
 class FFLiResourcePartsInfo:
@@ -1292,29 +1292,32 @@ class HalfFloat:
         F16_EXPONENT_SHIFT = 10
         F16_EXPONENT_BIAS = 15
         F16_MANTISSA_BITS = 0x3ff
-        F16_MANTISSA_SHIFT =  (23 - F16_EXPONENT_SHIFT)
-        F16_MAX_EXPONENT =  (F16_EXPONENT_BITS << F16_EXPONENT_SHIFT)
+        F16_MANTISSA_SHIFT = (23 - F16_EXPONENT_SHIFT)
+        F16_MAX_EXPONENT = (F16_EXPONENT_BITS << F16_EXPONENT_SHIFT)
 
-        a = struct.pack('>f',float32)
-        b = binascii.hexlify(a)
-
-        f32 = int(b,16)
+        # Convert float32 to 32-bit unsigned int directly:
+        f32 = struct.unpack('>I', struct.pack('>f', float32))[0]
         f16 = 0
+
         sign = (f32 >> 16) & 0x8000
         exponent = ((f32 >> 23) & 0xff) - 127
         mantissa = f32 & 0x007fffff
 
         if exponent == 128:
+            # Infinity or NaN
             f16 = sign | F16_MAX_EXPONENT
             if mantissa:
                 f16 |= (mantissa & F16_MANTISSA_BITS)
         elif exponent > 15:
+            # Overflow - represent as infinity
             f16 = sign | F16_MAX_EXPONENT
         elif exponent > -15:
+            # Normalized value
             exponent += F16_EXPONENT_BIAS
             mantissa >>= F16_MANTISSA_SHIFT
-            f16 = sign | exponent << F16_EXPONENT_SHIFT | mantissa
+            f16 = sign | (exponent << F16_EXPONENT_SHIFT) | mantissa
         else:
+            # Too small to represent as a normalized half, so set to zero
             f16 = sign
         return f16
 
@@ -1371,14 +1374,16 @@ class FFLiResourceShapeDataHeader:
     _positionFormat = endianness_character + '3f4x'
     _positionFormatSize = struct.calcsize(_positionFormat)
     assert _positionFormatSize == 0x10
+    _positionFormatHalf = endianness_character + '3H'  # 2x'
 
     _texCoordFormat = endianness_character + '2f'
     _texCoordFormatSize = struct.calcsize(_texCoordFormat)
     assert _texCoordFormatSize == 8
+    _texCoordFormatHalf = endianness_character + '2H'
 
-    _tangetFormat = endianness_character + '4b'
-    _tangetFormatSize = struct.calcsize(_tangetFormat)
-    assert _tangetFormatSize == 4
+    _tangentFormat = endianness_character + '4b'
+    _tangentFormatSize = struct.calcsize(_tangentFormat)
+    assert _tangentFormatSize == 4
 
     _colorFormat = endianness_character + '4B'
     _colorFormatSize = struct.calcsize(_colorFormat)
@@ -1490,7 +1495,6 @@ class FFLiResourceShapeDataHeader:
 
     @staticmethod
     def save(shape, isExpand=False):
-        encode_half_float = False  # TODO pos stride should be 8
         global total_uncompressed_size
         if shape is None:
             return b''
@@ -1510,7 +1514,7 @@ class FFLiResourceShapeDataHeader:
                 partsData += b'\0' * (pos - prevPos)
 
             if encode_half_float:
-                data = b''.join([struct.pack('H' * len(vec), *[HalfFloat.save(v) for v in vec]) for vec in shape.position])
+                data = b''.join([struct.pack(shape._positionFormatHalf, *[HalfFloat.save(v) for v in vec]) for vec in shape.position])
             else:
                 data = b''.join([struct.pack(shape._positionFormat, *vec) for vec in shape.position])
             dataPos[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_POSITION] = pos
@@ -1524,7 +1528,10 @@ class FFLiResourceShapeDataHeader:
                 pos = align(pos, ATTRIBUTE_DATA_ALIGNMENT)
                 partsData += b'\0' * (pos - prevPos)
 
-            data = b''.join([FFLiSnorm10_10_10_2.save(*vec) for vec in shape.normal])
+            if encode_half_float:
+                data = b''.join([FFLiSnorm8_8_8_8.save(*vec) for vec in shape.normal])
+            else:
+                data = b''.join([FFLiSnorm10_10_10_2.save(*vec) for vec in shape.normal])
             dataPos[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL] = pos
             dataSize[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL] = len(data)
             partsData += data
@@ -1537,7 +1544,7 @@ class FFLiResourceShapeDataHeader:
                 partsData += b'\0' * (pos - prevPos)
 
             if encode_half_float:
-                data = b''.join([struct.pack('H' * len(vec), *[HalfFloat.save(v) for v in vec]) for vec in shape.texCoord])
+                data = b''.join([struct.pack(shape._texCoordFormatHalf, *[HalfFloat.save(v) for v in vec]) for vec in shape.texCoord])
             else:
                 data = b''.join([struct.pack(shape._texCoordFormat, *vec) for vec in shape.texCoord])
             dataPos[FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TEXCOORD] = pos
@@ -2464,13 +2471,16 @@ class FFLiResourceHeader:
         # set uncompress buffer size as the maximum compressed size
         self.uncompressBufferSize = maximum_compressed_size
 
+        # HACK: this also means expand won't work with half float
+        if encode_half_float:
+            self.isExpand = 0x841F10A7
+
         headerData = struct.pack(
             self._format,
             0x46465241,  # b'FFRA',
             0x00070000,
             self.uncompressBufferSize,
             total_uncompressed_size,  # expandedBufferSize
-            #(0x2502DE0 if texture_header_parts_info_sizes[6] == 20 else 0x0CBBDE0),  # _c
             int(self.isExpand),
             textureHeaderData,
             shapeHeaderData
@@ -2617,6 +2627,7 @@ def main():
     parser.add_argument("-LE", action="store_true", help="Export resource header as little endian")
     parser.add_argument("-noZlib", action="store_true", help="Force disable compression when exporting")
     parser.add_argument("-brotli", action="store_true", help="Pack with Brotli compression instead of zlib")
+    parser.add_argument("-halfFloat", action="store_true", help="Pack vertex data more efficiently in half-float and normals in 8_8_8_8 format.")
 
     args = parser.parse_args()
 
@@ -2632,6 +2643,10 @@ def main():
     if args.brotli:
         global use_brotli_compression
         use_brotli_compression = True
+
+    if args.halfFloat:
+        global encode_half_float
+        encode_half_float = True
 
     if args.fromJSON:
         if not os.path.isfile(args.input_file):

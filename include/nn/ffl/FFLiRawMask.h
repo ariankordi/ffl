@@ -3,6 +3,13 @@
 
 #include <nn/ffl/FFLiRawMaskParts.h>
 
+#if FFL_USE_RIO
+    #include <math/rio_Matrix.h>
+    typedef rio::BaseMtx44f FFLRIOBaseMtx44f;
+#else
+    #include <nn/ffl/FFLRIOInterop.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #else
@@ -56,6 +63,7 @@ void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam,
     FFLShaderCallback**
     #endif
 pCallback);
+void FFLiGetMaskMatrix(FFLRIOBaseMtx44f* pBaseMtx44f, f32 resolution);
 
 #ifdef __cplusplus
 }

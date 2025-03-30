@@ -9,6 +9,7 @@
 
 #include <nn/ffl/FFLiShapePartsType.h>
 #include <nn/ffl/FFLiTexturePartsType.h>
+#include <nn/ffl/FFLiShape.h>
 
 #include <nn/ffl/detail/FFLiResourceShape.h>
 #include <nn/ffl/detail/FFLiResourceTexture.h>
@@ -38,6 +39,9 @@ void HeaderSwapEndianImpl(T* pHeader);
 // NOTE: "FFLI_RESOURCE_EXPAND_TYPE_TERM" = 1 (seen in asserts?)
 // asserts: resourceType < FFLI_RESOURCE_EXPAND_TYPE_TERM
 
+// HACK
+#define FFLI_RESOURCE_EXPAND_TYPE_VERT_LAYOUT_2 (int)(0x841F10A7)
+
 // Abstract type
 class FFLiResourceHeader
 {
@@ -66,6 +70,7 @@ public:
     // has linear textures and its mipmaps are specifically unused
     virtual bool TextureFormatIsLinear() const = 0;
     virtual bool IgnoreMipMaps() const = 0;
+    virtual FFLiVertexLayoutType VertexLayoutType() const = 0;
 
     /* TODO:
      * add ABSTRACT TEXTURE HEADER type here
@@ -159,6 +164,8 @@ public:
     bool TextureFormatIsLinear() const override { return false; }
     // Always use mipmaps for default FFL resource.
     bool IgnoreMipMaps() const override { return false; }
+    // ignored here
+    FFLiVertexLayoutType VertexLayoutType() const override { return FFLI_VERTEX_LAYOUT_TYPE_DEFAULT; }
 
 private:
     // header will be, hot loaded?? into this
@@ -234,6 +241,12 @@ public:
 
     bool TextureFormatIsLinear() const override { return true; }
     bool IgnoreMipMaps() const override { return m_IgnoreMipMaps; }
+    FFLiVertexLayoutType VertexLayoutType() const override
+    {
+        return m_Header->m_IsExpand == FFLI_RESOURCE_EXPAND_TYPE_VERT_LAYOUT_2
+               ? FFLI_VERTEX_LAYOUT_TYPE_HALF_FLOAT_NORMAL_8888
+               : FFLI_VERTEX_LAYOUT_TYPE_DEFAULT;
+    }
 
     void SwapEndian() override;
 
@@ -303,6 +316,12 @@ public:
 
     bool TextureFormatIsLinear() const override { return true; }
     bool IgnoreMipMaps() const override { return m_IgnoreMipMaps; }
+    FFLiVertexLayoutType VertexLayoutType() const override
+    {
+        return m_Header->m_IsExpand == FFLI_RESOURCE_EXPAND_TYPE_VERT_LAYOUT_2
+               ? FFLI_VERTEX_LAYOUT_TYPE_HALF_FLOAT_NORMAL_8888
+               : FFLI_VERTEX_LAYOUT_TYPE_DEFAULT;
+    }
 
     void SwapEndian() override;
 

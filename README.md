@@ -116,7 +116,7 @@ This documents all of the definitions that this supports to add/remove functiona
   - ... This option will choose to wrap that part index.
 
 #### Not documented (slash useless):
-* FFL_USE_ADJUST_MTX
+* FFL_USE_ADJUST_MTX, FFL_USE_ADJUST_MTX_MASK
 * FFL_USE_MINIZ
 * FFL_USE_MODULATE_EYEBROW_EX
 * FFL_LOG_CHARMODEL_CLEANUP

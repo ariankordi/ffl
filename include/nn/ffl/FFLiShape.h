@@ -17,6 +17,14 @@ struct  FFLiCharModel;
 class   FFLiCoordinate;
 class   FFLiResourceLoader;
 
+enum FFLiVertexLayoutType
+{
+    FFLI_VERTEX_LAYOUT_TYPE_DEFAULT,
+    //FFLI_VERTEX_LAYOUT_TYPE_HALF_FLOAT = 1, // same as above but half float pos/texcoords
+    FFLI_VERTEX_LAYOUT_TYPE_HALF_FLOAT_NORMAL_8888, // half float pos/texcoords AND 8888 normals
+    FFLI_VERTEX_LAYOUT_TYPE_MAX
+};
+
 bool FFLiCanDrawShape(const FFLDrawParam* pDrawParam);
 
 FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, FFLiCharModel* pModel, FFLiShapePartsType partsType, u16 index, FFLiResourceLoader* pResLoader);

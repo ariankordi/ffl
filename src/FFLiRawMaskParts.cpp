@@ -44,6 +44,11 @@ void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const 
     };
 
     CalcMVMatrix(&mvMatrix, pDesc);
+
+#ifdef FFL_USE_ADJUST_MTX_MASK
+    rio::MemUtil::copy(&mvpMatrix, pProjMatrix, sizeof(rio::Matrix44f));
+    pDrawParam->primitiveParam.pAdjustMatrix = new rio::Matrix34f(mvMatrix);
+#else
     mvpMatrix.fromMatrix34(mvMatrix);
     mvpMatrix.setMul(static_cast<const rio::Matrix44f&>(*pProjMatrix), mvpMatrix);
     #ifdef FFL_USE_ADJUST_MTX
@@ -51,6 +56,7 @@ void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const 
     #else
         pDrawParam->primitiveParam._8 = 0;
     #endif
+#endif // FFL_USE_ADJUST_MTX_MASK
 
     InitPrimitive(&pDrawParam->primitiveParam);
     InitAttributes(&pDrawParam->attributeBufferParam, pDesc->originPos, &mvpMatrix);
@@ -196,6 +202,7 @@ void CalcAttribute(FFLVec4* pPosBuf, FFLVec2* pTexBuf, FFLiOriginPosition origin
     pTexBuf[2].x = texCoordX23;
     pTexBuf[3].x = texCoordX23;
 
+#ifndef FFL_USE_ADJUST_MTX_MASK
     for (u32 i = 0; i < 4; i++)
     {
         const f32 w = pMVPMatrix->m[3][0] * pPosBuf[i].x + pMVPMatrix->m[3][1] * pPosBuf[i].y + pMVPMatrix->m[3][2] * pPosBuf[i].z + pMVPMatrix->m[3][3];
@@ -208,6 +215,7 @@ void CalcAttribute(FFLVec4* pPosBuf, FFLVec2* pTexBuf, FFLiOriginPosition origin
             pPosBuf[i].w
         };
     }
+#endif // FFL_USE_ADJUST_MTX_MASK
 }
 
 void InitAttributes(FFLAttributeBufferParam* pAttributes, FFLiOriginPosition originPosition, const rio::BaseMtx44f* pMVPMatrix)
@@ -216,6 +224,7 @@ void InitAttributes(FFLAttributeBufferParam* pAttributes, FFLiOriginPosition ori
     const u32 TEXCOORD_BUFFER_SIZE = sizeof(FFLVec2) * 4;
 
     static const FFLAttributeBufferParam ATTRIBUTES = { {
+        // size                 stride          (ptr is unset)
         { POSITION_BUFFER_SIZE, sizeof(FFLVec4) },
         { TEXCOORD_BUFFER_SIZE, sizeof(FFLVec2) },
         { 0, 0 },

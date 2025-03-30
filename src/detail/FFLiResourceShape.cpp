@@ -26,7 +26,7 @@ void FFLiSetNormalIsSnorm8_8_8_8(bool enable)
     g_NormalIsSnorm8_8_8_8 = enable;
 }
 
-const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLiShapePartsType partsType, FFLiResourceShapeElementType elementType)
+const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLiShapePartsType partsType, FFLiResourceShapeElementType elementType, FFLiVertexLayoutType layoutType)
 {
     const FFLiResourceShapeDataHeader* pShape = (const FFLiResourceShapeDataHeader*)pShapeData;
 
@@ -36,7 +36,7 @@ const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLi
         return GetElement(pSize, pShape, pShape->GetElementPos(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_POSITION), pShape->GetElementSize(FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_POSITION));
     case FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_NORMAL:
     {
-        if (g_NormalIsSnorm8_8_8_8)
+        if (g_NormalIsSnorm8_8_8_8 && layoutType != FFLI_VERTEX_LAYOUT_TYPE_HALF_FLOAT_NORMAL_8888)
         {
             // convert FFLiSnorm10_10_10_2 to FFLiSnorm8_8_8_8
             // note that this is done in AFLiGetResourceShapeElement
@@ -128,19 +128,19 @@ void FFLiResourceShapeDataHeader::SwapEndian()
 
 void FFLiResourceShapeHairTransform::SwapEndian()
 {
-    SwapEndianVec3(&(_0[0]));
-    SwapEndianVec3(&(_0[1]));
-    SwapEndianVec3(&(_0[2]));
-    SwapEndianVec3(&(_0[3]));
-    SwapEndianVec3(&(_0[4]));
-    SwapEndianVec3(&(_0[5]));
+    SwapEndianVec3(&m_FrontTranslate);
+    SwapEndianVec3(&m_FrontRotate);
+    SwapEndianVec3(&m_SideTranslate);
+    SwapEndianVec3(&m_SideRotate);
+    SwapEndianVec3(&m_TopTranslate);
+    SwapEndianVec3(&m_TopRotate);
 }
 
 void FFLiResourceShapeFacelineTransform::SwapEndian()
 {
-    SwapEndianVec3(&m_HairPos);
-    SwapEndianVec3(&m_FaceCenterPos);
-    SwapEndianVec3(&m_BeardPos);
+    SwapEndianVec3(&m_HairTranslate);
+    SwapEndianVec3(&m_NoseTranslate);
+    SwapEndianVec3(&m_BeardTranslate);
 }
 
 namespace {

@@ -19,6 +19,10 @@
 #include <nn/ffl/FFLiTextureTempObject.h>
 #include <nn/ffl/FFLiUtil.h>
 
+#ifdef FFL_USE_ADJUST_MTX_MASK
+#include <nn/ffl/FFLiRawMask.h>
+#endif
+
 #include <gfx/rio_Window.h>
 #include <math/rio_Matrix.h>
 
@@ -258,7 +262,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     shaderCallback.Set(pCallback);
 
     rio::Matrix44f mvpMatrix = rio::Matrix44f::ident;
-
+#ifndef FFL_USE_ADJUST_MTX_MASK
     // Flip Y in the view matrix when the
     // default GL clip control is being used
 
@@ -268,12 +272,23 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
 #endif
 
     shaderCallback.CallSetMatrix(&mvpMatrix);
+#else
+    rio::BaseMtx44f projMatrix;
+    const f32 width = static_cast<f32>(FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution));
+
+    FFLiGetMaskMatrix(&projMatrix, width);
+
+    shaderCallback.CallSetMatrix(&projMatrix);
+#endif // FFL_USE_ADJUST_MTX_MASK
 
     FFLiRenderMaskTextures(&pModel->maskTextures, &pModel->pTextureTempObject->maskTextures, &shaderCallback
 #if RIO_IS_CAFE
         , &m_pManager->GetCopySurface()
 #endif // RIO_IS_CAFE
     );
+
+    shaderCallback.CallSetMatrix(&mvpMatrix); // Reset to ident
+
     if (pModel->facelineRenderTexture.pTexture2D != NULL)
         FFLiRenderFacelineTexture(&pModel->facelineRenderTexture, &pModel->charInfo, resolution, &pModel->pTextureTempObject->facelineTexture, &shaderCallback
 #if RIO_IS_CAFE
@@ -443,7 +458,7 @@ static const bool UPDATE_BOUNDING_BOX[FFLI_SHAPE_PARTS_TYPE_MAX][FFL_MODEL_TYPE_
     { false,  true, false }   // FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP
 };
 
-void CalcluateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc, FFLiShapePartsType partsType)
+[[maybe_unused]] void CalcluateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc, FFLiShapePartsType partsType)
 {
     for (u32 i = 0; i < FFL_MODEL_TYPE_MAX; i++)
         if (UPDATE_BOUNDING_BOX[partsType][i])
@@ -467,7 +482,9 @@ FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 ind
     pDrawParam->primitiveParam._8 = 0;
 #endif
     FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_FLATTEN_NOSE);
+#ifndef FFL_USE_ADJUST_MTX
     CalcluateBoundingBox(pModel->boundingBox, &boundingBox, partsType);
+#endif
     return FFL_RESULT_OK;
 }
 

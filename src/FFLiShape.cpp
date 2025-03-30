@@ -1,6 +1,7 @@
 #include <nn/ffl/FFLiCharModel.h>
 #include <nn/ffl/FFLiCoordinate.h>
 #include <nn/ffl/FFLiResourceLoader.h>
+#include <nn/ffl/FFLiResourceHeader.h>
 #include <nn/ffl/FFLiShape.h>
 
 #include <nn/ffl/detail/FFLiBug.h>
@@ -31,7 +32,7 @@ union F32BitCast
 };
 NN_STATIC_ASSERT(sizeof(F32BitCast) == 4);
 
-static bool IsNaN(f32 value)
+[[maybe_unused]] static bool IsNaN(f32 value)
 {
     F32BitCast x = { value };
     // Basically:
@@ -43,7 +44,11 @@ static bool IsNaN(f32 value)
 // when flipping X on shapes (flipped hair).
 // If this is false, the index buffer will be
 // adjusted to reverse triangle winding.
+#ifndef FFL_USE_ADJUST_MTX
 bool g_FrontCullForFlipX = true; // True by default in FFL.
+#else
+bool g_FrontCullForFlipX = false; // Not necessary with matrix.
+#endif
 
 void FFLiSetFrontCullForFlipX(bool enable)
 {
@@ -54,7 +59,7 @@ namespace {
 
 FFLiResourceShapeElementType GetElementType(FFLAttributeBufferType type);
 
-u32 GetStride(FFLAttributeBufferType type, u32 size);
+u32 GetStride(FFLAttributeBufferType type, u32 size, FFLiVertexLayoutType layoutType);
 
 //void EndianSwap(void* ptr, u32 size);
 
@@ -109,43 +114,44 @@ FFLResult FFLiLoadShape(void** ppShapeData, FFLDrawParam* pDrawParam, FFLBoundin
     }
     else
     {
+        const FFLiVertexLayoutType layoutType = pResLoader->Header()->VertexLayoutType();
         for (u32 i = 0; i < FFL_ATTRIBUTE_BUFFER_TYPE_MAX; i++)
         {
             FFLiResourceShapeElementType elementType = GetElementType(FFLAttributeBufferType(i));
             FFLAttributeBuffer& attribute = pDrawParam->attributeBufferParam.attributeBuffers[i];
-            attribute.ptr = const_cast<void*>(FFLiGetResourceShapeElement(&attribute.size, pData, partsType, elementType));
-            attribute.stride = GetStride(FFLAttributeBufferType(i), attribute.size);
+            attribute.ptr = const_cast<void*>(FFLiGetResourceShapeElement(&attribute.size, pData, partsType, elementType, layoutType));
+            attribute.stride = GetStride(FFLAttributeBufferType(i), attribute.size, layoutType);
         }
 
         {
             FFLPrimitiveParam& primitive = pDrawParam->primitiveParam;
-            primitive.pIndexBuffer = const_cast<void*>(FFLiGetResourceShapeElement(&primitive.indexCount, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX));
+            primitive.pIndexBuffer = const_cast<void*>(FFLiGetResourceShapeElement(&primitive.indexCount, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX, layoutType));
             primitive.primitiveType = rio::Drawer::TRIANGLES;
         }
 
         if (partsType == FFLI_SHAPE_PARTS_TYPE_HAIR_NORMAL)
         {
-            const FFLiResourceShapeHairTransform* pTransform = static_cast<const FFLiResourceShapeHairTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR));
+            const FFLiResourceShapeHairTransform* pTransform = static_cast<const FFLiResourceShapeHairTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_HAIR, layoutType));
 
-            pModel->partsTransform.headFrontTranslate = pTransform->Get(0);
-            pModel->partsTransform.headFrontRotate  = pTransform->Get(1);
-            pModel->partsTransform.headSideTranslate = pTransform->Get(2);
-            pModel->partsTransform.headSideRotate = pTransform->Get(3);
-            pModel->partsTransform.headTopTranslate = pTransform->Get(4);
-            pModel->partsTransform.headTopRotate = pTransform->Get(5);
+            pModel->partsTransform.headFrontTranslate = pTransform->GetFrontTranslate();
+            pModel->partsTransform.headFrontRotate  = pTransform->GetFrontRotate();
+            pModel->partsTransform.headSideTranslate = pTransform->GetSideTranslate();
+            pModel->partsTransform.headSideRotate = pTransform->GetSideRotate();
+            pModel->partsTransform.headTopTranslate = pTransform->GetTopTranslate();
+            pModel->partsTransform.headTopRotate = pTransform->GetTopRotate();
         }
         else if (partsType == FFLI_SHAPE_PARTS_TYPE_FACELINE)
         {
-            const FFLiResourceShapeFacelineTransform* pTransform = static_cast<const FFLiResourceShapeFacelineTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_FACELINE));
+            const FFLiResourceShapeFacelineTransform* pTransform = static_cast<const FFLiResourceShapeFacelineTransform*>(FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_TRANSFORM_FACELINE, layoutType));
 
-            pModel->beardPos        = pTransform->GetBeardPosition();
-            pModel->hairPos         = pTransform->GetHairPosition();
-            pModel->faceCenterPos   = pTransform->GetFaceCenterPosition();
+            pModel->beardPos        = pTransform->GetBeardTranslate();
+            pModel->hairPos         = pTransform->GetHairTranslate();
+            pModel->faceCenterPos   = pTransform->GetNoseTranslate();
 
-            pModel->partsTransform.hatTranslate = pTransform->GetHairPosition();
+            pModel->partsTransform.hatTranslate = pTransform->GetHairTranslate();
         }
 
-        rio::MemUtil::copy(pBoundingBox, FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BOUNDING_BOX), sizeof(FFLBoundingBox));
+        rio::MemUtil::copy(pBoundingBox, FFLiGetResourceShapeElement(&size, pData, partsType, FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BOUNDING_BOX, layoutType), sizeof(FFLBoundingBox));
     }
 
     return FFL_RESULT_OK;
@@ -186,7 +192,11 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
     if (scaleX != 1.0f || scaleY != 1.0f || scaleZ != 1.0f || pTranslate != NULL)
     { // otherwise it will be left null and will be ok
         // Allocate the new model matrix
-        rio::Matrix34f* modelMtx = new rio::Matrix34f(rio::Matrix34f::ident);
+        rio::Matrix34f* modelMtx = new rio::Matrix34f({
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0
+        });
 #ifdef FFL_LOG_CHARMODEL_CLEANUP
         RIO_LOG("malloc pAdjustMatrix: %p\n", modelMtx);
 #endif
@@ -200,8 +210,8 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
 
         pDrawParam->primitiveParam.pAdjustMatrix = modelMtx;
     }
-    // TODO: BOUNDING BOX?
-    // TODO: NON DEFAULT COORDINATE????
+    // NOTE: bounding box is NOT updated, caller should maintain it
+    // NOTE: also does not account for coordinate (m_SwizzleYZX, m_FlipYZX, m_Scale)
 
 #else
     AdjustAttribute<FFLVec4>(
@@ -318,6 +328,25 @@ FFLiResourceShapeElementType GetElementType(FFLAttributeBufferType type)
     }
 }
 
+static const rio::VertexStream::Format VERTEX_FORMATS[FFLI_VERTEX_LAYOUT_TYPE_MAX][FFL_ATTRIBUTE_BUFFER_TYPE_MAX] =
+{
+    // Default FFL formats
+    {
+        rio::VertexStream::FORMAT_32_32_32_FLOAT,   // POSITION
+        rio::VertexStream::FORMAT_32_32_FLOAT,      // TEXCOORD
+        rio::VertexStream::FORMAT_10_10_10_2_SNORM, // NORMAL
+        rio::VertexStream::FORMAT_8_8_8_8_SNORM,    // TANGENT
+        rio::VertexStream::FORMAT_8_8_8_8_UNORM     // COLOR
+    },
+    {
+        rio::VertexStream::FORMAT_16_16_16_16_FLOAT, // POSITION
+        rio::VertexStream::FORMAT_16_16_FLOAT,       // TEXCOORD
+        rio::VertexStream::FORMAT_8_8_8_8_SNORM,     // NORMAL
+        rio::VertexStream::FORMAT_8_8_8_8_SNORM,     // TANGENT
+        rio::VertexStream::FORMAT_8_8_8_8_UNORM      // COLOR
+    }
+};
+
 u32 FormatToStride(rio::VertexStream::Format format)
 {
     switch (format)
@@ -326,45 +355,28 @@ u32 FormatToStride(rio::VertexStream::Format format)
         return 8;
     case rio::VertexStream::FORMAT_32_32_32_FLOAT:
     case rio::VertexStream::FORMAT_32_32_32_32_FLOAT:
+        // Four extra bytes for padding.
         return 16;
     case rio::VertexStream::FORMAT_8_8_8_8_UNORM:
     case rio::VertexStream::FORMAT_8_8_8_8_SNORM:
     case rio::VertexStream::FORMAT_10_10_10_2_SNORM:
+        return 4;
+
+    case rio::VertexStream::FORMAT_16_16_16_16_FLOAT:
+        return 6;//8; // HACK: actually 16_16_16
+    case rio::VertexStream::FORMAT_16_16_FLOAT:
         return 4;
     default:
         return 0;
     }
 }
 
-u32 GetStride(FFLAttributeBufferType type, u32 size)
+u32 GetStride(FFLAttributeBufferType type, u32 size, FFLiVertexLayoutType layoutType)
 {
     u32 stride;
 
-    switch (type)
-    {
-    case FFL_ATTRIBUTE_BUFFER_TYPE_POSITION:
-        stride = FormatToStride(rio::VertexStream::FORMAT_32_32_32_FLOAT);
-        break;
-    case FFL_ATTRIBUTE_BUFFER_TYPE_TEXCOORD:
-        stride = FormatToStride(rio::VertexStream::FORMAT_32_32_FLOAT);
-        break;
-    case FFL_ATTRIBUTE_BUFFER_TYPE_NORMAL:
-        // Note that this is literally useless since they are both 32 bits.
-        if (g_NormalIsSnorm8_8_8_8)
-            stride = FormatToStride(rio::VertexStream::FORMAT_8_8_8_8_SNORM);
-        else
-            stride = FormatToStride(rio::VertexStream::FORMAT_10_10_10_2_SNORM);
-        break;
-    case FFL_ATTRIBUTE_BUFFER_TYPE_TANGENT:
-        stride = FormatToStride(rio::VertexStream::FORMAT_8_8_8_8_SNORM);
-        break;
-    case FFL_ATTRIBUTE_BUFFER_TYPE_COLOR:
-        stride = FormatToStride(rio::VertexStream::FORMAT_8_8_8_8_UNORM);
-        break;
-    default:
-        stride = 0;
-        break;
-    }
+    RIO_ASSERT(type < FFL_ATTRIBUTE_BUFFER_TYPE_MAX);
+    stride = FormatToStride(VERTEX_FORMATS[layoutType][type]);
 
     if (stride >= size)
         stride = 0;
@@ -432,7 +444,7 @@ void AdjustAttributeWithoutScale(T* pVec, u32 num, bool flipX, const FFLiCoordin
 
 // Reverses winding, should be called when flipping X
 // as an alternative to using front face culling.
-void AdjustIndexBuffer(void* pIndexPtr, u32 indexCount)
+[[maybe_unused]] void AdjustIndexBuffer(void* pIndexPtr, u32 indexCount)
 {
     u16* pIndexBuffer = static_cast<u16*>(pIndexPtr);
     u32 halfCount = indexCount / 2;

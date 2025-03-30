@@ -4,6 +4,7 @@
 #include <nn/ffl/FFLBoundingBox.h>
 
 #include <nn/ffl/FFLiShapePartsType.h>
+#include <nn/ffl/FFLiShape.h>
 
 #include <nn/ffl/detail/FFLiResourcePartsInfo.h>
 
@@ -29,7 +30,7 @@ enum FFLiResourceShapeElementType
     FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_BUFFER_MAX = FFLI_RESOURCE_SHAPE_ELEMENT_TYPE_INDEX + 1
 };
 
-const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLiShapePartsType partsType, FFLiResourceShapeElementType elementType);
+const void* FFLiGetResourceShapeElement(u32* pSize, const void* pShapeData, FFLiShapePartsType partsType, FFLiResourceShapeElementType elementType, FFLiVertexLayoutType layoutType);
 
 void FFLiSwapEndianResourceShapeElement(void* pShapeData, bool save, FFLiShapePartsType partsType);
 
@@ -101,43 +102,54 @@ NN_STATIC_ASSERT(sizeof(FFLiResourceShapeDataHeader) == 0x90);
 class FFLiResourceShapeHairTransform
 {
 public:
-    const FFLVec3& Get(s32 i) const
-    {
-        return _0[i];
-    }
+    const FFLVec3& GetFrontTranslate() const { return m_FrontTranslate; }
+
+    const FFLVec3& GetFrontRotate() const { return m_FrontRotate; }
+
+    const FFLVec3& GetSideTranslate() const { return m_SideTranslate; }
+
+    const FFLVec3& GetSideRotate() const { return m_SideRotate; }
+
+    const FFLVec3& GetTopTranslate() const { return m_TopTranslate; }
+
+    const FFLVec3& GetTopRotate() const { return m_TopRotate; }
 
     void SwapEndian();  // Deleted in NSMBU
 
 private:
-    // Is this just FFLPartsTransform? Not sure
-    FFLVec3 _0[6];
+    FFLVec3 m_FrontTranslate;
+    FFLVec3 m_FrontRotate;
+    FFLVec3 m_SideTranslate;
+    FFLVec3 m_SideRotate;
+    FFLVec3 m_TopTranslate;
+    FFLVec3 m_TopRotate;
 };
 NN_STATIC_ASSERT(sizeof(FFLiResourceShapeHairTransform) == 0x48);
 
 class FFLiResourceShapeFacelineTransform
 {
 public:
-    const FFLVec3& GetHairPosition() const
+    const FFLVec3& GetHairTranslate() const
     {
-        return m_HairPos;
+        return m_HairTranslate;
     }
 
-    const FFLVec3& GetFaceCenterPosition() const
+    const FFLVec3& GetNoseTranslate() const
     {
-        return m_FaceCenterPos;
+        return m_NoseTranslate;
     }
 
-    const FFLVec3& GetBeardPosition() const
+    const FFLVec3& GetBeardTranslate() const
     {
-        return m_BeardPos;
+        return m_BeardTranslate;
     }
 
     void SwapEndian();  // Deleted in NSMBU
 
 private:
-    FFLVec3 m_HairPos;
-    FFLVec3 m_FaceCenterPos;
-    FFLVec3 m_BeardPos;
+    FFLVec3 m_HairTranslate;
+    FFLVec3 m_NoseTranslate;
+    FFLVec3 m_BeardTranslate;
 };
 NN_STATIC_ASSERT(sizeof(FFLiResourceShapeFacelineTransform) == 0x24);
 

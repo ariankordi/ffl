@@ -70,7 +70,12 @@ void MatrixOrthographicOffCenterRightHanded(rio::BaseMtx44f* pOutValue, bool fli
     pOutValue->m[3][3] = 1.0f;
 }
 
+}
 
+void FFLiGetMaskMatrix(rio::BaseMtx44f* pBaseMtx44f, f32 width)
+{
+    MatrixOrthographicOffCenterRightHanded(pBaseMtx44f,
+    g_TextureFlipY, 0.0f, width, 0.0f, width, 200.0f, -200.0f);
 }
 
 const s32 excludeColorFromEyeTextureTypes[] = {
@@ -90,8 +95,7 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     //rio::BaseMtx44f& projMatrix = const_cast<rio::BaseMtx44f&>(proj.getMatrix());
     rio::BaseMtx44f projMatrix;
     // This ortho matrix below will have [1][1] and [1][3] flipped depending on g_TextureFlipY.
-    MatrixOrthographicOffCenterRightHanded(&projMatrix, g_TextureFlipY, 0.0f, static_cast<f32>(resolution),
-        0.0f, static_cast<f32>(resolution), 200.0f, -200.0f);
+    FFLiGetMaskMatrix(&projMatrix, static_cast<f32>(resolution));
 
     if (pDesc->pTexturesMustache[0] != NULL)
     {
