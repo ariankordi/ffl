@@ -96,6 +96,14 @@ bool FFLpGetCharInfoFromStoreData(FFLiCharInfo* pCharInfo, FFLStoreData* pStoreD
     return false;
 }
 
+bool FFLpGetCharInfoFromMiiDataOfficialRFL(FFLiCharInfo* pCharInfo, FFLiMiiDataOfficialRFL* pMiiDataOfficial)
+{
+    if (FFLiMiiDataOfficialRFL2CharInfo(pCharInfo, *static_cast<FFLiMiiDataOfficialRFL*>(pMiiDataOfficial), false) == FFL_RESULT_OK)
+        return FFLiiVerifyCharInfo(pCharInfo, true);
+
+    return false;
+}
+
 FFLResult FFLGetAdditionalInfo(FFLAdditionalInfo* pAdditionalInfo, FFLDataSource dataSource, const void* pBuffer, u16 index, bool checkFontRegion)
 {
     if (!FFLiManager::IsConstruct())

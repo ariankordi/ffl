@@ -10,6 +10,7 @@ extern "C" {
 
 typedef struct FFLAdditionalInfo FFLAdditionalInfo;
 typedef struct FFLStoreData FFLStoreData;
+typedef struct FFLiMiiDataOfficialRFL FFLiMiiDataOfficialRFL;
 
 typedef struct FFLiCharInfo FFLiCharInfo;
 
@@ -39,6 +40,7 @@ void FFLiEnableSpecialMii(u32 key);
 // Not sure where these are supposed to go:
 bool FFLpGetStoreDataFromCharInfo(FFLStoreData* pStoreData, const FFLiCharInfo* pCharInfo); // Deleted in NSMBU
 bool FFLpGetCharInfoFromStoreData(FFLiCharInfo* pCharInfo, FFLStoreData* pStoreData); // Deleted in NSMBU
+bool FFLpGetCharInfoFromMiiDataOfficialRFL(FFLiCharInfo* pCharInfo, FFLiMiiDataOfficialRFL* pMiiDataOfficial); // Custom
 
 #ifdef __cplusplus
 }

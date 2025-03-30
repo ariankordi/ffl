@@ -136,10 +136,11 @@ bool FFLiMiiDataCoreRFL2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCoreR
     pCharInfo->birthMonth = miiDataCoreRFL.BirthMonth();
     pCharInfo->birthDay = miiDataCoreRFL.BirthDay();
 
+    // @bug Originally this copied 22 bytes when field is 20
     if (pCreatorName != NULL)
-        rio::MemUtil::copy(pCharInfo->creatorName, pCreatorName, sizeof(u16) * (10 + 1));
+        rio::MemUtil::copy(pCharInfo->creatorName, pCreatorName, sizeof(u16) * 10);
     else
-        rio::MemUtil::set(pCharInfo->creatorName, 0, sizeof(u16) * (10 + 1));
+        rio::MemUtil::set(pCharInfo->creatorName, 0, sizeof(u16) * 10);
     pCharInfo->creatorName[10] = L'\0';
     bool creatorNameReplaced = replaceName ? ReplaceNameFromRFL(pCharInfo->creatorName, 10, 0) : false;
 
@@ -249,7 +250,8 @@ void FFLiMiiDataCore2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCore& mi
 
     rio::MemUtil::copy(&pCharInfo->authorID, &miiDataCore.AuthorID(), sizeof(FFLiAuthorID));
 
-    rio::MemUtil::copy(pCharInfo->name, miiDataCore.Name(), sizeof(u16) * (10 + 1));
+    // @bug Originally this copied 22 bytes when field is 20
+    rio::MemUtil::copy(pCharInfo->name, miiDataCore.Name(), sizeof(u16) * 10);
     pCharInfo->name[10] = L'\0';
 
     rio::MemUtil::copy(&pCharInfo->createID, &miiDataCore.CreateID(), sizeof(FFLCreateID));
@@ -257,10 +259,11 @@ void FFLiMiiDataCore2CharInfo(FFLiCharInfo* pCharInfo, const FFLiMiiDataCore& mi
     pCharInfo->birthMonth = resetBirthday ? 0 : miiDataCore.BirthMonth();
     pCharInfo->birthDay = resetBirthday ? 0 : miiDataCore.BirthDay();
 
+    // @bug Originally this copied 22 bytes when field is 20
     if (pCreatorName != NULL)
-        rio::MemUtil::copy(pCharInfo->creatorName, pCreatorName, sizeof(u16) * (10 + 1));
+        rio::MemUtil::copy(pCharInfo->creatorName, pCreatorName, sizeof(u16) * 10);
     else
-        rio::MemUtil::set(pCharInfo->creatorName, 0, sizeof(u16) * (10 + 1));
+        rio::MemUtil::set(pCharInfo->creatorName, 0, sizeof(u16) * 10);
     pCharInfo->creatorName[10] = L'\0';
 
     pCharInfo->padding_0 = 0;

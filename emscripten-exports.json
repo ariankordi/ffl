@@ -25,6 +25,7 @@
     "_FFLiDeleteTextureTempObject",
     "_FFLpGetStoreDataFromCharInfo",
     "_FFLpGetCharInfoFromStoreData",
+    "_FFLpGetCharInfoFromMiiDataOfficialRFL",
 
     "_FFLGetDrawParamOpaFaceline",
     "_FFLGetDrawParamOpaBeard",
