@@ -24,8 +24,11 @@ typedef enum FFLModelFlag
     // when initializing a CharModel and not
     // initialize shapes. Note that this means
     // you cannot DrawOpa/Xlu when this is set.
-    FFL_MODEL_FLAG_NEW_MASK_ONLY = 1 << 5,
+    FFL_MODEL_FLAG_NEW_MASK_ONLY   = 1 << 5,
 #endif
+    // Tries to mimic the behavior of CharModels in AFL
+    // by using the same glass scale and mask culling.
+    FFL_MODEL_FLAG_AFL_MODE        = 1 << 6
 } FFLModelFlag;
 
 #ifdef __cplusplus

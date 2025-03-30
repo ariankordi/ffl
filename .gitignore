@@ -60,3 +60,7 @@ CMakeFiles
 build*
 Makefile
 cmake_install.cmake
+
+# clangd, kate
+.cache
+.cmake

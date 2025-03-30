@@ -10,7 +10,12 @@ extern "C" {
 
 typedef struct FFLAdditionalInfo FFLAdditionalInfo;
 typedef struct FFLStoreData FFLStoreData;
+#ifdef __cplusplus
+typedef class FFLiMiiDataOfficialRFL FFLiMiiDataOfficialRFL;
+#else
+// kind of a hack
 typedef struct FFLiMiiDataOfficialRFL FFLiMiiDataOfficialRFL;
+#endif
 
 typedef struct FFLiCharInfo FFLiCharInfo;
 

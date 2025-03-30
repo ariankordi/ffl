@@ -681,7 +681,12 @@ FFLResult InitShapes(FFLiCharModel* pModel, FFLiResourceLoader * pResLoader, con
 
     if (pModel->charInfo.parts.glassType > 0)
     {
-        f32 glassScale = pModel->charInfo.parts.glassScale * 0.15f + 0.4f;
+        // @bug AFL erroneously uses 0.175f here.
+        f32 glassScale = pModel->charInfo.parts.glassScale *
+            // Selectively use wrong scale multiplier.
+            (pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_AFL_MODE
+                ? 0.175f : 0.15f)
+            + 0.4f;
 
         FFLVec3 glassPos = {
             .x = pModel->faceCenterPos.x,
@@ -888,7 +893,10 @@ void SetupDrawParam(FFLiCharModel* pModel)
         const FFLiRenderTexture* pMaskRenderTexture = pModel->maskTextures.pRenderTextures[pModel->expression];
         if (pMaskRenderTexture != NULL)
         {
-            pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].cullMode = FFL_CULL_MODE_BACK;
+            FFLCullMode cullMode = FFL_CULL_MODE_BACK;
+            if (pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_AFL_MODE)
+                cullMode = FFL_CULL_MODE_NONE;
+            pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].cullMode = cullMode;
             FFLiInitModulateShapeMask(&pModel->drawParam[FFLI_SHAPE_TYPE_XLU_MASK].modulateParam,
 #ifndef FFL_NO_RENDER_TEXTURE
                 pMaskRenderTexture->pTexture2D);
