@@ -49,10 +49,9 @@ endif()
 set(CMAKE_CACHE_ARGS_INCLUDE_HELP TRUE) # Include option descriptions with cmake -LH.
 
 # Define build modes for FFL.
-# Standalone (default, no RIO/GL), for-rio without RIO but for RIO,
-# and finally opengl-33 and opengl-es2 both with minimal RIO sources.
-set(FFL_MODE "" CACHE STRING "FFL build mode (blank for standalone, for-rio, opengl-33, opengl-es2)")
-set_property(CACHE FFL_MODE PROPERTY STRINGS "" "for-rio" "opengl-33" "opengl-es2")
+# Standalone (default, no RIO/GL), for-rio without RIO but for RIO
+set(FFL_MODE "" CACHE STRING "FFL build mode (blank for standalone, or for-rio)")
+set_property(CACHE FFL_MODE PROPERTY STRINGS "" "for-rio")
 
 
 # Paths to RIO and ninTexUtils.
@@ -83,7 +82,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-exceptions -fno-rtt
 
 # ------------------ Detect RIO -------------------
 
-if(FFL_MODE MATCHES "for-rio|opengl")
+if(FFL_MODE MATCHES "for-rio")
     if(FFL_WITH_RIO STREQUAL "")
         message(FATAL_ERROR "FFL_WITH_RIO (RIO repository) must be set for mode ${FFL_MODE}.")
     endif()
@@ -150,23 +149,7 @@ endif()
 # Function for making an FFL target, to reduce duplicated code.
 function(create_ffl_target target_name library_type)
 
-    if(FFL_MODE MATCHES "opengl") # If the mode starts with opengl...
-        # Add a minimal set of RIO sources to make GL calls.
-        set(RIO_GL_SOURCES
-            "${FFL_WITH_RIO}/src/gpu/rio_Texture.cpp"
-            "${FFL_WITH_RIO}/src/gpu/win/rio_Texture2DUtilWin.cpp"
-            "${FFL_WITH_RIO}/src/gpu/win/rio_TextureWin.cpp"
-            "${FFL_WITH_RIO}/src/gfx/rio_Projection.cpp"
-            "${FFL_WITH_RIO}/src/gpu/rio_RenderState.cpp"
-            "${FFL_WITH_RIO}/src/gpu/win/rio_RenderStateWin.cpp"
-            "${FFL_WITH_RIO}/src/gpu/rio_RenderBuffer.cpp"
-            "${FFL_WITH_RIO}/src/math/rio_Matrix.cpp"
-            "${FFL_WITH_RIO}/src/gpu/rio_RenderTarget.cpp"
-            "${FFL_WITH_RIO}/src/gfx/win/rio_GraphicsWin.cpp"
-        )
-        list(APPEND FFL_SOURCES ${RIO_GL_SOURCES})
     # Standalone mode does not add RIO sources. It only references RIO headers.
-    endif()
 
     # Create target.
     if(FFL_BUILD_EMSCRIPTEN_MODULE)
@@ -266,27 +249,6 @@ function(create_ffl_target target_name library_type)
         target_compile_definitions(${target_name} PRIVATE RIO_NO_GLFW_IMPORT)
         # Pass along RIO definitions that FFL supports.
         if(RIO_GLES)
-            target_compile_definitions(${target_name} PRIVATE RIO_GLES)
-        endif()
-
-
-    # OpenGL (minimal RIO) target.
-    elseif(FFL_MODE MATCHES "opengl")
-        target_compile_definitions(${target_name} PRIVATE
-            RIO_NO_GLFW_CALLS
-            RIO_NO_CONTROLLERS_WIN # ^^ Remove GLFW dependency.
-            RIO_NO_CLIP_CONTROL    # Assume pre-OpenGL 4.5.
-            RIO_NO_TEXTURE2D_FILE_CTOR # Relies on C++ STL.
-            #RIO_NO_GL_LOADER # Needed when building alongside smth else?
-            FFL_NO_FS # No RIO filesystem is being used
-            FFL_NO_DATABASE_FILE # ^^
-        )
-        if(FFL_BUILD_SHARED)# AND FFL_ADD_GLAD_GL_IMPLEMENTATION)
-            # Build GLAD implementation into libffl (FFLGladLoadGL)
-            target_compile_definitions(${target_name} PRIVATE FFL_ADD_GLAD_GL_IMPLEMENTATION)
-        endif()
-
-        if(FFL_MODE STREQUAL "opengl-es2") # OpenGL ES 2.0/3.0 target.
             target_compile_definitions(${target_name} PRIVATE RIO_GLES)
         endif()
     endif()
@@ -399,8 +361,6 @@ endif()
 
 if(FFL_MODE STREQUAL "for-rio")
     message(STATUS "FFL: Building for RIO using includes from: ${FFL_WITH_RIO}")
-elseif(FFL_MODE MATCHES "opengl")
-    message(STATUS "FFL: Building for OpenGL with minimal RIO sources from: ${FFL_WITH_RIO}")
 elseif(FFL_MODE STREQUAL "")
     message(STATUS "FFL: Building ffl standalone using RIO includes from: ${FFL_WITH_RIO}")
 endif()

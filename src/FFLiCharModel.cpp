@@ -33,12 +33,18 @@ FFLResult FFLiInitCharModelCPUStep(FFLiCharModel* pModel, const FFLCharModelSour
 
 void FFLiInitCharModelGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback)
 {
+#ifdef FFL_NO_RENDER_TEXTURE
+    RIO_ASSERT(false && "FFL_NO_RENDER_TEXTURE is enabled, you need " \
+    "to make your own faceline and mask textures instead " \
+    "of calling FFLInitCharModelGPUStep.");
+#else
     if (!FFLiManager::IsConstruct())
         return;
 
     FFLiManager* pManager = FFLiManager::GetInstance();
     FFLiCharModelCreator creator(&pManager->GetCharModelCreateParam(), pManager);
     return creator.ExecuteGPUStep(pModel, pCallback);
+#endif // FFL_NO_RENDER_TEXTURE
 }
 
 void FFLiDeleteCharModel(FFLiCharModel* pModel)

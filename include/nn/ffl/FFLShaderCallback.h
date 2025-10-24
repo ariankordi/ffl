@@ -5,12 +5,7 @@
 
 #if FFL_USE_RIO
     #include <gfx/rio_Graphics.h>
-    typedef rio::Graphics::CompareFunc FFLRIOCompareFunc;
-
     #include <math/rio_Matrix.h>
-    typedef rio::BaseMtx44f FFLRIOBaseMtx44f;
-#else
-    #include <nn/ffl/FFLRIOInterop.h>
 #endif
 
 #ifdef __cplusplus
@@ -29,10 +24,23 @@ typedef struct FFLShaderCallback
     // ^^ Apparently this is called "facelineLeaveAlpha"
     // in nn::mii::detail::TextureShaderInfoData/TextureShaderImpl
     u8                  _padding[3];
-    void (*pApplyAlphaTestFunc)(void* pObj, bool enable, FFLRIOCompareFunc func, f32 ref);
+
+#if FFL_USE_RIO
+    // this is not used for no render texture
+    void (*pApplyAlphaTestFunc)(void* pObj, bool enable, rio::Graphics::CompareFunc func, f32 ref);
+#else
+    void* _padding1[1];
+#endif // FFL_NO_RENDER_TEXTURE
     // ^^ Unused when FFL_NO_DRAW_MASK_ALPHA_VALUES is set (FFLiDrawRawMask)
+
     void (*pDrawFunc)(void* pObj, const FFLDrawParam* drawParam);
-    void (*pSetMatrixFunc)(void* pObj, const FFLRIOBaseMtx44f* matrix);
+
+    void (*pSetMatrixFunc)(void* pObj,
+#if FFL_USE_RIO
+                           const rio::BaseMtx44f* matrix);
+#else
+                           const float matrix[16]);
+#endif // FFL_USE_RIO
 }
 FFLShaderCallback;
 NN_STATIC_ASSERT32(sizeof(FFLShaderCallback) == 0x14);

@@ -7,14 +7,9 @@
     #include <gpu/rio_Texture.h>
     typedef rio::Texture2D FFLTexture;
     #define FFL_GET_RIO_NATIVE_TEXTURE_HANDLE(texture2D) (texture2D)->getNativeTextureHandle()
-#elif defined(FFL_USE_TEXTURE_CALLBACK)
-
+#else
     typedef void FFLTexture; // this is the texture handle
                              // i.e. the caller defines it
-
-#else
-    #include <nn/ffl/FFLRIOInterop.h>
-    typedef FFLRIOTexture2D FFLTexture;
 #endif
 
 // Marks that a faceline texture is supposed

@@ -8,29 +8,6 @@
 
 #include <nn/ffl/FFLExpression.h> // FFL_EXPRESSION_LIMIT
 
-#ifdef FFL_ADD_GLAD_GL_IMPLEMENTATION
-    #ifdef RIO_GLES
-        #define gladLoadGLES2 FFLGladLoadGL
-
-        #define GLAD_EGL_IMPLEMENTATION
-        #define GLAD_GLES2_IMPLEMENTATION
-
-        #include <glad/gles2.h>
-    #else
-        #define gladLoadGL FFLGladLoadGL
-
-        #define GLAD_GL_IMPLEMENTATION
-
-        #include <glad/gl.h>
-    #endif // RIO_GLES
-#else
-    void FFLGladLoadGL(void)
-    {
-        // no-op just so that this resolves
-        RIO_LOG("FFLGladLoadGL called but FFL_ADD_GLAD_GL_IMPLEMENTATION not defined, ignoring");
-    }
-#endif // FFL_ADD_GLAD_GL_IMPLEMENTATION
-
 // FFLiInitResEx(void *, FFLInitDesc const *, FFLResourceDesc const *)
 FFLResult FFLInitResEx(const FFLInitDesc* pInitDesc, const FFLResourceDesc* pResDesc)
 {

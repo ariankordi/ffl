@@ -50,14 +50,10 @@ The CMake assumes that RIO is located at `../rio`, but you can also pass `-DFFL_
 
 2. Choose a build mode. Here are your options:
 
-* For a RIO program/game.
+* For a program using RIO.
   - Such as [FFL-Testing](https://github.com/ariankordi/FFL-Testing).
   - `-DFFL_MODE=for-rio`
-* For an OpenGL program, bundling RIO code with it.
-  - Such as the [FFL raylib samples](https://github.com/ariankordi/ffl-raylib-samples).
-  - `-DFFL_MODE=opengl-33`, `-DFFL_MODE=opengl-es2`
-* Without RIO or OpenGL.
-  - Standalone, for something like [FFLSharp](https://github.com/ariankordi/FFLSharp).
+* Without RIO / standalone.
   - Will most likely use the dynamic library: `-DFFL_BUILD_SHARED=1`
 
 3. Head into the `ffl` folder and use CMake to build.
@@ -98,19 +94,17 @@ Over time, I've added new features that are not included in Abood's original dec
 ## Definitions
 This documents all of the definitions that this supports to add/remove functionality, as of December 2024.
 
-* FFL_ADD_GLAD_GL_IMPLEMENTATION - Adds GLAD implementation, enabling FFLGladLoadGL (dynamic linking)
 * FFL_ENABLE_NEW_MASK_ONLY_FLAG  - Enables new mask only flag which does not initialize shapes.
 * FFL_NO_DATABASE_DEFAULT    - disables default guest Miis
 * FFL_NO_DATABASE_FILE       - Disables opening and use of hidden/official databases.
 * FFL_NO_DATABASE_RANDOM     - Disables use of random database and FFLiGetRandomCharInfo.
 * FFL_NO_MIDDLE_DB           - Disables FFLMiddleDB functionality (^^)
-* FFL_NO_RENDER_TEXTURE      - Do not use FFLiRenderTexture (breaks FFLInitCharModelGPUStep)
 * FFL_NO_FS                  - Disables FFL's use of RIO filesystem.
   - This is used for databases and non-cached resource loading.
 * FFL_NO_NINTEXUTILS         - Disables ninTexUtils, which is needed for Wii U/FFLRes resource file support.
   - Specifically, this library deswizzles Wii U format textures. You can still use AFL resources with this.
 * FFL_NO_DRAW_MASK_ALPHA_VALUES - Skip drawing alpha values on mask (FFL default behavior)...
-  - This makes zero difference to the mask's appearance for me.
+  - This makes zero difference to the mask's appearance for me. Maybe alpha testing needs to be enabled.
 * FFL_MLC_PATH - Takes a quoted string. Defines the MLC path if FS is not disabled.
 * FFL_PART_INDEX_WRAP - When out of bounds part indexes are passed in (invalid CharInfo)...
   - ... This option will choose to wrap that part index.

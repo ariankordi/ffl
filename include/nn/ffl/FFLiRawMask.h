@@ -5,9 +5,6 @@
 
 #if FFL_USE_RIO
     #include <math/rio_Matrix.h>
-    typedef rio::BaseMtx44f FFLRIOBaseMtx44f;
-#else
-    #include <nn/ffl/FFLRIOInterop.h>
 #endif
 
 #ifdef __cplusplus
@@ -58,12 +55,17 @@ extern "C" {
 void FFLiInvalidateRawMask(FFLiRawMaskDrawParam* pDrawParam);
 void FFLiDrawRawMask(const FFLiRawMaskDrawParam* pDrawParam,
 #ifdef __cplusplus
-    const FFLiShaderCallback*
+    const FFLiShaderCallback* pCallback);
 #else
-    FFLShaderCallback**
-    #endif
-pCallback);
-void FFLiGetMaskMatrix(FFLRIOBaseMtx44f* pBaseMtx44f, f32 resolution);
+    FFLShaderCallback** pCallback);
+#endif // __cplusplus
+
+void FFLiGetMaskMatrix(
+#if FFL_USE_RIO
+    rio::BaseMtx44f* pBaseMtx44f, f32 resolution);
+#else
+    float pBaseMtx44f[16], f32 resolution);
+#endif // FFL_USE_RIO
 
 #ifdef __cplusplus
 }

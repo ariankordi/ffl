@@ -9,12 +9,6 @@
 
 #if FFL_USE_RIO
     #include <gpu/rio_Drawer.h>
-    #ifndef FFL_RIO_PRIMITIVE_MODE_
-        #define FFL_RIO_PRIMITIVE_MODE_
-        typedef rio::Drawer::PrimitiveMode FFLRIOPrimitiveMode;
-    #endif
-#else
-    #include <nn/ffl/FFLRIOInterop.h>
 #endif
 
 #ifdef __cplusplus
@@ -52,7 +46,11 @@ typedef struct FFLPrimitiveParam
 {
     // Shapes are triangles, but for faceline/mask
     // texture 2D planes it is triangle strip
-    FFLRIOPrimitiveMode         primitiveType;
+#if FFL_USE_RIO
+    rio::Drawer::PrimitiveMode  primitiveType;
+#else
+    unsigned int                primitiveType;
+#endif
     u32                         indexCount;
 #ifdef FFL_USE_ADJUST_MTX
     rio::Matrix34f*             pAdjustMatrix;

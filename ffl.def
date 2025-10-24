@@ -47,7 +47,6 @@ EXPORTS
     FFLiDrawRawMask
     FFLiDeleteTextureTempObject
 
-    FFLGladLoadGL
     FFLSetTextureCallback
     FFLInitCharModelCPUStepWithCallback
     FFLSetTextureFlipY

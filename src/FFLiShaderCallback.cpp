@@ -27,8 +27,10 @@ void FFLiShaderCallback::Set(const FFLShaderCallback* pCallback)
 
 void FFLiShaderCallback::CallApplyAlphaTest(bool enable, rio::Graphics::CompareFunc func, f32 ref) const
 {
+#ifndef FFL_NO_RENDER_TEXTURE
     if (IsExist())
         (*m_pShaderCallback->pApplyAlphaTestFunc)(m_pShaderCallback->pObj, enable, func, ref);
+#endif // FFL_NO_RENDER_TEXTURE
 }
 
 void FFLiShaderCallback::CallSetMatrix(const rio::BaseMtx44f* mat) const

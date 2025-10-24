@@ -34,11 +34,11 @@ public:
         CallApplyAlphaTest(false, rio::Graphics::COMPARE_FUNC_ALWAYS, 0.0f);
     }
 
-    void CallApplyAlphaTest(bool enable, rio::Graphics::CompareFunc func, f32 ref) const;
     void CallSetMatrix(const rio::BaseMtx44f* mat) const;
     void CallDraw(const FFLDrawParam* drawParam) const;
 
 private:
+    void CallApplyAlphaTest(bool enable, rio::Graphics::CompareFunc func, f32 ref) const;
     const FFLShaderCallback*    m_pShaderCallback;
 };
 NN_STATIC_ASSERT32(sizeof(FFLiShaderCallback) == 4);

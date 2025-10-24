@@ -247,14 +247,9 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     return FFL_RESULT_OK;
 }
 
+#ifndef FFL_NO_RENDER_TEXTURE
 void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback)
 {
-#ifdef FFL_NO_RENDER_TEXTURE
-    RIO_LOG("WARNING: FFLInitCharModelGPUStep was called. When FFL_NO_RENDER_TEXTURE is enabled, you need " \
-    "to make your own faceline and mask textures. This function will try to make RIO_GL_CALL()s, which may or " \
-    "may not crash you right now by jumping to undefined GL function pointers. Proceed with caution.\n");
-#else
-//#endif // FFL_NO_RENDER_TEXTURE
     u32 resolution = FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution);
 
     FFLiShaderCallback shaderCallback;
@@ -262,22 +257,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
 
     rio::Matrix44f mvpMatrix = rio::Matrix44f::ident;
 #ifndef FFL_USE_ADJUST_MTX_MASK
-    // Flip Y in the view matrix when the
-    // default GL clip control is being used
-
-    // (NOTE: Now being done to the primitives directly based on g_TextureFlipY)
-#ifdef RIO_NO_CLIP_CONTROL
-    //mvpMatrix.m[1][1] *= -1.f;
-#endif
-
     shaderCallback.CallSetMatrix(&mvpMatrix);
-#else
-    rio::BaseMtx44f projMatrix;
-    const f32 width = static_cast<f32>(FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution));
-
-    FFLiGetMaskMatrix(&projMatrix, width);
-
-    shaderCallback.CallSetMatrix(&projMatrix);
 #endif // FFL_USE_ADJUST_MTX_MASK
 
     FFLiRenderMaskTextures(&pModel->maskTextures, &pModel->pTextureTempObject->maskTextures, &shaderCallback
@@ -286,7 +266,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
 #endif // RIO_IS_CAFE
     );
 
-    shaderCallback.CallSetMatrix(&mvpMatrix); // Reset to ident
+    shaderCallback.CallSetMatrix(&mvpMatrix); // Reset to ident in case above function set it
 
     if (pModel->facelineRenderTexture.pTexture2D != NULL)
         FFLiRenderFacelineTexture(&pModel->facelineRenderTexture, &pModel->charInfo, resolution, &pModel->pTextureTempObject->facelineTexture, &shaderCallback
@@ -302,8 +282,8 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pModel->charModelDesc.resourceType);
 
     FFLiDeleteTextureTempObject(pModel);
-#endif // FFL_NO_RENDER_TEXTURE
 }
+#endif // FFL_NO_RENDER_TEXTURE
 
 void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
 {
@@ -462,15 +442,14 @@ FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 ind
     if (result != FFL_RESULT_OK)
         return result;
 
-#ifdef FFL_USE_ADJUST_MTX
-    pDrawParam->primitiveParam.pAdjustMatrix = NULL;
-#else
-    pDrawParam->primitiveParam._8 = 0;
-#endif
-    FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_FLATTEN_NOSE);
+    bool flattenNose = pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_FLATTEN_NOSE;
+    FFLiAdjustShape(pDrawParam, &boundingBox, scaleX, scaleY, pTranslate, flipX, pCoordinate, partsType, flattenNose);
+
 #ifndef FFL_USE_ADJUST_MTX
+    pDrawParam->primitiveParam._8 = 0;
     CalcluateBoundingBox(pModel->boundingBox, &boundingBox, partsType);
 #endif
+
     return FFL_RESULT_OK;
 }
 
@@ -933,6 +912,7 @@ void InvalidateTexture(const GX2Texture& texture)
 
 #endif // RIO_IS_CAFE
 
+#ifndef FFL_NO_RENDER_TEXTURE
 void InvalidateTextures(FFLiCharModel* pModel)
 {
 #if RIO_IS_CAFE
@@ -946,14 +926,16 @@ void InvalidateTextures(FFLiCharModel* pModel)
         InvalidateTexture(pModel->pGlassTexture->getNativeTexture());
 #endif // RIO_IS_CAFE
 }
+#endif // FFL_NO_RENDER_TEXTURE
+
 
 }
 
+#ifndef FFL_NO_RENDER_TEXTURE
 void FFLiCharModelCreator::AfterExecuteGPUStep(FFLiCharModel* pModel)
 {
     InvalidateShapes(pModel);
     InvalidateTextures(pModel);
-#if !defined(RIO_NO_GLFW_CALLS) && !defined(FFL_NO_RENDER_TEXTURE)
     rio::Window::instance()->makeContextCurrent();
 
     u32 width = rio::Window::instance()->getWidth();
@@ -961,12 +943,11 @@ void FFLiCharModelCreator::AfterExecuteGPUStep(FFLiCharModel* pModel)
 
     rio::Graphics::setViewport(0, 0, width, height);
     rio::Graphics::setScissor(0, 0, width, height);
-#endif // !defined(RIO_NO_GLFW_CALLS) && !defined(FFL_NO_RENDER_TEXTURE)
-#ifndef FFL_NO_RENDER_TEXTURE
-    #if RIO_IS_CAFE
-        GX2DrawDone();
-    #elif RIO_IS_WIN
-        RIO_GL_CALL(glFinish());
-    #endif
-#endif // FFL_NO_RENDER_TEXTURE
+
+#if RIO_IS_CAFE
+    GX2DrawDone();
+#elif RIO_IS_WIN
+    RIO_GL_CALL(glFinish());
+#endif
 }
+#endif // FFL_NO_RENDER_TEXTURE

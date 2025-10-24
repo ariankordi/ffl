@@ -58,12 +58,30 @@
     #endif
 #endif
 
-
+// Assume that if we are not building for C++,
+// this is being imported from another project, don't use RIO headers.
+// (Bad assumption)
 #ifdef __cplusplus
-    #define FFL_USE_RIO 1
-    #include <misc/rio_Types.h>
-    #include <gpu/rio_Texture.h>
-    typedef rio::Texture2D FFLRIOTexture2D;
+    // Build without RIO types at all?
+    #ifdef FFL_NO_RIO
+        #define FFL_USE_RIO 0
+        // contradictory but we are stillll using HEADERS
+        #include <misc/rio_Types.h>
+
+        // these will only be defined if this file is included though...
+        #define FFL_NO_RENDER_TEXTURE
+        #define FFL_USE_TEXTURE_CALLBACK
+        /* building FFL without RIO (without GLFW headers)
+         * will not work at the moment due to:
+         * reference to rio::BaseMtx44f in FFLiShaderCallback.cpp
+         * rio::Drawer:: primitive types
+           - rio::Drawer::TRIANGLES, rio::Drawer::TRIANGLE_STRIP
+         * rio::Drawer::cVtxAlignment, rio::Drawer::cIdxAlignment
+         */
+    #else
+        #define FFL_USE_RIO 1
+        #include <misc/rio_Types.h>
+    #endif
 #else
     #define FFL_USE_RIO 0
     // Typedefs that RIO would have otherwise imported
