@@ -442,7 +442,7 @@ void UpdateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc)
     }
 }
 
-static const bool UPDATE_BOUNDING_BOX[FFLI_SHAPE_PARTS_TYPE_MAX][FFL_MODEL_TYPE_MAX] = {
+static const bool BOUNDING_BOX_USE[FFLI_SHAPE_PARTS_TYPE_MAX][FFL_MODEL_TYPE_MAX] = {
     // Normal -Hat- FaceOnly
     {  true,  true,  true },  // FFLI_SHAPE_PARTS_TYPE_BEARD
     {  true, false, false },  // FFLI_SHAPE_PARTS_TYPE_HAT_NORMAL
@@ -461,7 +461,7 @@ static const bool UPDATE_BOUNDING_BOX[FFLI_SHAPE_PARTS_TYPE_MAX][FFL_MODEL_TYPE_
 [[maybe_unused]] void CalcluateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc, FFLiShapePartsType partsType)
 {
     for (u32 i = 0; i < FFL_MODEL_TYPE_MAX; i++)
-        if (UPDATE_BOUNDING_BOX[partsType][i])
+        if (BOUNDING_BOX_USE[partsType][i])
             UpdateBoundingBox(&(pDst[i]), pSrc);
 }
 
@@ -810,25 +810,26 @@ void AdjustPartsTransform(FFLiCharModel* pModel, const FFLiCoordinate* pCoordina
 
 struct FFLiShapeTypeInfo
 {
-    FFLiShapeType   hairIndex;
-    FFLiShapeType   foreheadIndex;
-    FFLiShapeType   capIndex;
-};
-
-static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_NORMAL = {
-    FFLI_SHAPE_TYPE_OPA_HAIR_NORMAL,
-    FFLI_SHAPE_TYPE_OPA_FOREHEAD_NORMAL,
-    FFLI_SHAPE_TYPE_OPA_HAT_NORMAL
-};
-
-static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_HAT = {
-    FFLI_SHAPE_TYPE_OPA_HAIR_CAP,
-    FFLI_SHAPE_TYPE_OPA_FOREHEAD_CAP,
-    FFLI_SHAPE_TYPE_OPA_HAT_CAP
+    FFLiShapeType hairIndex;
+    FFLiShapeType foreheadIndex;
+    FFLiShapeType capIndex;
 };
 
 const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
 {
+    // INFOS.GetShapeTypeInfo__40__N_24_FFLiCharModelCreator_cpp_1f5483f2F12FFLModelType.sugar_release_SDK2.2E07.2Exx.5Cprogram.5Cffl.5Ccafe_ffl.5Csystem.5Cobj.5Cghs.5Ccafe.5Clib.5Cffl.5CNDEBUG.5CFFLiCharModelCreator..1
+    static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_NORMAL = {
+        FFLI_SHAPE_TYPE_OPA_HAIR_NORMAL,
+        FFLI_SHAPE_TYPE_OPA_FOREHEAD_NORMAL,
+        FFLI_SHAPE_TYPE_OPA_HAT_NORMAL
+    };
+
+    static const FFLiShapeTypeInfo SHAPE_TYPE_INFO_HAT = {
+        FFLI_SHAPE_TYPE_OPA_HAIR_CAP,
+        FFLI_SHAPE_TYPE_OPA_FOREHEAD_CAP,
+        FFLI_SHAPE_TYPE_OPA_HAT_CAP
+    };
+
     switch (type)
     {
     case FFL_MODEL_TYPE_NORMAL:
@@ -840,13 +841,13 @@ const FFLiShapeTypeInfo& GetShapeTypeInfo(FFLModelType type)
     }
 }
 
-static const FFLModelType MODEL_TYPE[2] = {
-    FFL_MODEL_TYPE_NORMAL,
-    FFL_MODEL_TYPE_HAT
-};
-
 void SetupDrawParam(FFLiCharModel* pModel)
 {
+    static const FFLModelType MODEL_TYPES[2] = {
+        FFL_MODEL_TYPE_NORMAL,
+        FFL_MODEL_TYPE_HAT
+    };
+
     FFLCullMode hairCullMode = FFL_CULL_MODE_BACK;
 
     pModel->drawParam[FFLI_SHAPE_TYPE_OPA_FACELINE].cullMode = FFL_CULL_MODE_BACK;
@@ -864,9 +865,9 @@ void SetupDrawParam(FFLiCharModel* pModel)
 
     for (u32 i = 0; i < 2; i++)
     {
-        if (pModel->charModelDesc.modelFlag & 1 << MODEL_TYPE[i])
+        if (pModel->charModelDesc.modelFlag & 1 << MODEL_TYPES[i])
         {
-            const FFLiShapeTypeInfo& shapeTypeInfo = GetShapeTypeInfo(MODEL_TYPE[i]);
+            const FFLiShapeTypeInfo& shapeTypeInfo = GetShapeTypeInfo(MODEL_TYPES[i]);
 
             FFLDrawParam& drawParamForehead = pModel->drawParam[shapeTypeInfo.foreheadIndex];
             drawParamForehead.cullMode = hairCullMode;
