@@ -5,6 +5,10 @@
 
 #include <misc/rio_MemUtil.h>
 
+#if RIO_IS_CAFE
+#include <nn/act.h>
+#endif // RIO_IS_CAFE
+
 static inline
 FFLiCreateID* GetCreateID(FFLCreateID* pCreateID)
 {
@@ -141,6 +145,116 @@ void FFLiGetDefaultCreateIDonCTR(FFLCreateID* pCreateID, s32 index)
     }
 }
 
+
+/*
+void FFLiCreateMiiIDonWiiU(FFLCreateID* pCreateID, const FFLiCreateIDBase* pCreateIDBase, u32 date, bool isSpecial)
+{
+    u8 flag = FFLI_CREATE_ID_BIT_NORMAL; // initialize flag
+    u32 dateTmp = date / 2; // date gets divided by two (>> 1)
+    if (!isSpecial) // set flag to special
+        flag = ~FFLI_CREATE_ID_BIT_NORMAL;
+
+                    // why 25 what... what........
+                    // is index even date or like the create id in // 32 bits or smth
+    (pCreateID->_).databaseIndex = (u8)dateTmp; // 0-8 bits
+    (pCreateID->_)._1 = (u8)(dateTmp >> 16); // 8-16 bits
+    //(pCreateID->_).flags = flag | 0b01010000 | (u8)(date >> 25) & 0xf;
+
+    (pCreateID->_).flags = flag | FFLI_CREATE_ID_BIT_NORMAL | FFLI_CREATE_ID_TYPE_WIIU;
+
+                                      // vv 7 bits
+    (pCreateID->_).flags |= (u8)(date >> 25) & 0xf; // 0b00001111
+
+    (pCreateID->_)._2 = (u8)(dateTmp >> 8); // 24 bits
+
+    // copy create id base into create id
+    rio::MemUtil::copy(&(pCreateID->_).base, pCreateIDBase, sizeof(FFLiCreateIDBase));
+}
+
+// NOTE: an exact copy of this function "FFLiSetCreateID" exists too?????
+void FFLiiSetCreateID(FFLCreateID* pCreateID, bool isSpecial)
+{
+    FFLiCreateIDBase* pCreateIDBase = FFLiGetCreateIDBase();
+
+    s32 year, month, day, hour, minute, second;
+
+    FFLiGetNowDateTime(&year, &month, &day, &hour, &minute, &second);
+    if (year < 2010)
+        year = 2010;
+
+    s32 daysToday = FFLiDateToDays(year, month, day);
+    s32 daysMin = FFLiDateToDays(2010, 1, 1);
+
+    FFLiCreateMiiIDonWiiU
+            (pCreateID,pCreateIDBase,
+                (daysToday - daysMin) * 86400 + (hour * 60 + minute) * 60 + second, isSpecial);
+}
+
+void FFLiSetCreateID(FFLCreateID* pCreateID, bool isSpecial)
+{ // just a thunk not a copy
+    return FFLiiSetCreateID(pCreateID, isSpecial);
+}
+
+void FFLiIncrementCreateIDTime(FFLiCreateID* pCreateID)
+
+{
+    u32 all = ((u32)pCreateID->_2 << 8 |
+            (u32)pCreateID->_1 << 0x10 | (pCreateID->flags & 0xf) << 0x18 |
+            (u32)pCreateID->databaseIndex) + 1;
+    pCreateID->databaseIndex = (u8)all;
+    pCreateID->flags = (u8)((u32)all >> 0x18) & 0xf | pCreateID->flags & 0xf0;
+    pCreateID->_1 = (u8)((u32)all >> 0x10);
+    pCreateID->_2 = (u8)((u32)all >> 8);
+}
+
+*/
+/*
+FFLResult FFLiGetCreateIDBaseBySystem(FFLiCreateIDBase* pCreateIDBase)
+{
+    RIO_ASSERT(pCreateIDBase != NULL);
+
+    // TODO NOT TESTED PROBABLY WONT WORK vv
+#if RIO_IS_CAFE
+    u8 deviceHash[12];
+    nn::Result result = nn::act::GetDeviceHash(&deviceHash);
+    if (result.IsFailure())
+        return FFL_RESULT_FILE_LOAD_ERROR;
+
+    rio::MemUtil::copy(pCreateIDBase, &deviceHash, sizeof(FFLiCreateIDBase));
+#else
+    rio::MemUtil::set(pCreateIDBase, 0, sizeof(FFLiCreateIDBase));
+#endif // RIO_IS_CAFE
+
+    return FFL_RESULT_OK;
+}
+
+
+FFLiCreateIDBase* FFLiGetCreateIDBase()
+{
+    if (!FFLiManager::IsConstruct())
+        return NULL;
+
+    FFLiManager* pManager = FFLiManager::GetInstance();
+    return pManager->GetSystemContext()->GetCreateIDBase();
+}
+
+FFLResult FFLpSetupCreateIDBase() // FFLp = private?
+{
+    FFLiCreateIDBase createIDBase;
+    FFLResult result = FFLiGetCreateIDBaseBySystem(&createIDBase);
+    if (result == FFL_RESULT_OK)
+    {
+        if (!FFLiManager::IsConstruct())
+            return FFL_RESULT_MANAGER_NOT_CONSTRUCT;
+
+        FFLiManager* pManager = FFLiManager::GetInstance();
+        pManager->GetSystemContext()->SetCreateIDBase(&createIDBase);
+        result = FFL_RESULT_OK;
+    }
+
+    return result;
+}
+*/
 
 
 bool FFLiRFLCreateID::Convert(FFLCreateID* pCreateID, const FFLiAuthorID* pAuthorID) const

@@ -23,11 +23,9 @@ public:
     const FFLiAuthorID* UserID() const;
     u64 TitleID() const;
 
-    /*
-    Deleted in NSMBU:
+    // Deleted in NSMBU:
     const FFLiCreateIDBase* GetCreateIDBase() const;
     void SetCreateIDBase(const FFLiCreateIDBase* pCreateIDBase);
-    */
 
     bool AfterConstruct();
 

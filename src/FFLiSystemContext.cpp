@@ -57,6 +57,19 @@ u64 FFLiSystemContext::TitleID() const
     return m_TitleID;
 }
 
+const FFLiCreateIDBase* FFLiSystemContext::GetCreateIDBase() const
+{
+    return &m_CreateIDBase;
+}
+
+void FFLiSystemContext::SetCreateIDBase(const FFLiCreateIDBase* pCreateIDBase)
+{
+    m_CreateIDBase.value16[0] = pCreateIDBase->value16[0];
+    m_CreateIDBase.value16[1] = pCreateIDBase->value16[1];
+    // TODO: TOUCH UP ???????
+    *(u32 *)&(m_CreateIDBase).value16[2] = *(u32 *)&pCreateIDBase->value16[2] & 0xffff0000;
+}
+
 bool FFLiSystemContext::AfterConstruct()
 {
 #if RIO_IS_CAFE

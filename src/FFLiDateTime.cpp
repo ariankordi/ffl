@@ -133,3 +133,70 @@ s32 FFLiGetSecondsFrom_2000_01_01()
     s32 days = FFLiDateToDays(year, month, day);
     return ((days * 24 + hour) * 60 + minute) * 60 + second;
 }
+
+
+/*
+void FFLiDateTime2DateTimeHidden
+               (FFLiDateTimeHidden *pDateTimeHidden, const FFLiDateTime& dateTime)
+
+{
+    uint uVar1;
+    uint uVar2;
+    int iVar3;
+    uint uVar4;
+    uint uVar5;
+
+    iVar3 = FFLiClamp__tm__2_i__FZ1ZN21_Z1Z(2000,0x84f,dateTime.year);
+    uVar4 = *pDateTimeHidden;
+    uVar1 = (*(ushort *)((int)dateTime.month + 2) & 0xf | (iVar3 + -2000) * 0x10 & 0xffff0U) << 0x15
+    ;
+    *pDateTimeHidden = uVar1 | uVar4 & 0x1fffff;
+    uVar5 = dateTime.second;
+    uVar2 = ((*(ushort *)((int)dateTime.day + 2) & 0x1f) << 5 |
+            *(ushort *)((int)dateTime.hour + 2) & 0x1f) << 0xb;
+    *pDateTimeHidden = uVar2 | uVar1 | uVar4 & 0x7ff;
+    *pDateTimeHidden =
+        (*(ushort *)((int)dateTime.minute + 2) & 0x3f) << 5 |
+        ((int)uVar5 >> 1) + (uint)((int)uVar5 < 0 && (uVar5 & 1) != 0) & 0x1f | uVar2 | uVar1;
+
+    // AFL:
+    uVar7 = *(uint *)pDateTimeHidden;
+    *(uint *)pDateTimeHidden = uVar5 | uVar7 & 0xffffff80;
+                    // month
+    uVar1 = (*(uint *)(&dateTime + 4) & 0xf) << 7;
+    *(uint *)pDateTimeHidden = uVar5 | uVar7 & 0xfffff800 | uVar1;
+                    // day
+    uVar2 = (*(uint *)(&dateTime + 8) & 0x1f) << 0xb;
+    *(uint *)pDateTimeHidden = uVar5 | uVar7 & 0xffff0000 | uVar1 | uVar2;
+                    // hour
+    uVar3 = (*(uint *)(&dateTime + 0xc) & 0x1f) << 0x10;
+    *(uint *)pDateTimeHidden = uVar5 | uVar7 & 0xffe00000 | uVar1 | uVar2 | uVar3;
+                    // minute
+    uVar4 = (*(uint *)(&dateTime + 0x10) & 0x3f) << 0x15;
+    *(uint *)pDateTimeHidden = uVar5 | uVar7 & 0xf8000000 | uVar1 | uVar2 | uVar3 | uVar4;
+                    // second
+    *(uint *)pDateTimeHidden =
+        uVar5 | uVar1 | uVar2 | uVar3 | uVar4 |
+        (*(int *)(&dateTime + 0x14) - (*(int *)(&dateTime + 0x14) >> 0x1f)) * 0x4000000 & 0xf8000000U;
+}
+
+void AFLiDateTimeHidden2DateTime(AFLiDateTime *pDateTime,const AFLiDateTimeHidden& dateTimeHidden)
+
+{
+    // FFL:
+    pDateTime->year = (dateTimeHidden >> 0x19) + 2000;
+    pDateTime->month = dateTimeHidden >> 0x15 & 0xf;
+    pDateTime->day = dateTimeHidden >> 0x10 & 0x1f;
+    pDateTime->hour = dateTimeHidden >> 0xb & 0x1f;
+    pDateTime->minute = dateTimeHidden >> 5 & 0x3f;
+    pDateTime->second = (dateTimeHidden & 0x1f) << 1;
+
+    // AFL:
+    pDateTime->year = (*(uint *)&dateTimeHidden & 0x7f) + 2000;
+    pDateTime->month = (uint)(*(int *)&dateTimeHidden << 0x15) >> 0x1c;
+    pDateTime->day = (uint)(*(int *)&dateTimeHidden << 0x10) >> 0x1b;
+    pDateTime->hour = *(ushort *)(&dateTimeHidden + 2) & 0x1f;
+    pDateTime->minute = (uint)(*(int *)&dateTimeHidden << 5) >> 0x1a;
+    pDateTime->second = *(uint *)&dateTimeHidden >> 0x1a & 0x3e;
+}
+*/
