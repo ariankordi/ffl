@@ -44,7 +44,7 @@ bool FFLiIsNullMiiID(const FFLCreateID* pCreateID)
 void FFLiGetTemporaryMiiID(FFLCreateID* pCreateID)
 {
     static const FFLiCreateID temporaryMiiID = {
-        FFLI_CREATE_ID_FLAG_TEMPORARY,
+        FFLI_CREATE_ID_BIT_TEMPORARY,
         0,
         0,
         0,
@@ -57,7 +57,7 @@ void FFLiGetTemporaryMiiID(FFLCreateID* pCreateID)
 bool FFLiIsNormalMiiID(const FFLCreateID* pCreateID)
 {
     u8 flags = GetCreateID(pCreateID)->flags;
-    return (flags & FFLI_CREATE_ID_FLAG_NORMAL) != 0;
+    return (flags & FFLI_CREATE_ID_BIT_NORMAL) != 0;
 }
 
 bool FFLiIsSpecialMiiID(const FFLCreateID* pCreateID)
@@ -65,38 +65,35 @@ bool FFLiIsSpecialMiiID(const FFLCreateID* pCreateID)
     return !FFLiIsNormalMiiID(pCreateID);
 }
 
-
 bool FFLiIsWiiMiiID(const FFLCreateID* pCreateID)
 {
-    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
-    return type == FFLI_CREATE_ID_TYPE_WII;
+    u8 flags = GetCreateID(pCreateID)->flags;
+    return (flags & FFLI_CREATE_ID_BIT_CTR) == 0 && (flags & FFLI_CREATE_ID_BIT_NTR) == 0;
 }
 
 bool FFLiIsNTRMiiID(const FFLCreateID* pCreateID)
 {
-    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
-    return type == FFLI_CREATE_ID_TYPE_NTR;
+    u8 flags = GetCreateID(pCreateID)->flags;
+    return (flags & FFLI_CREATE_ID_BIT_CTR) == 0 && (flags & FFLI_CREATE_ID_BIT_NTR) != 0;
 }
 
 bool FFLiIsCTRMiiID(const FFLCreateID* pCreateID)
 {
-    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
-    return type == FFLI_CREATE_ID_TYPE_CTR;
+    u8 flags = GetCreateID(pCreateID)->flags;
+    return (flags & FFLI_CREATE_ID_BIT_CTR) != 0 && (flags & FFLI_CREATE_ID_BIT_NTR) == 0;
 }
 
 bool FFLiIsWiiUMiiID(const FFLCreateID* pCreateID)
 {
-    u8 type = GetCreateID(pCreateID)->flags & FFLI_CREATE_ID_TYPE_MASK;
-    return type == FFLI_CREATE_ID_TYPE_WIIU;
+    u8 flags = GetCreateID(pCreateID)->flags;
+    return (flags & FFLI_CREATE_ID_BIT_CTR) != 0 && (flags & FFLI_CREATE_ID_BIT_NTR) != 0;
 }
-
-
 
 
 bool FFLiIsTemporaryMiiID(const FFLCreateID* pCreateID)
 {
     u8 flags = GetCreateID(pCreateID)->flags;
-    return (flags & FFLI_CREATE_ID_FLAG_TEMPORARY) != 0;
+    return (flags & FFLI_CREATE_ID_BIT_TEMPORARY) != 0;
 }
 
 bool FFLiIsValidMiiID(const FFLCreateID* pCreateID)
@@ -167,7 +164,7 @@ bool FFLiRFLCreateID::Convert(FFLCreateID* pCreateID, const FFLiAuthorID* pAutho
     //pCreateID->data[9] = (u8)crc;
 
     // Clear temporary flag if it is there (0b11101111 / 0xef)
-    pCreateID->data[0] &= ~FFLI_CREATE_ID_FLAG_TEMPORARY;
+    pCreateID->data[0] &= ~FFLI_CREATE_ID_BIT_TEMPORARY;
     return true;
 
 }
@@ -193,14 +190,14 @@ bool FFLiRFLCreateID::IsValidOnNand() const
 bool FFLiRFLCreateID::IsTemporary() const
 {
     RIO_ASSERT(IsValid());
-    return (this->data[0] & FFLI_CREATE_ID_FLAG_TEMPORARY) != 0;
+    return (this->data[0] & FFLI_CREATE_ID_BIT_TEMPORARY) != 0;
     //return this->data[0] >> 5 & 1;
 }
 
 bool FFLiRFLCreateID::IsNormal() const
 {
     RIO_ASSERT(IsValid());
-    return (this->data[0] & FFLI_CREATE_ID_FLAG_NORMAL) != 0;
+    return (this->data[0] & FFLI_CREATE_ID_BIT_NORMAL) != 0;
     //return this->data[0] >> 7;
 }
 
@@ -212,7 +209,7 @@ bool FFLiRFLCreateID::IsSpecial() const
 bool FFLiRFLCreateID::IsDs() const
 {
     RIO_ASSERT(IsValid());
-    return (this->data[0] & FFLI_CREATE_ID_TYPE_MASK) == FFLI_CREATE_ID_TYPE_NTR;
+    return (this->data[0] & FFLI_CREATE_ID_BIT_CTR) == 0 && (this->data[0] & FFLI_CREATE_ID_BIT_NTR) != 0;
     //return this->data[0] >> 6 & 1;
 }
 
