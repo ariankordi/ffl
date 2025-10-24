@@ -99,9 +99,8 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
     // are used - because they are not always initialized.
     if (!(pModel->charModelDesc.modelFlag & FFL_MODEL_FLAG_NEW_EXPRESSIONS))
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("model flag does not have FFL_MODEL_FLAG_NEW_EXPRESSIONS, truncating pModel->charModelDesc.allExpressionFlag\n");
-#endif
+        FFL_LOG_VERBOSE("model flag does not have FFL_MODEL_FLAG_NEW_EXPRESSIONS, truncating pModel->charModelDesc.allExpressionFlag\n");
+
         pModel->charModelDesc.allExpressionFlag.flag.mid = 0;
         pModel->charModelDesc.allExpressionFlag.flag.high = 0;
 #if RIO_DEBUG
@@ -308,9 +307,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
 
 void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
 {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-    RIO_LOG("in FFLiCharModelCreator::Delete(%p)\n", pModel);
-#endif
+    FFL_LOG_VERBOSE("in FFLiCharModelCreator::Delete(%p)\n", pModel);
 
 #ifndef FFL_NO_RENDER_TEXTURE
 
@@ -326,49 +323,34 @@ void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
     DeleteShapes(pModel);
     if (pModel->facelineRenderTexture.pTexture2D != NULL)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("faceline render texture2D != NULL (%p), calling FFLiDeleteFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->facelineRenderTexture);
-#endif
+        FFL_LOG_VERBOSE("faceline render texture2D != NULL (%p), calling FFLiDeleteFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->facelineRenderTexture);
         FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
     }
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
     else
-        RIO_LOG("faceline render texture2D == NULL\n");
-#endif
+        FFL_LOG_VERBOSE("faceline render texture2D == NULL\n");
 
     if (pModel->pTextureTempObject != NULL)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("pTextureTempObject != NULL (%p)\n", pModel->pTextureTempObject);
-#endif
+        FFL_LOG_VERBOSE("pTextureTempObject != NULL (%p)\n", pModel->pTextureTempObject);
+
         if (pModel->facelineRenderTexture.pTexture2D != NULL)
         {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-            RIO_LOG("faceline render texture2D != NULL (%p), calling FFLiDeleteTempObjectFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->pTextureTempObject->facelineTexture);
-#endif
+            FFL_LOG_VERBOSE("faceline render texture2D != NULL (%p), calling FFLiDeleteTempObjectFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->pTextureTempObject->facelineTexture);
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);
         }
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteTempObjectMaskTextures(%p)\n", &pModel->pTextureTempObject->maskTextures);
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteTempObjectMaskTextures(%p)\n", &pModel->pTextureTempObject->maskTextures);
         FFLiDeleteTempObjectMaskTextures(&pModel->pTextureTempObject->maskTextures, pModel->charModelDesc.allExpressionFlag, pModel->charModelDesc.resourceType);
 
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteTextureTempObject(%p)\n", &pModel->pTextureTempObject);
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteTextureTempObject(%p)\n", &pModel->pTextureTempObject);
 
         FFLiDeleteTextureTempObject(pModel);
     }
 
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-    RIO_LOG("FFLiDeleteMaskTextures(%p)\n", &pModel->maskTextures);
-#endif
+    FFL_LOG_VERBOSE("FFLiDeleteMaskTextures(%p)\n", &pModel->maskTextures);
 
     FFLiDeleteMaskTextures(&pModel->maskTextures);
 
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-    RIO_LOG("exiting FFLiCharModelCreator::Delete()\n");
-#endif
+    FFL_LOG_VERBOSE("exiting FFLiCharModelCreator::Delete()\n");
 }
 
 // this method is needed in case you don't have "delete" in C

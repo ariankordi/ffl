@@ -4,6 +4,7 @@
 #include <nn/ffl/FFLiResourceHeader.h>
 #include <nn/ffl/FFLiShape.h>
 
+#include <nn/ffl/FFLiUtil.h>
 #include <nn/ffl/detail/FFLiBug.h>
 #include <nn/ffl/detail/FFLiResourceShape.h>
 
@@ -162,9 +163,8 @@ void FFLiDeleteShape(void** ppShapeData, FFLDrawParam* pDrawParam)
 #ifdef FFL_USE_ADJUST_MTX
     if (pDrawParam->primitiveParam.pAdjustMatrix != NULL)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("free pAdjustMatrix: %p\n", pDrawParam->primitiveParam.pAdjustMatrix);
-#endif
+        FFL_LOG_VERBOSE("free pAdjustMatrix: %p\n", pDrawParam->primitiveParam.pAdjustMatrix);
+
         delete pDrawParam->primitiveParam.pAdjustMatrix;
     }
 #endif
@@ -197,11 +197,10 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
             0, 1, 0, 0,
             0, 0, 1, 0
         });
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("malloc pAdjustMatrix: %p\n", modelMtx);
-#endif
 
         // Apply translation
+        FFL_LOG_VERBOSE("malloc pAdjustMatrix: %p\n", modelMtx);
+
         if (pTranslate != NULL)
             modelMtx->applyTranslationLocal({ pTranslate->x, pTranslate->y, pTranslate->z });
 

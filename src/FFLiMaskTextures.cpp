@@ -166,10 +166,8 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
         return result;
 
     //InitRawMask(pObject, expressionFlag);
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-    RIO_LOG("FFLiInitTempObjectMaskTextures: input expression flags: %d/%d/%d\n",
+    FFL_LOG_VERBOSE("FFLiInitTempObjectMaskTextures: input expression flags: %d/%d/%d\n",
             expressionFlag.flags[0], expressionFlag.flags[1], expressionFlag.flags[2]);
-#endif // FFL_LOG_CHARMODEL_CLEANUP
 
     for (s32 fi = 0; fi < 3; ++fi) // 3 = Amount of u32s in FFLAllExpressionFlag
     {
@@ -185,9 +183,7 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
             RIO_ASSERT(i < FFL_EXPRESSION_LIMIT);
 
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-            RIO_LOG("FFLiInitTempObjectMaskTextures(%p):   Creating mask %i (%p)\n", pObject, (i), pObject->pRawMaskDrawParam[i]);
-#endif
+            FFL_LOG_VERBOSE("FFLiInitTempObjectMaskTextures(%p):   Creating mask %i (%p)\n", pObject, (i), pObject->pRawMaskDrawParam[i]);
 
             FFLiRawMaskTextureDesc desc;
             FFLiCharInfo expressionCharInfo = *pCharInfo;
@@ -255,9 +251,8 @@ void FFLiDeleteTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, FFLAl
 
             if (j >= FFL_EXPRESSION_LIMIT)
                 break;
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-            RIO_LOG("FFLiDeleteTempObjectMaskTextures(%p): Deleting mask %i (%p)\n", pObject, (j), pObject->pRawMaskDrawParam[j]);
-#endif
+            FFL_LOG_VERBOSE("FFLiDeleteTempObjectMaskTextures(%p): Deleting mask %i (%p)\n", pObject, (j), pObject->pRawMaskDrawParam[j]);
+
             FFLiDeleteDrawParamRawMask(pObject->pRawMaskDrawParam[j]);
             delete pObject->pRawMaskDrawParam[j];
         }

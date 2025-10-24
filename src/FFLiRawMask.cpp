@@ -4,6 +4,7 @@
 #include <nn/ffl/FFLiShaderCallback.h>
 #include <nn/ffl/FFLiPartsTextures.h>
 
+#include <nn/ffl/FFLiUtil.h>
 #include <nn/ffl/FFLiManager.h> // for g_TextureFlipY
 
 #include <nn/ffl/detail/FFLiCharInfo.h>
@@ -196,51 +197,38 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
 
 void FFLiDeleteDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam)
 {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-    RIO_LOG("in FFLiDeleteDrawParamRawMask(%p)\n", pDrawParam);
-#endif
+    FFL_LOG_VERBOSE("in FFLiDeleteDrawParamRawMask(%p)\n", pDrawParam);
     FFLiDeleteDrawParamRawMaskPartsFill(&pDrawParam->drawParamRawMaskPartsFill);
     if (pDrawParam->drawParamRawMaskPartsMole.primitiveParam.indexCount != 0)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole)\n");
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole)\n");
         FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole);
     }
     FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]));
     FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]));
     if (pDrawParam->drawParamRawMaskPartsEyebrow[1].primitiveParam.indexCount != 0)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]))\n");
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]))\n");
         FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]));
     }
     if (pDrawParam->drawParamRawMaskPartsEyebrow[0].primitiveParam.indexCount != 0)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]))\n");
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]))\n");
         FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]));
     }
     FFLiDeleteDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth);
     if (pDrawParam->drawParamRawMaskPartsMustache[1].primitiveParam.indexCount != 0)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]))\n");
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]))\n");
         FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]));
     }
     if (pDrawParam->drawParamRawMaskPartsMustache[0].primitiveParam.indexCount != 0)
     {
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-        RIO_LOG("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]))\n");
-#endif
+        FFL_LOG_VERBOSE("FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]))\n");
         FFLiDeleteDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]));
     }
-#ifdef FFL_LOG_CHARMODEL_CLEANUP
-    RIO_LOG("exiting FFLiDeleteDrawParamRawMask\n");
-#endif
+
+    FFL_LOG_VERBOSE("exiting FFLiDeleteDrawParamRawMask\n");
 }
 
 void FFLiInvalidateRawMask(FFLiRawMaskDrawParam* pDrawParam)

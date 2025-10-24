@@ -3,6 +3,13 @@
 
 #include <nn/ffl/types.h>
 
+// Macro for verbose logging. Feel free to relocate this.
+#ifdef FFL_LOG_CHARMODEL_CLEANUP
+#define FFL_LOG_VERBOSE RIO_LOG
+#else
+#define FFL_LOG_VERBOSE(FMT, ARGS...)
+#endif // FFL_LOG_CHARMODEL_CLEANUP
+
 template <typename T>
 T FFLiMin(T a, T b)
 {
