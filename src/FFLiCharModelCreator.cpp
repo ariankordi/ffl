@@ -422,6 +422,8 @@ FFLiShapeType ConvertShapePartsTypeToShapeType(FFLiShapePartsType partsType)
     }
 }
 
+#ifndef FFL_USE_ADJUST_MTX
+
 void UpdateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc)
 {
     if (!IsNaN(pSrc->min.x))
@@ -458,12 +460,14 @@ static const bool BOUNDING_BOX_USE[FFLI_SHAPE_PARTS_TYPE_MAX][FFL_MODEL_TYPE_MAX
     { false,  true, false }   // FFLI_SHAPE_PARTS_TYPE_FOREHEAD_CAP
 };
 
-[[maybe_unused]] void CalcluateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc, FFLiShapePartsType partsType)
+void CalcluateBoundingBox(FFLBoundingBox* pDst, const FFLBoundingBox* pSrc, FFLiShapePartsType partsType)
 {
     for (u32 i = 0; i < FFL_MODEL_TYPE_MAX; i++)
         if (BOUNDING_BOX_USE[partsType][i])
             UpdateBoundingBox(&(pDst[i]), pSrc);
 }
+
+#endif // FFL_USE_ADJUST_MTX
 
 FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 index, f32 scaleX, f32 scaleY, const FFLVec3* pTranslate, bool flipX, FFLiResourceLoader* pResLoader, const FFLiCoordinate* pCoordinate)
 {
