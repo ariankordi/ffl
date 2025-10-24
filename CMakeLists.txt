@@ -56,8 +56,8 @@ set_property(CACHE FFL_MODE PROPERTY STRINGS "" "for-rio" "opengl-33" "opengl-es
 
 
 # Paths to RIO and ninTexUtils.
-set(FFL_WITH_RIO "${CMAKE_CURRENT_SOURCE_DIR}/../rio" CACHE PATH "Path to RIO directory (must have include/ and src/)")
-set(FFL_WITH_NINTEXUTILS "${CMAKE_CURRENT_SOURCE_DIR}/../ninTexUtils" CACHE PATH "Path to ninTexUtils directory (must have include/ and src/)")
+set(FFL_WITH_RIO "${CMAKE_CURRENT_LIST_DIR}/../rio" CACHE PATH "Path to RIO directory (must have include/ and src/)")
+set(FFL_WITH_NINTEXUTILS "${CMAKE_CURRENT_LIST_DIR}/../ninTexUtils" CACHE PATH "Path to ninTexUtils directory (must have include/ and src/)")
 
 # Use debug as the primary build target.
 if(NOT CMAKE_BUILD_TYPE)
