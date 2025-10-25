@@ -50,7 +50,7 @@ union F32BitCast
 };
 NN_STATIC_ASSERT(sizeof(F32BitCast) == 4);
 
-static bool IsNaN(f32 value)
+[[maybe_unused]] static bool IsNaN(f32 value)
 {
     F32BitCast x = { value };
     // Basically:
@@ -250,13 +250,18 @@ FFLResult FFLiCharModelCreator::ExecuteCPUStep(FFLiCharModel* pModel, const FFLC
 #ifndef FFL_NO_RENDER_TEXTURE
 void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShaderCallback* pCallback)
 {
-    u32 resolution = FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution);
-
     FFLiShaderCallback shaderCallback;
     shaderCallback.Set(pCallback);
 
     rio::Matrix44f mvpMatrix = rio::Matrix44f::ident;
+#ifndef FFL_USE_ADJUST_MTX_MASK
+    // Premultiplied vertices: identity matrix
     shaderCallback.CallSetMatrix(&mvpMatrix);
+#else
+    rio::BaseMtx44f projMatrix;
+    FFLiGetMaskMatrix(&projMatrix, 64);
+    shaderCallback.CallSetMatrix(&projMatrix);
+#endif // FFL_USE_ADJUST_MTX_MASK
 
     FFLiRenderMaskTextures(&pModel->maskTextures, &pModel->pTextureTempObject->maskTextures, &shaderCallback
 #if RIO_IS_CAFE
@@ -267,11 +272,14 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     shaderCallback.CallSetMatrix(&mvpMatrix); // Reset to ident in case above function set it
 
     if (pModel->facelineRenderTexture.pTexture2D != NULL)
+    {
+        const u32 resolution = FFLiCharModelCreateParam::GetResolution(pModel->charModelDesc.resolution);
         FFLiRenderFacelineTexture(&pModel->facelineRenderTexture, &pModel->charInfo, resolution, &pModel->pTextureTempObject->facelineTexture, &shaderCallback
 #if RIO_IS_CAFE
             , &m_pManager->GetCopySurface()
 #endif // RIO_IS_CAFE
         );
+    }
 
     AfterExecuteGPUStep(pModel);
 

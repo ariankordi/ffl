@@ -91,28 +91,25 @@ namespace {
 
 void CalcMVMatrix(rio::Matrix34f* pMVMatrix, const FFLiRawMaskPartsDesc* pDesc)
 {
-    static const f32 scaleAdjustX = 0.88961464f;
-    static const f32 scaleAdjustY = 0.9276675f;
+    static const f32 texScaleX = 0.88961464f;
+    static const f32 texScaleY = 0.9276675f;
 
     //const rio::Vector3f scale =     { pDesc->scale.x * scaleAdjustX, pDesc->scale.y * scaleAdjustY, 1.0f };
     const rio::Vector3f rotate =    { 0.0f, 0.0f, rio::Mathf::deg2rad(pDesc->rot) };
     const rio::Vector3f translate = { pDesc->pos.x, pDesc->pos.y, 0.0f };
 
-    //pMVMatrix->makeSRT(scale, rotate, translate);
+    //pMVMatrix->makeSRT(scale, rotate, translate); // Incorrect. Rotation axis is not accurate
 
-    rio::Matrix34f scaleMatrix, rotateMatrix, scaleAdjustMatrix, translateMatrix;
-    scaleMatrix.makeS({ pDesc->scale.x, pDesc->scale.y, 1.0f });
-    pMVMatrix->setMul(scaleMatrix, *pMVMatrix);
+    rio::Matrix34f scaleRotate, scaleTranslate;
+    scaleRotate.makeSR({ pDesc->scale.x, pDesc->scale.y, 1.0f }, rotate);
+    scaleTranslate.makeST({ texScaleX, texScaleY, 1.0f }, translate);
+    pMVMatrix->setMul(scaleTranslate, scaleRotate);
 
-    rotateMatrix.makeR(rotate);
-    pMVMatrix->setMul(rotateMatrix, *pMVMatrix);
-
-    scaleAdjustMatrix.makeS({ scaleAdjustX, scaleAdjustY, 1.0f });
-    pMVMatrix->setMul(scaleAdjustMatrix, *pMVMatrix);
-
-    translateMatrix.makeT(translate);
-    pMVMatrix->setMul(translateMatrix, *pMVMatrix);
-
+#if 0
+    // Simulate the orthographic projection. This is somewhat untested.
+    scaleTranslate.makeST({ 2.0f/64.0f, 2.0f/64.0f, 1.0f }, { -1.0f, -1.0f, 0.0f });
+    pMVMatrix->setMul(scaleTranslate, *pMVMatrix);
+#endif
 }
 
 void* Allocate(u32 size, u32 alignment)

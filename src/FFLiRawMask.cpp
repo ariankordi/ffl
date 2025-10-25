@@ -37,49 +37,44 @@ struct RawMasks
 
 void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex);
 
-
-/* void __cdecl nn::util::general::MatrixOrthographicOffCenterRightHanded(struct
-   nn::util::general::MatrixRowMajor4x4fType * __ptr64,float,float,float,float,float,float) */
-void MatrixOrthographicOffCenterRightHanded(rio::BaseMtx44f* pOutValue, bool flipY, f32 left, f32 right, f32 bottom, f32 top, f32 nearZ, f32 farZ)
-{
-    f32 col00 = 1.0f / (right - left);
-    f32 col11 = 1.0f / (top - bottom);
-    f32 col22 = -1.0f / (farZ - nearZ);
-    pOutValue->m[0][0] = col00 * 2.0f;
-    pOutValue->m[1][0] = 0.0f;
-    pOutValue->m[2][0] = 0.0f;
-    pOutValue->m[3][0] = 0.0f;
-    pOutValue->m[0][1] = 0.0f;
-
-    if (flipY)
-        pOutValue->m[1][1] = col11 * 2.0f;
-    else
-        pOutValue->m[1][1] = -col11 * 2.0f;
-
-    pOutValue->m[2][1] = 0.0f;
-    pOutValue->m[3][1] = 0.0f;
-    pOutValue->m[0][2] = 0.0f;
-    pOutValue->m[1][2] = 0.0f;
-    pOutValue->m[2][2] = col22;
-    pOutValue->m[3][2] = 0.0f;
-    pOutValue->m[0][3] = -(right + left) * col00;
-
-    if (flipY)
-        pOutValue->m[1][3] = -(top + bottom) * col11;
-    else
-        pOutValue->m[1][3] = (top + bottom) * col11;
-
-
-    pOutValue->m[2][3] = nearZ * col22;
-    pOutValue->m[3][3] = 1.0f;
-}
-
 }
 
 void FFLiGetMaskMatrix(rio::BaseMtx44f* pBaseMtx44f, f32 width)
 {
-    MatrixOrthographicOffCenterRightHanded(pBaseMtx44f,
-    g_TextureFlipY, 0.0f, width, 0.0f, width, 200.0f, -200.0f);
+    //MatrixOrthographicOffCenterRightHanded(pBaseMtx44f,
+    //g_TextureFlipY, 0.0f, 64, 0.0f, 64, 200.0f, -200.0f);
+
+    const float col0011 = 2.0 / 64;
+    // First row.
+    pBaseMtx44f->m[0][0] = col0011; // X-axis.
+    pBaseMtx44f->m[1][0] = 0.0f;
+    pBaseMtx44f->m[2][0] = 0.0f;
+    pBaseMtx44f->m[3][0] = 0.0f;
+
+    // Second row.
+    pBaseMtx44f->m[0][1] = 0.0f;
+    pBaseMtx44f->m[1][1] = col0011; // Y-axis.
+    pBaseMtx44f->m[2][1] = 0.0f;
+    pBaseMtx44f->m[3][1] = 0.0f;
+
+    // Third row.
+    pBaseMtx44f->m[0][2] = 0.0f;
+    pBaseMtx44f->m[1][2] = 0.0f;
+    // Z-axis is not needed for 2D planes. It can be 1 or 0.
+    pBaseMtx44f->m[2][2] = 1.0f; // 0.64 / width;
+    pBaseMtx44f->m[3][2] = 0.0f;
+
+    // Fourth row (translation).
+    // Set translation to -1.0.
+    pBaseMtx44f->m[0][3] = -1.0f;
+    pBaseMtx44f->m[1][3] = -1.0f;
+    pBaseMtx44f->m[2][3] = 0.0f; // Can also be -1.0f.
+    pBaseMtx44f->m[3][3] = 1.0f; // W-axis kept to 1.0.
+    if (!g_TextureFlipY)
+    {
+        pBaseMtx44f->m[1][1] *= -1.0f;
+        pBaseMtx44f->m[1][3] *= -1.0f;
+    }
 }
 
 const s32 excludeColorFromEyeTextureTypes[] = {
@@ -93,13 +88,13 @@ const s32 excludeColorFromEyebrowTypeThreshold = 23;
 void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex, s32 eyebrowIndex, s32 mouthIndex, const FFLiRawMaskTextureDesc* pDesc)
 {
     RawMasks rawMasks;
-    CalcRawMask(&rawMasks, pCharInfo, resolution, leftEyeIndex, rightEyeIndex);
+    CalcRawMask(&rawMasks, pCharInfo, /* resolution */ 2, leftEyeIndex, rightEyeIndex);
 
     //const rio::OrthoProjection proj = rio::OrthoProjection(-200.0f, 200.0f, 0.0f, static_cast<f32>(resolution), 0.0f, static_cast<f32>(resolution));
     //rio::BaseMtx44f& projMatrix = const_cast<rio::BaseMtx44f&>(proj.getMatrix());
+
     rio::BaseMtx44f projMatrix;
-    // This ortho matrix below will have [1][1] and [1][3] flipped depending on g_TextureFlipY.
-    FFLiGetMaskMatrix(&projMatrix, static_cast<f32>(resolution));
+    FFLiGetMaskMatrix(&projMatrix, 64); // static_cast<f32>(resolution));
 
     if (pDesc->pTextureMustacheR != NULL)
     {
@@ -335,7 +330,8 @@ void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolut
     static f32 POS_X_ADD_MOLE       = POS_X_ADD + 14.233834f;
     static f32 POS_Y_ADD_MOLE       = POS_Y_ADD + 11.178394f + 2 * POS_Y_MUL;
 
-    f32 baseScale = resolution * (1.f / 64.f);
+    //f32 baseScale = resolution * (1.f / 64.f);
+    const f32 baseScale = 1.0f;
 
     f32 eyeSpacingX = pCharInfo->parts.eyeSpacingX * SPACING_MUL;
 
@@ -382,14 +378,16 @@ void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolut
     pRawMasks->eyeR.pos.x = (32 - eyeSpacingX) * baseScale;
     pRawMasks->eyeR.pos.y = eyePosY * baseScale;
     pRawMasks->eyeR.scale.x = eyeScaleX * baseScale;
-    pRawMasks->eyeR.scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, leftEyeIndex);
+    //pRawMasks->eyeR.scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, leftEyeIndex);
+    pRawMasks->eyeR.scale.y = eyeScaleY * baseScale;
     pRawMasks->eyeR.rot = eyeRotate;
     pRawMasks->eyeR.originPos = FFLI_ORIGIN_POSITION_LEFT;
 
     pRawMasks->eyeL.pos.x = (eyeSpacingX + 32) * baseScale;
     pRawMasks->eyeL.pos.y = eyePosY * baseScale;
     pRawMasks->eyeL.scale.x = eyeScaleX * baseScale;
-    pRawMasks->eyeL.scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, rightEyeIndex);
+    //pRawMasks->eyeL.scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, rightEyeIndex);
+    pRawMasks->eyeL.scale.y = eyeScaleY * baseScale;
     pRawMasks->eyeL.rot = 360.0f - eyeRotate;
     pRawMasks->eyeL.originPos = FFLI_ORIGIN_POSITION_RIGHT;
 
@@ -410,7 +408,8 @@ void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolut
     pRawMasks->mouth.pos.x = 32 * baseScale;
     pRawMasks->mouth.pos.y = mouthPosY * baseScale;
     pRawMasks->mouth.scale.x = mouthScaleX * baseScale;
-    pRawMasks->mouth.scale.y = FFLiiGetAdjustedMouthH(mouthScaleY * baseScale, pCharInfo->parts.mouthType);
+    // pRawMasks->mouth.scale.y = FFLiiGetAdjustedMouthH(mouthScaleY * baseScale, pCharInfo->parts.mouthType);
+    pRawMasks->mouth.scale.y = mouthScaleY * baseScale;
     pRawMasks->mouth.rot = 0.0f;
     pRawMasks->mouth.originPos = FFLI_ORIGIN_POSITION_CENTER;
 
