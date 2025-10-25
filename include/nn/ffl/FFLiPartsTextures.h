@@ -105,7 +105,8 @@ NN_STATIC_ASSERT32(sizeof(FFLiPartsTextures) == 0x154);
 
 struct FFLiEyeMouthTypeElement
 {
-    FFLiEyeTextureType      eyeTextureType[2];
+    FFLiEyeTextureType      eyeRTextureType;
+    FFLiEyeTextureType      eyeLTextureType;
     FFLiMouthTextureType    mouthTextureType;
     FFLiEyebrowTextureType  eyebrowTextureType;
 };

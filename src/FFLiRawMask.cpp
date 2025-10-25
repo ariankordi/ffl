@@ -25,11 +25,14 @@ enum
 
 struct RawMasks
 {
-    FFLiRawMaskPartsDesc    rawMaskPartsDescEye[2];
-    FFLiRawMaskPartsDesc    rawMaskPartsDescEyebrow[2];
-    FFLiRawMaskPartsDesc    rawMaskPartsDescMouth;
-    FFLiRawMaskPartsDesc    rawMaskPartsDescMustache[2];
-    FFLiRawMaskPartsDesc    rawMaskPartsDescMole;
+    FFLiRawMaskPartsDesc eyeR;
+    FFLiRawMaskPartsDesc eyeL;
+    FFLiRawMaskPartsDesc eyebrowR;
+    FFLiRawMaskPartsDesc eyebrowL;
+    FFLiRawMaskPartsDesc mouth;
+    FFLiRawMaskPartsDesc mustacheR;
+    FFLiRawMaskPartsDesc mustacheL;
+    FFLiRawMaskPartsDesc mole;
 };
 
 void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolution, s32 leftEyeIndex, s32 rightEyeIndex);
@@ -98,20 +101,20 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     // This ortho matrix below will have [1][1] and [1][3] flipped depending on g_TextureFlipY.
     FFLiGetMaskMatrix(&projMatrix, static_cast<f32>(resolution));
 
-    if (pDesc->pTexturesMustache[0] != NULL)
+    if (pDesc->pTextureMustacheR != NULL)
     {
-        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, pDesc->pTexturesMustache[0]);
-        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), &(rawMasks.rawMaskPartsDescMustache[0]), &projMatrix);
+        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[0].modulateParam, pCharInfo->parts.beardColor, pDesc->pTextureMustacheR);
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[0]), &(rawMasks.mustacheR), &projMatrix);
     }
     else
     {
         pDrawParam->drawParamRawMaskPartsMustache[0].primitiveParam.indexCount = 0;
     }
 
-    if (pDesc->pTexturesMustache[1] != NULL)
+    if (pDesc->pTextureMustacheL != NULL)
     {
-        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam, pCharInfo->parts.beardColor, pDesc->pTexturesMustache[1]);
-        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), &(rawMasks.rawMaskPartsDescMustache[1]), &projMatrix);
+        FFLiInitModulateMustache(&pDrawParam->drawParamRawMaskPartsMustache[1].modulateParam, pCharInfo->parts.beardColor, pDesc->pTextureMustacheL);
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsMustache[1]), &(rawMasks.mustacheL), &projMatrix);
     }
     else
     {
@@ -124,32 +127,32 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
         FFLiInitModulateMouthEx(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, pDesc->pTextureMouth);
     else
         FFLiInitModulateMouth(&pDrawParam->drawParamRawMaskPartsMouth.modulateParam, pCharInfo->parts.mouthColor, pDesc->pTextureMouth);
-    FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, &rawMasks.rawMaskPartsDescMouth, &projMatrix);
+    FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMouth, &rawMasks.mouth, &projMatrix);
 
-    if (pDesc->pTexturesEyebrow[0] != NULL)
+    if (pDesc->pTextureEyebrowR != NULL)
     {
 #ifdef FFL_USE_MODULATE_EYEBROW_EX
         if (eyebrowIndex > excludeColorFromEyebrowTypeThreshold)
-            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[0]);
+            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTextureEyebrowR);
         else
 #endif
-            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[0]);
-        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), &(rawMasks.rawMaskPartsDescEyebrow[0]), &projMatrix);
+            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[0].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTextureEyebrowR);
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[0]), &(rawMasks.eyebrowR), &projMatrix);
     }
     else
     {
         pDrawParam->drawParamRawMaskPartsEyebrow[0].primitiveParam.indexCount = 0;
     }
 
-    if (pDesc->pTexturesEyebrow[1] != NULL)
+    if (pDesc->pTextureEyebrowL != NULL)
     {
 #ifdef FFL_USE_MODULATE_EYEBROW_EX
         if (eyebrowIndex > excludeColorFromEyebrowTypeThreshold)
-            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[1]);
+            FFLiInitModulateEyebrowEx(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTextureEyebrowL);
         else
 #endif
-            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTexturesEyebrow[1]);
-        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), &(rawMasks.rawMaskPartsDescEyebrow[1]), &projMatrix);
+            FFLiInitModulateEyebrow(&pDrawParam->drawParamRawMaskPartsEyebrow[1].modulateParam, pCharInfo->parts.eyebrowColor, pDesc->pTextureEyebrowL);
+        FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEyebrow[1]), &(rawMasks.eyebrowL), &projMatrix);
     }
     else
     {
@@ -169,22 +172,22 @@ void FFLiInitDrawParamRawMask(FFLiRawMaskDrawParam* pDrawParam, const FFLiCharIn
     }
 
     if (isLeftEyeUsingTextureDirect)
-        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[0]);
+        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTextureEyeR);
     else
-        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[0]);
+        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[0].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTextureEyeR);
 
     if (isRightEyeUsingTextureDirect)
-        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[1]);
+        FFLiInitModulateEyeEx(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTextureEyeL);
     else
-        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTexturesEye[1]);
+        FFLiInitModulateEye(&pDrawParam->drawParamRawMaskPartsEye[1].modulateParam, pCharInfo->parts.eyeColor, pCharInfo->parts.eyeType, pDesc->pTextureEyeL);
 
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), &(rawMasks.rawMaskPartsDescEye[0]), &projMatrix);
-    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), &(rawMasks.rawMaskPartsDescEye[1]), &projMatrix);
+    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[0]), &(rawMasks.eyeR), &projMatrix);
+    FFLiInitDrawParamRawMaskParts(&(pDrawParam->drawParamRawMaskPartsEye[1]), &(rawMasks.eyeL), &projMatrix);
 
     if (pDesc->pTextureMole != NULL)
     {
         FFLiInitModulateMole(&pDrawParam->drawParamRawMaskPartsMole.modulateParam, pDesc->pTextureMole);
-        FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, &rawMasks.rawMaskPartsDescMole, &projMatrix);
+        FFLiInitDrawParamRawMaskParts(&pDrawParam->drawParamRawMaskPartsMole, &rawMasks.mole, &projMatrix);
     }
     else
     {
@@ -376,61 +379,61 @@ void CalcRawMask(RawMasks* pRawMasks, const FFLiCharInfo* pCharInfo, s32 resolut
     f32 molePosX = pCharInfo->parts.molePositionX * POS_X_MUL + POS_X_ADD_MOLE;
     f32 molePosY = pCharInfo->parts.molePositionY * POS_Y_MUL + POS_Y_ADD_MOLE;
 
-    pRawMasks->rawMaskPartsDescEye[0].pos.x = (32 - eyeSpacingX) * baseScale;
-    pRawMasks->rawMaskPartsDescEye[0].pos.y = eyePosY * baseScale;
-    pRawMasks->rawMaskPartsDescEye[0].scale.x = eyeScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescEye[0].scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, leftEyeIndex);
-    pRawMasks->rawMaskPartsDescEye[0].rot = eyeRotate;
-    pRawMasks->rawMaskPartsDescEye[0].originPos = FFLI_ORIGIN_POSITION_LEFT;
+    pRawMasks->eyeR.pos.x = (32 - eyeSpacingX) * baseScale;
+    pRawMasks->eyeR.pos.y = eyePosY * baseScale;
+    pRawMasks->eyeR.scale.x = eyeScaleX * baseScale;
+    pRawMasks->eyeR.scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, leftEyeIndex);
+    pRawMasks->eyeR.rot = eyeRotate;
+    pRawMasks->eyeR.originPos = FFLI_ORIGIN_POSITION_LEFT;
 
-    pRawMasks->rawMaskPartsDescEye[1].pos.x = (eyeSpacingX + 32) * baseScale;
-    pRawMasks->rawMaskPartsDescEye[1].pos.y = eyePosY * baseScale;
-    pRawMasks->rawMaskPartsDescEye[1].scale.x = eyeScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescEye[1].scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, rightEyeIndex);
-    pRawMasks->rawMaskPartsDescEye[1].rot = 360.0f - eyeRotate;
-    pRawMasks->rawMaskPartsDescEye[1].originPos = FFLI_ORIGIN_POSITION_RIGHT;
+    pRawMasks->eyeL.pos.x = (eyeSpacingX + 32) * baseScale;
+    pRawMasks->eyeL.pos.y = eyePosY * baseScale;
+    pRawMasks->eyeL.scale.x = eyeScaleX * baseScale;
+    pRawMasks->eyeL.scale.y = FFLiiGetAdjustedEyeH(eyeScaleY * baseScale, rightEyeIndex);
+    pRawMasks->eyeL.rot = 360.0f - eyeRotate;
+    pRawMasks->eyeL.originPos = FFLI_ORIGIN_POSITION_RIGHT;
 
-    pRawMasks->rawMaskPartsDescEyebrow[0].pos.x = (32 - eyebrowSpacingX) * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[0].pos.y = eyebrowPosY * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[0].scale.x = eyebrowScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[0].scale.y = eyebrowScaleY * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[0].rot = eyebrowRotate;
-    pRawMasks->rawMaskPartsDescEyebrow[0].originPos = FFLI_ORIGIN_POSITION_LEFT;
+    pRawMasks->eyebrowR.pos.x = (32 - eyebrowSpacingX) * baseScale;
+    pRawMasks->eyebrowR.pos.y = eyebrowPosY * baseScale;
+    pRawMasks->eyebrowR.scale.x = eyebrowScaleX * baseScale;
+    pRawMasks->eyebrowR.scale.y = eyebrowScaleY * baseScale;
+    pRawMasks->eyebrowR.rot = eyebrowRotate;
+    pRawMasks->eyebrowR.originPos = FFLI_ORIGIN_POSITION_LEFT;
 
-    pRawMasks->rawMaskPartsDescEyebrow[1].pos.x = (eyebrowSpacingX + 32) * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[1].pos.y = eyebrowPosY * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[1].scale.x = eyebrowScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[1].scale.y = eyebrowScaleY * baseScale;
-    pRawMasks->rawMaskPartsDescEyebrow[1].rot = 360.0f - eyebrowRotate;
-    pRawMasks->rawMaskPartsDescEyebrow[1].originPos = FFLI_ORIGIN_POSITION_RIGHT;
+    pRawMasks->eyebrowL.pos.x = (eyebrowSpacingX + 32) * baseScale;
+    pRawMasks->eyebrowL.pos.y = eyebrowPosY * baseScale;
+    pRawMasks->eyebrowL.scale.x = eyebrowScaleX * baseScale;
+    pRawMasks->eyebrowL.scale.y = eyebrowScaleY * baseScale;
+    pRawMasks->eyebrowL.rot = 360.0f - eyebrowRotate;
+    pRawMasks->eyebrowL.originPos = FFLI_ORIGIN_POSITION_RIGHT;
 
-    pRawMasks->rawMaskPartsDescMouth.pos.x = 32 * baseScale;
-    pRawMasks->rawMaskPartsDescMouth.pos.y = mouthPosY * baseScale;
-    pRawMasks->rawMaskPartsDescMouth.scale.x = mouthScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescMouth.scale.y = FFLiiGetAdjustedMouthH(mouthScaleY * baseScale, pCharInfo->parts.mouthType);
-    pRawMasks->rawMaskPartsDescMouth.rot = 0.0f;
-    pRawMasks->rawMaskPartsDescMouth.originPos = FFLI_ORIGIN_POSITION_CENTER;
+    pRawMasks->mouth.pos.x = 32 * baseScale;
+    pRawMasks->mouth.pos.y = mouthPosY * baseScale;
+    pRawMasks->mouth.scale.x = mouthScaleX * baseScale;
+    pRawMasks->mouth.scale.y = FFLiiGetAdjustedMouthH(mouthScaleY * baseScale, pCharInfo->parts.mouthType);
+    pRawMasks->mouth.rot = 0.0f;
+    pRawMasks->mouth.originPos = FFLI_ORIGIN_POSITION_CENTER;
 
-    pRawMasks->rawMaskPartsDescMustache[0].pos.x = 32 * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[0].pos.y = mustachePosY * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[0].scale.x = mustacheScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[0].scale.y = mustacheScaleY * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[0].rot = 0.0f;
-    pRawMasks->rawMaskPartsDescMustache[0].originPos = FFLI_ORIGIN_POSITION_LEFT;
+    pRawMasks->mustacheR.pos.x = 32 * baseScale;
+    pRawMasks->mustacheR.pos.y = mustachePosY * baseScale;
+    pRawMasks->mustacheR.scale.x = mustacheScaleX * baseScale;
+    pRawMasks->mustacheR.scale.y = mustacheScaleY * baseScale;
+    pRawMasks->mustacheR.rot = 0.0f;
+    pRawMasks->mustacheR.originPos = FFLI_ORIGIN_POSITION_LEFT;
 
-    pRawMasks->rawMaskPartsDescMustache[1].pos.x = 32 * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[1].pos.y = mustachePosY * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[1].scale.x = mustacheScaleX * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[1].scale.y = mustacheScaleY * baseScale;
-    pRawMasks->rawMaskPartsDescMustache[1].rot = 0.0f;
-    pRawMasks->rawMaskPartsDescMustache[1].originPos = FFLI_ORIGIN_POSITION_RIGHT;
+    pRawMasks->mustacheL.pos.x = 32 * baseScale;
+    pRawMasks->mustacheL.pos.y = mustachePosY * baseScale;
+    pRawMasks->mustacheL.scale.x = mustacheScaleX * baseScale;
+    pRawMasks->mustacheL.scale.y = mustacheScaleY * baseScale;
+    pRawMasks->mustacheL.rot = 0.0f;
+    pRawMasks->mustacheL.originPos = FFLI_ORIGIN_POSITION_RIGHT;
 
-    pRawMasks->rawMaskPartsDescMole.pos.x = molePosX * baseScale;
-    pRawMasks->rawMaskPartsDescMole.pos.y = molePosY * baseScale;
-    pRawMasks->rawMaskPartsDescMole.scale.x = moleScale * baseScale;
-    pRawMasks->rawMaskPartsDescMole.scale.y = moleScale * baseScale;
-    pRawMasks->rawMaskPartsDescMole.rot = 0.0f;
-    pRawMasks->rawMaskPartsDescMole.originPos = FFLI_ORIGIN_POSITION_CENTER;
+    pRawMasks->mole.pos.x = molePosX * baseScale;
+    pRawMasks->mole.pos.y = molePosY * baseScale;
+    pRawMasks->mole.scale.x = moleScale * baseScale;
+    pRawMasks->mole.scale.y = moleScale * baseScale;
+    pRawMasks->mole.rot = 0.0f;
+    pRawMasks->mole.originPos = FFLI_ORIGIN_POSITION_CENTER;
 }
 
 }

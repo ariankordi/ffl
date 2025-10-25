@@ -191,23 +191,23 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
 
             SetupExpressionCharInfo(&expressionCharInfo, pCharInfo, FFLExpression(i));
 
-            desc.pTexturesEye[0] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[0]];
-            desc.pTexturesEye[1] = pObject->partsTextures.pTexturesEye[element.eyeTextureType[1]];
+            desc.pTextureEyeR = pObject->partsTextures.pTexturesEye[element.eyeRTextureType];
+            desc.pTextureEyeL = pObject->partsTextures.pTexturesEye[element.eyeLTextureType];
 
-            desc.pTexturesEyebrow[0] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
-            desc.pTexturesEyebrow[1] = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
+            desc.pTextureEyebrowR = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
+            desc.pTextureEyebrowL = pObject->partsTextures.pTexturesEyebrow[element.eyebrowTextureType];
 
             desc.pTextureMouth = pObject->partsTextures.pTexturesMouth[element.mouthTextureType];
 
             if (expressionCharInfo.parts.mustacheType != FFL_MUSTACHE_TYPE_EMPTY)
             {
-                desc.pTexturesMustache[0] = pObject->partsTextures.pTextureMustache;
-                desc.pTexturesMustache[1] = pObject->partsTextures.pTextureMustache;
+                desc.pTextureMustacheR = pObject->partsTextures.pTextureMustache;
+                desc.pTextureMustacheL = pObject->partsTextures.pTextureMustache;
             }
             else
             {
-                desc.pTexturesMustache[0] = NULL;
-                desc.pTexturesMustache[1] = NULL;
+                desc.pTextureMustacheR = NULL;
+                desc.pTextureMustacheL = NULL;
             }
 
             desc.pTextureMole = pObject->partsTextures.pTextureMole;
@@ -219,8 +219,8 @@ FFLResult FFLiInitTempObjectMaskTextures(FFLiMaskTexturesTempObject* pObject, co
                 pObject->pRawMaskDrawParam[i],
                 &expressionCharInfo,
                 resolution,
-                FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[0]),
-                FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeTextureType[1]),
+                FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeRTextureType),
+                FFLiCharInfoAndTypeToEyeIndex(pCharInfo, element.eyeLTextureType),
 
                 FFLiCharInfoAndTypeToEyebrowIndex(pCharInfo, element.eyebrowTextureType),
                 FFLiCharInfoAndTypeToMouthIndex(pCharInfo, element.mouthTextureType),

@@ -32,10 +32,13 @@ NN_STATIC_ASSERT32(sizeof(FFLiRawMaskDrawParam) == 0x3A8);
 
 struct FFLiRawMaskTextureDesc
 {
-    FFLTexture* pTexturesEye[2];
-    FFLTexture* pTexturesEyebrow[2];
+    FFLTexture* pTextureEyeR;
+    FFLTexture* pTextureEyeL;
+    FFLTexture* pTextureEyebrowR;
+    FFLTexture* pTextureEyebrowL;
     FFLTexture* pTextureMouth;
-    FFLTexture* pTexturesMustache[2];
+    FFLTexture* pTextureMustacheR;
+    FFLTexture* pTextureMustacheL;
     FFLTexture* pTextureMole;
 };
 NN_STATIC_ASSERT32(sizeof(FFLiRawMaskTextureDesc) == 0x20);
