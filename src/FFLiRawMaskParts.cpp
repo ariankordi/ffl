@@ -35,13 +35,7 @@ void DeleteAttributesForFill(FFLAttributeBufferParam* pAttributes);
 void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const FFLiRawMaskPartsDesc* pDesc, const rio::BaseMtx44f* pProjMatrix)
 {
     rio::Matrix44f mvpMatrix;
-    rio::Matrix34f mvMatrix = { // rio::Matrix34f::ident;
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0
-        // why is this inlined? just in case you
-        // want to build without any rio sources
-    };
+    rio::Matrix34f mvMatrix;
 
     CalcMVMatrix(&mvMatrix, pDesc);
 
@@ -49,13 +43,13 @@ void FFLiInitDrawParamRawMaskParts(FFLiRawMaskPartsDrawParam* pDrawParam, const 
     rio::MemUtil::copy(&mvpMatrix, pProjMatrix, sizeof(rio::Matrix44f));
     pDrawParam->primitiveParam.pAdjustMatrix = new rio::Matrix34f(mvMatrix);
 #else
-    mvpMatrix.fromMatrix34(mvMatrix);
-    mvpMatrix.setMul(static_cast<const rio::Matrix44f&>(*pProjMatrix), mvpMatrix);
     #ifdef FFL_USE_ADJUST_MTX
-        pDrawParam->primitiveParam.pAdjustMatrix = NULL;
+        pDrawParam->primitiveParam.pAdjustMatrix = 0;
     #else
         pDrawParam->primitiveParam._8 = 0;
     #endif
+    mvpMatrix.fromMatrix34(mvMatrix);
+    mvpMatrix.setMul(static_cast<const rio::Matrix44f&>(*pProjMatrix), mvpMatrix);
 #endif // FFL_USE_ADJUST_MTX_MASK
 
     InitPrimitive(&pDrawParam->primitiveParam);
@@ -144,6 +138,7 @@ void InitPrimitive(FFLPrimitiveParam* pPrimitive)
     static const u32 INDEX_COUNT = 4;
 #endif
 
+    // IDX_ARRAY__36__N_20_FFLiRawMaskParts_cpp_7c9651f3..sugar_release_SDK2.2E07.2Exx.5Cprogram.5Cffl.5Ccafe_ffl.5Csystem.5Cobj.5Cghs.5Ccafe.5Clib.5Cffl.5CNDEBUG.5CFFLiRawMaskParts.
     static const u32 INDEX_BUFFER_SIZE = sizeof(u16) * INDEX_COUNT;
 
 #ifndef FFL_USE_2D_TRIANGLE_STRIP
@@ -205,14 +200,15 @@ void CalcAttribute(FFLVec4* pPosBuf, FFLVec2* pTexBuf, FFLiOriginPosition origin
 #ifndef FFL_USE_ADJUST_MTX_MASK
     for (u32 i = 0; i < 4; i++)
     {
-        const f32 w = pMVPMatrix->m[3][0] * pPosBuf[i].x + pMVPMatrix->m[3][1] * pPosBuf[i].y + pMVPMatrix->m[3][2] * pPosBuf[i].z + pMVPMatrix->m[3][3];
-        const f32 w_inv = 1 / w;
+        //const f32 w = pMVPMatrix->m[3][0] * pPosBuf[i].x + pMVPMatrix->m[3][1] * pPosBuf[i].y + pMVPMatrix->m[3][2] * pPosBuf[i].z + pMVPMatrix->m[3][3];
+        //const f32 w_inv = 1 / w;
+        const f32 w_inv = 1.0f;
 
         pPosBuf[i] = FFLVec4 {
             (pMVPMatrix->m[0][0] * pPosBuf[i].x + pMVPMatrix->m[0][1] * pPosBuf[i].y + pMVPMatrix->m[0][2] * pPosBuf[i].z + pMVPMatrix->m[0][3]) * w_inv,
             (pMVPMatrix->m[1][0] * pPosBuf[i].x + pMVPMatrix->m[1][1] * pPosBuf[i].y + pMVPMatrix->m[1][2] * pPosBuf[i].z + pMVPMatrix->m[1][3]) * w_inv,
             (pMVPMatrix->m[2][0] * pPosBuf[i].x + pMVPMatrix->m[2][1] * pPosBuf[i].y + pMVPMatrix->m[2][2] * pPosBuf[i].z + pMVPMatrix->m[2][3]) * w_inv,
-            pPosBuf[i].w
+            1.0f//pPosBuf[i].w
         };
     }
 #endif // FFL_USE_ADJUST_MTX_MASK
@@ -223,7 +219,7 @@ void InitAttributes(FFLAttributeBufferParam* pAttributes, FFLiOriginPosition ori
     const u32 POSITION_BUFFER_SIZE = sizeof(FFLVec4) * 4;
     const u32 TEXCOORD_BUFFER_SIZE = sizeof(FFLVec2) * 4;
 
-    static const FFLAttributeBufferParam ATTRIBUTES = { {
+    static const FFLAttributeBufferParam BASE_PARAM = { {
         // size                 stride          (ptr is unset)
         { POSITION_BUFFER_SIZE, sizeof(FFLVec4) },
         { TEXCOORD_BUFFER_SIZE, sizeof(FFLVec2) },
@@ -232,7 +228,7 @@ void InitAttributes(FFLAttributeBufferParam* pAttributes, FFLiOriginPosition ori
         { 0, 0 }
     } };
 
-    rio::MemUtil::copy(pAttributes, &ATTRIBUTES, sizeof(FFLAttributeBufferParam));
+    rio::MemUtil::copy(pAttributes, &BASE_PARAM, sizeof(FFLAttributeBufferParam));
 
     pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr = Allocate(FFLiBugCanSwapSize(POSITION_BUFFER_SIZE), rio::Drawer::cVtxAlignment);
     pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_TEXCOORD].ptr = Allocate(FFLiBugCanSwapSize(TEXCOORD_BUFFER_SIZE), rio::Drawer::cVtxAlignment);
@@ -290,38 +286,27 @@ void InitAttributesForFill(FFLAttributeBufferParam* pAttributes)
 {
     const u32 POSITION_BUFFER_SIZE = sizeof(FFLVec4) * 4;
 
-    /*
-    static const FFLVec4 POSITION_BUFFER[4] = {
+    // POSITIONS.InitAttributesForFill__36__N_20_FFLiRawMaskParts_cpp_7c9651f3FP23FFLAttributeBufferParamP19FFLiBufferAllocator.sugar_release_SDK2.2E07.2Exx.5Cprogram.5Cffl.5Ccafe_ffl.5Csystem.5Cobj.5Cghs.5Ccafe.5Clib.5Cffl.5CNDEBUG.5CFFLiRawMaskParts..3
+
+    static const FFLVec4 POSITIONS[4] = {
         {  1.0f, -1.0f,  0.0f,  0.0f },
         {  1.0f,  1.0f,  0.0f,  0.0f },
         { -1.0f,  1.0f,  0.0f,  0.0f },
         { -1.0f, -1.0f,  0.0f,  0.0f }
     };
-    */
-    FFLVec4 POSITION_BUFFER[4];
-    // no texture, orientation does not matter, no Y flip needed.. I think
 
+    // NOTE: no texture, orientation does not matter, no Y flip needed.. I think
+    static const FFLVec4 POSITIONS_FLIP[4] = {
+        {  1.0f,  1.0f,  0.0f,  0.0f },
+        {  1.0f, -1.0f,  0.0f,  0.0f },
+        { -1.0f, -1.0f,  0.0f,  0.0f },
+        { -1.0f,  1.0f,  0.0f,  0.0f }
+    };
 
-    if (g_TextureFlipY)
-    {
-        // Flipped Y-coordinates
-        POSITION_BUFFER[0] = {  1.0f,   1.0f,  0.0f,  0.0f };  // Top-left
-        POSITION_BUFFER[1] = {  1.0f,  -1.0f,  0.0f,  0.0f };  // Top-right
-        POSITION_BUFFER[2] = { -1.0f,  -1.0f,  0.0f,  0.0f };  // Bottom-left
-        POSITION_BUFFER[3] = { -1.0f,   1.0f,  0.0f,  0.0f };  // Bottom-right
-    }
-    else
-    {
-        // Default Y-coordinates
-        POSITION_BUFFER[0] = {  1.0f,  -1.0f,  0.0f,  0.0f };  // Top-left
-        POSITION_BUFFER[1] = {  1.0f,   1.0f,  0.0f,  0.0f };  // Top-right
-        POSITION_BUFFER[2] = { -1.0f,   1.0f,  0.0f,  0.0f };  // Bottom-left
-        POSITION_BUFFER[3] = { -1.0f,  -1.0f,  0.0f,  0.0f };  // Bottom-right
-    }
+    NN_STATIC_ASSERT(sizeof(POSITIONS) == POSITION_BUFFER_SIZE);
+    NN_STATIC_ASSERT(sizeof(POSITIONS_FLIP) == POSITION_BUFFER_SIZE);
 
-    NN_STATIC_ASSERT(sizeof(POSITION_BUFFER) == POSITION_BUFFER_SIZE);
-
-    static const FFLAttributeBufferParam ATTRIBUTES = { {
+    static const FFLAttributeBufferParam BASE_PARAM = { {
         { POSITION_BUFFER_SIZE, sizeof(FFLVec4) },
         { 0, 0 },
         { 0, 0 },
@@ -329,11 +314,15 @@ void InitAttributesForFill(FFLAttributeBufferParam* pAttributes)
         { 0, 0 }
     } };
 
-    rio::MemUtil::copy(pAttributes, &ATTRIBUTES, sizeof(FFLAttributeBufferParam));
+    rio::MemUtil::copy(pAttributes, &BASE_PARAM, sizeof(FFLAttributeBufferParam));
 
     pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr = Allocate(FFLiBugCanSwapSize(POSITION_BUFFER_SIZE), rio::Drawer::cVtxAlignment);
 
-    rio::MemUtil::copy(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITION_BUFFER, POSITION_BUFFER_SIZE);
+    if (g_TextureFlipY)
+        rio::MemUtil::copy(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITIONS_FLIP, POSITION_BUFFER_SIZE);
+    else
+        rio::MemUtil::copy(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITIONS, POSITION_BUFFER_SIZE);
+
     EndianSwap(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITION_BUFFER_SIZE);
 }
 

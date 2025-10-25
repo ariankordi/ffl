@@ -44,19 +44,22 @@ NN_STATIC_ASSERT32(sizeof(FFLAttributeBufferParam) == 0x3C);
 
 typedef struct FFLPrimitiveParam
 {
+#if FFL_USE_RIO
     // Shapes are triangles, but for faceline/mask
     // texture 2D planes it is triangle strip
-#if FFL_USE_RIO
     rio::Drawer::PrimitiveMode  primitiveType;
 #else
     unsigned int                primitiveType;
-#endif
+#endif // endif
+
     u32                         indexCount;
+
 #ifdef FFL_USE_ADJUST_MTX
     rio::Matrix34f*             pAdjustMatrix;
 #else
     u32                         _8; // Deleted
-#endif
+#endif // FFL_USE_ADJUST_MTX
+
     void*                       pIndexBuffer;
 }
 FFLPrimitiveParam;

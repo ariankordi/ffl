@@ -256,9 +256,7 @@ void FFLiCharModelCreator::ExecuteGPUStep(FFLiCharModel* pModel, const FFLShader
     shaderCallback.Set(pCallback);
 
     rio::Matrix44f mvpMatrix = rio::Matrix44f::ident;
-#ifndef FFL_USE_ADJUST_MTX_MASK
     shaderCallback.CallSetMatrix(&mvpMatrix);
-#endif // FFL_USE_ADJUST_MTX_MASK
 
     FFLiRenderMaskTextures(&pModel->maskTextures, &pModel->pTextureTempObject->maskTextures, &shaderCallback
 #if RIO_IS_CAFE
@@ -448,7 +446,7 @@ FFLResult InitShape(FFLiCharModel* pModel, FFLiShapePartsType partsType, u32 ind
 #ifndef FFL_USE_ADJUST_MTX
     pDrawParam->primitiveParam._8 = 0;
     CalcluateBoundingBox(pModel->boundingBox, &boundingBox, partsType);
-#endif
+#endif // FFL_USE_ADJUST_MTX
 
     return FFL_RESULT_OK;
 }
