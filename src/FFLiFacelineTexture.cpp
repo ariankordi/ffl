@@ -348,25 +348,22 @@ void InitAttributes(FFLAttributeBufferParam* pAttributes, u32 resolution)
     const u32 POSITION_BUFFER_SIZE = sizeof(FFLVec4) * 4;
     const u32 TEXCOORD_BUFFER_SIZE = sizeof(FFLVec2) * 4;
 
-    FFLVec4 POSITION_BUFFER[4];
-    if (g_TextureFlipY)
-    {
-        // Flipped Y-coordinates
-        POSITION_BUFFER[0] = { -1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-left
-        POSITION_BUFFER[1] = {  1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-right
-        POSITION_BUFFER[2] = { -1.0f,   1.0f,  0.0f,  0.0f }; // Top-left
-        POSITION_BUFFER[3] = {  1.0f,   1.0f,  0.0f,  0.0f }; // Top-right
-    }
-    else
-    {
-        // Default Y-coordinates
-        POSITION_BUFFER[0] = { -1.0f,   1.0f,  0.0f,  0.0f }; // Top-left
-        POSITION_BUFFER[1] = {  1.0f,   1.0f,  0.0f,  0.0f }; // Top-right
-        POSITION_BUFFER[2] = { -1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-left
-        POSITION_BUFFER[3] = {  1.0f,  -1.0f,  0.0f,  0.0f }; // Bottom-right
-    }
+    static const FFLVec4 POSITIONS[4] = {
+        { -1.0f,  1.0f,  0.0f,  0.0f },
+        {  1.0f,  1.0f,  0.0f,  0.0f },
+        { -1.0f, -1.0f,  0.0f,  0.0f },
+        {  1.0f, -1.0f,  0.0f,  0.0f }
+    };
 
-    NN_STATIC_ASSERT(sizeof(POSITION_BUFFER) == POSITION_BUFFER_SIZE);
+    static const FFLVec4 POSITIONS_FLIP[4] = {
+        { -1.0f, -1.0f,  0.0f,  0.0f },
+        {  1.0f, -1.0f,  0.0f,  0.0f },
+        { -1.0f,  1.0f,  0.0f,  0.0f },
+        {  1.0f,  1.0f,  0.0f,  0.0f }
+    };
+
+    NN_STATIC_ASSERT(sizeof(POSITIONS) == POSITION_BUFFER_SIZE);
+    NN_STATIC_ASSERT(sizeof(POSITIONS_FLIP) == POSITION_BUFFER_SIZE);
 
     static const FFLVec2 TEXCOORD_BUFFER[4] = {
         { 0.0f, 0.0f },
@@ -380,7 +377,11 @@ void InitAttributes(FFLAttributeBufferParam* pAttributes, u32 resolution)
     pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].stride = sizeof(FFLVec4);
     pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr = Allocate(FFLiBugCanSwapSize(POSITION_BUFFER_SIZE), rio::Drawer::cVtxAlignment);
 
-    rio::MemUtil::copy(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITION_BUFFER, POSITION_BUFFER_SIZE);
+    if (g_TextureFlipY)
+        rio::MemUtil::copy(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITIONS_FLIP, POSITION_BUFFER_SIZE);
+    else
+        rio::MemUtil::copy(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITIONS, POSITION_BUFFER_SIZE);
+
     EndianSwap(pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_POSITION].ptr, POSITION_BUFFER_SIZE);
 
     pAttributes->attributeBuffers[FFL_ATTRIBUTE_BUFFER_TYPE_TEXCOORD].size = TEXCOORD_BUFFER_SIZE;

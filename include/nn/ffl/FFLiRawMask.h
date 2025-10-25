@@ -15,12 +15,28 @@ extern "C" {
 
 typedef struct FFLiRawMaskDrawParam
 {
-    FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsEye[2];
-    FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsEyebrow[2];
-    FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsMouth;
-    FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsMustache[2];
-    FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsMole;
-    FFLiRawMaskPartsDrawParam   drawParamRawMaskPartsFill;
+    /* Original order:
+    FFLiRawMaskPartsDrawParam eyeR;
+    FFLiRawMaskPartsDrawParam eyeL;
+    FFLiRawMaskPartsDrawParam eyebrowR;
+    FFLiRawMaskPartsDrawParam eyebrowL;
+    FFLiRawMaskPartsDrawParam mouth;
+    FFLiRawMaskPartsDrawParam mustacheR;
+    FFLiRawMaskPartsDrawParam mustacheL;
+    FFLiRawMaskPartsDrawParam mole;
+    FFLiRawMaskPartsDrawParam fill;
+    */
+    // The order has been changed to the draw order
+    // so that it can be incremented through easier.
+    FFLiRawMaskPartsDrawParam mustacheR;
+    FFLiRawMaskPartsDrawParam mustacheL;
+    FFLiRawMaskPartsDrawParam mouth;
+    FFLiRawMaskPartsDrawParam eyebrowR;
+    FFLiRawMaskPartsDrawParam eyebrowL;
+    FFLiRawMaskPartsDrawParam eyeR;
+    FFLiRawMaskPartsDrawParam eyeL;
+    FFLiRawMaskPartsDrawParam mole;
+    FFLiRawMaskPartsDrawParam fill;
 }
 FFLiRawMaskDrawParam;
 NN_STATIC_ASSERT32(sizeof(FFLiRawMaskDrawParam) == 0x3A8);
