@@ -39,11 +39,7 @@ if(EMSCRIPTEN)
     # as an executable that functions as an Emscripten module.
     option(FFL_BUILD_EMSCRIPTEN_MODULE "Build as an Emscripten module" ON)
     # Emscripten-specific option to build for WASM or not.
-    option(FFL_BUILD_WASM "Build for WebAssembly" ON)
-    # Set flags to reduce use of libstdc++.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -fno-threadsafe-statics")
-    set(FFL_USE_ADJUST_MTX ON)
-    set(FFL_ENABLE_NEW_MASK_ONLY_FLAG ON)
+    option(FFL_BUILD_WASM "Build for WebAssembly (as opposed to only JS)" ON)
 endif()
 
 set(CMAKE_CACHE_ARGS_INCLUDE_HELP TRUE) # Include option descriptions with cmake -LH.
@@ -154,7 +150,14 @@ function(create_ffl_target target_name library_type)
     # Create target.
     if(FFL_BUILD_EMSCRIPTEN_MODULE)
         # If making Emscripten module, instead build an executable.
-        message(STATUS "Building an executable instead of a library in order to build an Emscripten module. To disable this, turn off FFL_BUILD_EMSCRIPTEN_MODULE.")
+        message(STATUS "\nFFL: Building an executable instead of a library in order to build an Emscripten module. To disable this, turn off FFL_BUILD_EMSCRIPTEN_MODULE.")
+
+        # Set flags to reduce use of libstdc++.
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -fno-threadsafe-statics")
+        # Set other standard flags for the ffl-emscripten module.
+        set(FFL_USE_ADJUST_MTX ON)
+        set(FFL_ENABLE_NEW_MASK_ONLY_FLAG ON)
+
         add_executable(${target_name} ${FFL_SOURCES})
     else()
         # Create a library target (static or shared)

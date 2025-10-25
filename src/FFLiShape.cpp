@@ -285,7 +285,7 @@ void FFLiAdjustShape(FFLDrawParam* pDrawParam, FFLBoundingBox* pBoundingBox, f32
         );
 */
 
-#endif
+#endif // FFL_USE_ADJUST_MTX
 
 }
 

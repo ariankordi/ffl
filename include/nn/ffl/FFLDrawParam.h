@@ -3,12 +3,11 @@
 
 #include <nn/ffl/FFLModulateParam.h>
 
-#ifdef FFL_USE_ADJUST_MTX
-    #include <math/rio_Matrix.h>
-#endif
-
 #if FFL_USE_RIO
     #include <gpu/rio_Drawer.h>
+    #if FFL_USE_ADJUST_MTX
+        #include <math/rio_Matrix.h>
+    #endif
 #endif
 
 #ifdef __cplusplus
