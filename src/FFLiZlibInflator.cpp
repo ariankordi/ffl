@@ -2,18 +2,26 @@
 
 #include <misc/rio_MemUtil.h>
 
-#ifndef FFL_NO_ZLIB
+#if !defined(FFL_NO_ZLIB) || defined(FFL_USE_MINIZ) || defined(FFL_USE_EM_INFLATE)
+
+#ifdef FFL_USE_EM_INFLATE
+    // https://github.com/emmanuel-marty/em_inflate/tree/d3994fe353820da9e2524c80727ef259265670f7
+    // Download "em_inflate" in include. Include the .c file so there is no extra build step.
+    #include "em_inflate/lib/em_inflate.c"
+#endif
+
+#ifndef FFL_USE_EM_INFLATE // zlib implementation
 
 FFLiZlibInflator::FFLiZlibInflator(s32 windowBits)
     : m_IsStreamEnd(false)
 {
-#ifdef FFL_USE_MINIZ
-    // NOTE: when you use miniz the window bits HAS to be 15
-    // ... meaning it will not work with any public FFL resources :(
-    RIO_ASSERT(windowBits == Z_DEFAULT_WINDOW_BITS || windowBits == -Z_DEFAULT_WINDOW_BITS);
-#endif
     rio::MemUtil::set(&m_Stream, 0, sizeof(z_stream));
-    [[maybe_unused]] s32 ret = inflateInit2(&m_Stream, windowBits);
+    [[maybe_unused]] s32 ret =
+#ifdef FFL_NO_ZLIB
+        inflateInit(&m_Stream); // miniz does not like our windowBits
+#else
+        inflateInit2(&m_Stream, windowBits);
+#endif
     RIO_ASSERT(ret == Z_OK);
 }
 
@@ -43,5 +51,15 @@ s32 FFLiZlibInflator::Process(void** ppDst, u32* pDstSize, const void** ppSrc, u
 
     return ret;
 }
+
+#else // FFL_USE_EM_INFLATE
+FFLiZlibInflator::FFLiZlibInflator(s32) { }
+FFLiZlibInflator::~FFLiZlibInflator() { }
+s32 FFLiZlibInflator::Process(void** ppDst, u32* pDstSize, const void** ppSrc, u32* pSrcSize, s32 flush)
+{
+    em_inflate(*ppSrc, *pSrcSize, (u8*)*ppDst, *pDstSize);
+    return Z_STREAM_END;
+}
+#endif // FFL_USE_EM_INFLATE
 
 #endif // FFL_NO_ZLIB

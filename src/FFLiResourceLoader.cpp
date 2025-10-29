@@ -391,7 +391,7 @@ bool UncompressBrotli(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer
 }
 #endif // FFL_USE_BROTLI
 
-#ifndef FFL_NO_ZLIB
+#ifdef Z_OK
 bool UncompressZlib(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
 {
     FFLiZlibInflator inflator(FFLiResourceWindowBitsToZlibWindowBits(FFLiResourceWindowBits(partsInfo.windowBits)));
@@ -406,7 +406,7 @@ bool UncompressZlib(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* 
     RIO_ASSERT(ret == Z_STREAM_END);
     return ret == Z_STREAM_END;
 }
-#endif // FFL_NO_ZLIB
+#endif // Z_OK
 
 
 bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuffer, const FFLiResourcePartsInfo& partsInfo)
@@ -415,8 +415,7 @@ bool Uncompress(void* pDst, const void* pSrc, FFLiResourceUncompressBuffer* pBuf
     if (partsInfo.strategy == FFLI_RESOURCE_STRATEGY_BROTLI)
         return UncompressBrotli(pDst, pSrc, pBuffer, partsInfo);
 #endif // FFL_USE_BROTLI
-
-#ifndef FFL_NO_ZLIB
+#ifdef Z_OK
     return UncompressZlib(pDst, pSrc, pBuffer, partsInfo);
 #else
     RIO_ASSERT(false && "This was built with FFL_NO_ZLIB, but a resource in this file is compressed. You will have to make a completely uncompressed resource file with FFLResource.py.");

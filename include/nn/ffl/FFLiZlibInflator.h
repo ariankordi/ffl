@@ -3,16 +3,21 @@
 
 #include <nn/ffl/FFLiZlibInterface.h>
 
-#ifndef FFL_NO_ZLIB
+#if !defined(FFL_NO_ZLIB) || defined(FFL_USE_EM_INFLATE)
 
-#ifdef FFL_USE_MINIZ
+#ifdef FFL_USE_EM_INFLATE
+    #include "em_inflate/lib/em_inflate.h"
+#elif defined(FFL_USE_MINIZ)
     #include <miniz.h>
-    #ifndef Z_OK
-        #define Z_OK MZ_OK
-    #endif // Z_OK
 #else
     #include <zlib.h>
-#endif // FFL_USE_MINIZ
+#endif
+
+#ifndef Z_OK // redefine zlib consts
+    #define Z_STREAM_END 1
+    #define Z_FINISH 4
+    #define Z_OK 0
+#endif // Z_OK
 
 class FFLiZlibInflator : public FFLiZlibInterface
 {
@@ -24,8 +29,10 @@ public:
 
 private:
     //u32                 _0[4 / sizeof(u32)];    // Deleted
+#ifndef FFL_USE_EM_INFLATE
     z_stream            m_Stream;
     bool                m_IsStreamEnd;
+#endif
 };
 NN_STATIC_ASSERT32(sizeof(FFLiZlibInflator) == 0x40);
 
