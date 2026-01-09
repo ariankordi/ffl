@@ -118,7 +118,7 @@ void FFLiSetupRenderTexture(FFLiRenderTexture* pRenderTexture, const FFLColor* p
             GX2ClearDepthStencilEx(pGX2DepthBuffer, pGX2DepthBuffer->depthClear, pGX2DepthBuffer->stencilClear, GX2_CLEAR_FLAGS_BOTH);
 #elif RIO_IS_WIN
             RIO_GL_CALL(glDepthMask(GL_TRUE));
-            RIO_GL_CALL(glClearDepth(1.0f));
+            RIO_GL_CALL(glClearDepthf(1.0f));
             RIO_GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
 #endif
         }

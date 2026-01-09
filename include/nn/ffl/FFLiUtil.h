@@ -7,7 +7,7 @@
 #ifdef FFL_LOG_CHARMODEL_CLEANUP
 #define FFL_LOG_VERBOSE RIO_LOG
 #else
-#define FFL_LOG_VERBOSE(FMT, ARGS...)
+#define FFL_LOG_VERBOSE(FMT, ...)
 #endif // FFL_LOG_CHARMODEL_CLEANUP
 
 template <typename T>
