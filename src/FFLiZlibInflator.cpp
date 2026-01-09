@@ -5,9 +5,8 @@
 #if !defined(FFL_NO_ZLIB) || defined(FFL_USE_MINIZ) || defined(FFL_USE_EM_INFLATE)
 
 #ifdef FFL_USE_EM_INFLATE
-    // https://github.com/emmanuel-marty/em_inflate/tree/d3994fe353820da9e2524c80727ef259265670f7
-    // Download "em_inflate" in include. Include the .c file so there is no extra build step.
-    #include "em_inflate/lib/em_inflate.c"
+    // Include the .c file so there is no extra build step.
+    #include "em_inflate.c"
 #endif
 
 #ifndef FFL_USE_EM_INFLATE // zlib implementation

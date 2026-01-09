@@ -6,7 +6,7 @@
 #if !defined(FFL_NO_ZLIB) || defined(FFL_USE_EM_INFLATE)
 
 #ifdef FFL_USE_EM_INFLATE
-    #include "em_inflate/lib/em_inflate.h"
+    #include "em_inflate.h"
 #elif defined(FFL_USE_MINIZ)
     #include <miniz.h>
 #else

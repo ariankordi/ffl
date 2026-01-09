@@ -5,6 +5,7 @@ project(ffl LANGUAGES CXX)
 
 option(FFL_NO_NINTEXUTILS "Disable ninTexUtils (then you can only use AFL resources)" OFF)
 option(FFL_NO_ZLIB "Disable zlib (then you need to disable zlib on a resource made with FFLResource.py)" OFF)
+option(FFL_USE_EM_INFLATE "Use em_inflate instead of zlib, which is a more lightweight alternative." OFF)
 option(FFL_USE_BROTLI "Enable brotli support for unofficial resource files. Do NOT enable this if you are not going to use a resource explicitly packed with brotli." OFF)
 option(FFL_NO_FS "Disables FFL's use of RIO filesystem, for databases and non-cached resource loading." OFF)
 # This should probably be changeable at runtime:
@@ -105,14 +106,30 @@ endif()
 
 # ------------------ zlib, brotli -------------------
 
-if(NOT FFL_NO_ZLIB)
+if(NOT FFL_NO_ZLIB AND NOT FFL_USE_EM_INFLATE)
     find_package(ZLIB QUIET)
     if(NOT ZLIB_FOUND)
-        message(WARNING "zlib not found. Proceeding without zlib. Please note that this will not work with resources that are not uncompressed (all publicly available ones are)")
-        set(FFL_NO_ZLIB ON)
+        message(WARNING "zlib not found. Falling back to downloading em_inflate.")
+        set(FFL_USE_EM_INFLATE ON)
     endif()
-else()
+elseif(NOT FFL_USE_EM_INFLATE)
     message(WARNING "zlib disabled. Will proceed without zlib features (FFL_NO_ZLIB).")
+endif()
+
+# Fetch em_inflate if it is requested.
+if(FFL_USE_EM_INFLATE)
+    include(FetchContent)
+    FetchContent_Declare(
+        em_inflate
+        URL https://github.com/emmanuel-marty/em_inflate/archive/d3994fe.zip
+        URL_HASH SHA1=adaa98627c4bea5f455cb912bb8df0acadae2209
+        DOWNLOAD_EXTRACT_TIMESTAMP true
+    )
+    FetchContent_MakeAvailable(em_inflate)
+
+    # Add the include path.
+    include_directories(${em_inflate_SOURCE_DIR}/lib)
+    message(STATUS "FFL: Using em_inflate for zlib implementation.")
 endif()
 
 if(FFL_USE_BROTLI)
@@ -175,9 +192,11 @@ function(create_ffl_target target_name library_type)
         endif()
     endif()
 
-    if(ZLIB_FOUND AND NOT FFL_NO_ZLIB) # Link zlib.
+    if(ZLIB_FOUND AND NOT FFL_USE_EM_INFLATE) # Link zlib.
         target_link_libraries(${target_name} PRIVATE ZLIB::ZLIB)
-    else()
+    elseif(FFL_USE_EM_INFLATE)
+        target_compile_definitions(${FFL_TARGET_NAME} PRIVATE FFL_USE_EM_INFLATE)
+    else() # No zlib at all.
         target_compile_definitions(${target_name} PRIVATE FFL_NO_ZLIB)
     endif()
 
