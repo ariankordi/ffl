@@ -94,6 +94,8 @@ Over time, I've added new features that are not included in Abood's original dec
 ## Definitions
 This documents all of the definitions that this supports to add/remove functionality, as of October 2025.
 
+* **FFL_NO_RIO** - Allows using without RIO headers + disables render textures and requires "texture callback" to be set. Set this from your own code.
+
 * FFL_ENABLE_NEW_MASK_ONLY_FLAG  - Enables new mask only flag which does not initialize shapes.
 * FFL_NO_DATABASE_DEFAULT    - disables default guest Miis
 * FFL_NO_DATABASE_FILE       - Disables opening and use of hidden/official databases.
@@ -111,14 +113,12 @@ This documents all of the definitions that this supports to add/remove functiona
 * FFL_USE_ADJUST_MTX - Passes scale/translate transforms for shapes via a matrix in FFLDrawParam, rather than FFL transforming all vertex data on the CPU. This is needed to use half-float vertex format.
   - The matrix should be [easily decomposable](https://github.com/ariankordi/FFL.js/blob/5747565a081bb68148ccaf4e818065d0da0eb44c/ffl.js#L2994-L3009).
   - FFL_USE_ADJUST_MTX_MASK does the same thing but specifically for mask transforms. This matrix is not easily decomposable, and also has a projection.
-* FFL_LOG_CHARMODEL_CLEANUP - Enable verbse logging for specific allocations in CharModel/faceline/mask.
+* FFL_LOG_CHARMODEL_CLEANUP - Enable verbose logging for specific allocations in CharModel/faceline/mask.
 * FFL_USE_EM_INFLATE - Use em_inflate instead of zlib. Assumes FFL_NO_ZLIB=ON and [em_inflate repo](https://github.com/emmanuel-marty/em_inflate/tree/d3994fe353820da9e2524c80727ef259265670f7) is cloned in `include/`.
 
 #### Not documented (slash useless):
 * FFL_USE_MODULATE_EYEBROW_EX
 * FFL_USE_TEXTURE_CALLBACK
-* ~~FFL_USE_MINIZ~~
-* ~~FFL_NO_RIO~~
 
 ## License Note
 All of the changes that I have made to FFL in this repo are hereby licensed under [the Unlicense](https://choosealicense.com/licenses/unlicense/). However, this does not account for changes made by Abood when porting the decompilation, or the library to begin with.

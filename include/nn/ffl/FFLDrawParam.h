@@ -54,7 +54,11 @@ typedef struct FFLPrimitiveParam
     u32                         indexCount;
 
 #ifdef FFL_USE_ADJUST_MTX
+    #if FFL_USE_RIO
     rio::Matrix34f*             pAdjustMatrix;
+    #else
+    void*                       pAdjustMatrix;
+    #endif
 #else
     u32                         _8; // Deleted
 #endif // FFL_USE_ADJUST_MTX
