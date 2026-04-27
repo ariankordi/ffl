@@ -307,7 +307,8 @@ void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
 
     DeleteTextures(pModel);
     DeleteShapes(pModel);
-    if (pModel->facelineRenderTexture.pTexture2D != NULL)
+    bool hasFaceline = pModel->facelineRenderTexture.pTexture2D != NULL;
+    if (hasFaceline)
     {
         FFL_LOG_VERBOSE("faceline render texture2D != NULL (%p), calling FFLiDeleteFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->facelineRenderTexture);
         FFLiDeleteFacelineTexture(&pModel->facelineRenderTexture);
@@ -319,7 +320,7 @@ void FFLiCharModelCreator::Delete(FFLiCharModel* pModel)
     {
         FFL_LOG_VERBOSE("pTextureTempObject != NULL (%p)\n", pModel->pTextureTempObject);
 
-        if (pModel->facelineRenderTexture.pTexture2D != NULL)
+        if (hasFaceline)
         {
             FFL_LOG_VERBOSE("faceline render texture2D != NULL (%p), calling FFLiDeleteTempObjectFacelineTexture(%p)\n", pModel->facelineRenderTexture.pTexture2D, &pModel->pTextureTempObject->facelineTexture);
             FFLiDeleteTempObjectFacelineTexture(&pModel->pTextureTempObject->facelineTexture, &pModel->charInfo, pModel->charModelDesc.resourceType);

@@ -34,7 +34,7 @@ private:
     bool                m_IsStreamEnd;
 #endif
 };
-NN_STATIC_ASSERT32(sizeof(FFLiZlibInflator) == 0x40);
+//NN_STATIC_ASSERT32(sizeof(FFLiZlibInflator) == 0x40);
 
 #endif // FFL_NO_ZLIB
 

@@ -34,19 +34,16 @@ option(FFL_USE_EXTRA_RESOURCES "Expand resource types to add two more: very high
 # Target output options:
 option(FFL_BUILD_STATIC "Build FFL as a static library (.a, .lib)" OFF)
 option(FFL_BUILD_SHARED "Build FFL as a shared/dynamically linked library (.dll, .so, .dylib)" ON) # Not available with Emscripten
-# Note that FFL_ADD_GLAD_GL_IMPLEMENTATION is enabled when FFL_BUILD_SHARED is used.
-if(EMSCRIPTEN)
-    # By default when using Emscripten, this will be built
-    # as an executable that functions as an Emscripten module.
-    option(FFL_BUILD_EMSCRIPTEN_MODULE "Build as an Emscripten module" ON)
-    # Emscripten-specific option to build for WASM or not.
-    option(FFL_BUILD_WASM "Build for WebAssembly (as opposed to only JS)" ON)
-endif()
+
+# Build an Emscripten module out of the library.
+option(FFL_BUILD_EMSCRIPTEN_MODULE "Build as an Emscripten module" OFF)
+# Emscripten-specific option to build for WASM or not.
+option(FFL_BUILD_WASM "Build for WebAssembly (as opposed to only JS)" ON)
 
 set(CMAKE_CACHE_ARGS_INCLUDE_HELP TRUE) # Include option descriptions with cmake -LH.
 
 # Define build modes for FFL.
-# Standalone (default, no RIO/GL), for-rio without RIO but for RIO
+# Standalone (default, no RIO), for-rio without RIO but for RIO
 set(FFL_MODE "" CACHE STRING "FFL build mode (blank for standalone, or for-rio)")
 set_property(CACHE FFL_MODE PROPERTY STRINGS "" "for-rio")
 
